@@ -1,0 +1,59 @@
+@import "~bootswatch/dist/journal/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootswatch/dist/journal/bootswatch";
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
+nav
+{
+    height: 4rem;
+
+}
+
+.logo_ez
+{
+    font-family: 'Lato', sans-serif;
+    font-size: 2rem;
+    text-decoration: underline;
+    transform: skewX(-7deg);
+}
+
+ul
+{
+    li{
+        width: 8rem;
+    }
+
+}
+
+form
+{
+    input{
+        border-radius: .5rem;
+        transition: all .4s;
+
+        &:focus{
+            transform: translateY(-.2rem);
+
+            -webkit-box-shadow: 0px 0px 35px -6px rgba(0,0,0,0.75);
+            -moz-box-shadow: 0px 0px 35px -6px rgba(0,0,0,0.75);
+            box-shadow: 0px 0px 35px -6px rgba(0,0,0,0.75);
+
+            border-radius: 1rem;
+            transition: all .4s;
+
+            box-shadow:
+            0 0 2px 1px #fff,  
+            0 0 3px 2px #f0f, 
+            0 0 5px 3px #0ff; 
+
+            &::-webkit-input-placeholder  {
+
+                transition: opacity 0.5s ease!important;
+                opacity: 0.25;
+             }
+        }
+
+    }
+
+}

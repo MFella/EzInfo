@@ -1,0 +1,19 @@
+
+body{
+    background-image: url("../../assets/dogy.jpg");
+}
+
+.container
+{
+    max-width: 100vw;
+    height: calc(100vh - 4rem);
+    background-image: url("../../assets/dogy.jpg");
+    background-repeat: no-repeat; 
+    background-size: cover; 
+    opacity: .85;
+}
+
+.row
+{
+    opacity: .8;
+}
