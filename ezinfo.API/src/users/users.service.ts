@@ -5,6 +5,8 @@ import {Users} from '../users';
 import {InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {User} from './user.entity';
+import {UserForCreationDto} from './dto/user-for-creation.dto';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -34,22 +36,73 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
-    create(newUser: User)
+    async create(newUser: UserForCreationDto)
     {
-        const id = Date.now();
-        this.users[id] = {...newUser, id};
+        const user = new User();
+        user.login = newUser.login;
+        user.name = newUser.name;
+        user.surname = newUser.surname;
+        try{
+            const customHash = await argon2.hash(newUser.password);
+            user.passwordHash = customHash;
+            console.log(`Hashed password: ${customHash}`);
+
+        }catch(err)
+        {
+            console.log(err);
+        }
+
+        return await this.usersRepository.save(user);
     }
 
-    findOne(id: number): Promise<User> {
+    async findOne(id: number): Promise<User> {
 
         // const user:User = this.users[id];
 
         // if(!user) throw new Error('No user found ;/.');
 
         // return user;
+        const user = await this.usersRepository.findOne(id);
+        console.log(user);
+        try{
+            //the way of retriving hash from blob
+            const convert = Buffer.from(user.passwordHash, 'base64').toString('utf-8');
 
-        return this.usersRepository.findOne(id);
+            if(await argon2.verify(convert, "kaczorek99"))
+            {
+                console.log("No tak, to sie zgadza");
+            }
+            else{
+                console.log("Lipa")
+            }
+
+        }catch(e)
+        {
+            console.log(`error occured: ${e}`);
+        }
+
+        
+        return await this.usersRepository.findOne(id);
     }
+
+    async ifUserExists(login: string)
+    {
+        const hipoUser = await this.usersRepository.find({login: login});
+        console.log(hipoUser);
+
+        if(hipoUser.length === 0)
+        {
+            return true;
+        }else return false;
+
+    }
+
+
+    // async registerUser(user: UserForCreationDto)
+    // {
+    //     if(await this.usersRepository.find({login: user.login}))
+
+    // }
 
     // update(user: User)
     // {

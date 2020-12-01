@@ -5,13 +5,25 @@ export class User{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('string')
+    @Column({
+        nullable: false
+    })
     name: string;
 
-    @Column()
+    @Column({
+        nullable: false
+    })
     surname: string;
 
-    @Column()
+    @Column({
+        nullable: false
+    })
     login: string;
+
+    @Column({
+        type: "blob",
+        nullable: false
+    })
+    passwordHash: string;
 
 }

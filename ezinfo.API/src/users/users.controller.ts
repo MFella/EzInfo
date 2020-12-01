@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import {UsersService} from './users.service';
 import {User} from '../user';
 import {Users} from '../users';
+import { exception } from 'console';
+import { UserForCreationDto } from './dto/user-for-creation.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,19 +19,28 @@ export class UsersController {
     @Get(':id')
     async find(@Param('id') id: number): Promise<User>
     {
-        return this.userServ.find(id);
+        return this.userServ.findOne(id);
+        //return this.userServ.find(id);
     }
 
     @Post()
-    create(@Body() user: User)
+    create(@Body() user: UserForCreationDto)
     {
+    
         this.userServ.create(user);
+    }
+
+    @Get('/exists/:login')
+    async ifUserExists(@Param('login') login: string): Promise<boolean>
+    {
+        return this.userServ.ifUserExists(login);
     }
 
     @Put()
     update(@Body() user: User)
     {
-        this.userServ.update(user);
+        //this.userServ.update(user);
+        throw new exception("Not implemented yet");
     }
 
     @Delete(':id')
