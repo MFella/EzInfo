@@ -7,13 +7,15 @@ import { NavComponent } from './nav/nav.component';
 import { HomeComponent } from './home/home.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RegisterComponent } from './register/register.component';
+import { FilesListComponent } from './files-list/files-list.component';
 
 @NgModule({
-  declarations: [			
+  declarations: [				
     AppComponent,
       NavComponent,
       HomeComponent,
-      RegisterComponent
+      RegisterComponent,
+      FilesListComponent
    ],
   imports: [
     BrowserModule,

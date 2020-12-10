@@ -1,0 +1,17 @@
+.container
+{
+    position: relative;
+    max-width: 100vw;
+    //height: calc(100vh + 4rem);
+    //height: 100vh;
+    background-image: url("../../assets/browse_doggy.jpg");
+    background-repeat: no-repeat; 
+    background-size: cover; 
+    opacity: .95;
+    padding: 3rem;
+}
+
+.list-group
+{
+    opacity: .9;
+}
