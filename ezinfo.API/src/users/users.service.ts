@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { exception } from 'console';
 //import {User} from '../user';
 import {Users} from '../users';
@@ -21,13 +21,15 @@ export class UsersService {
             id: 1,
             login: "Czarek",
             name: "Czarek",
-            surname: "Surname"
+            surname: "Surname",
+            email: "how@wp.pl"
         },
         2:{
             id: 2,
             login: "Marek",
             name: "Zegare",
-            surname: "Hahaha"
+            surname: "Hahaha",
+            email: "DSADSA"
         },
 
     };
@@ -36,12 +38,34 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
+    public async checkIfExists(login: string)
+    {
+        try{
+            console.log(`Login is: ${login}`);
+            console.log(login);
+
+            const user = await this.usersRepository.findOne({where: {login}})
+
+            if(user)
+            {
+                return {"available": false};
+
+            } else return {"available": true};
+        }
+        catch(e)
+        {
+            throw new HttpException("Something went wrong", 500);
+        }
+
+    }
+
     async create(newUser: UserForCreationDto)
     {
         const user = new User();
         user.login = newUser.login;
         user.name = newUser.name;
         user.surname = newUser.surname;
+        user.email = newUser.email;
         try{
             const customHash = await argon2.hash(newUser.password);
             user.passwordHash = customHash;
@@ -52,37 +76,49 @@ export class UsersService {
             console.log(err);
         }
 
-        return await this.usersRepository.save(user);
+        const res = await this.usersRepository.save(user);
+
+        const {passwordHash, id,  ...result} = res;
+
+        return result;
     }
 
-    async findOne(id: number): Promise<User> {
+    async findByLogin(login: string): Promise<User> {
 
         // const user:User = this.users[id];
 
         // if(!user) throw new Error('No user found ;/.');
 
         // return user;
-        const user = await this.usersRepository.findOne(id);
-        console.log(user);
-        try{
-            //the way of retriving hash from blob
-            const convert = Buffer.from(user.passwordHash, 'base64').toString('utf-8');
-
-            if(await argon2.verify(convert, "kaczorek99"))
-            {
-                console.log("No tak, to sie zgadza");
+        const user = await this.usersRepository.findOne({
+            where:{
+                login
             }
-            else{
-                console.log("Lipa")
-            }
+        });
 
-        }catch(e)
-        {
-            console.log(`error occured: ${e}`);
-        }
+        return user;
+
+        //const user = await this.usersRepository.findOne(login);
+        // console.log(`User is: ${user}`);
+        // try{
+        //     //the way of retriving hash from blob
+        //     const convert = Buffer.from(user.passwordHash, 'base64').toString('utf-8');
+
+        //     if(await argon2.verify(convert, "kaczorek99"))
+        //     {
+        //         console.log("No tak, to sie zgadza");
+        //     }
+        //     else{
+        //         console.log("Lipa")
+        //     }
+
+        // }catch(e)
+        // {
+        //     console.log(`error occured: ${e}`);
+        // }
 
         
-        return await this.usersRepository.findOne(id);
+        //return await this.usersRepository.findOne(login);
     }
 
     async ifUserExists(login: string)

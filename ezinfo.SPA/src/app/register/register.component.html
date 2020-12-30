@@ -1,7 +1,7 @@
 
 
 <div class="container p-4">
-  <form class="p-4 mr-2 ml-2 mt-4 w-75 mx-auto">
+  <form class="p-4 mr-2 ml-2 mt-4 w-75 mx-auto" [formGroup]="registerForm" (ngSubmit)="register()">
 
     <div class="row">
       <div class="col-md-12">
@@ -11,17 +11,68 @@
     </div>
 
     <div class="row py-4">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <label for="name">Name</label>
-        <input type="text" class="form-control" placeholder="Name" name="name">
+        <input type="text" class="form-control" placeholder="Name" name="name" formControlName="name"
+        [ngClass]="{'is-valid': this.registerForm.controls.name.status === 'VALID',
+        'is-invalid': this.registerForm.controls.name.status === 'INVALID' && this.registerForm.controls.name.touched
+        && this.registerForm.controls.name.value.length !== 0}"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Only letters are allowed
+          Min length 2, and max length - 16
+        </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <label for="surname">Surname</label>
-        <input type="text" class="form-control" placeholder="Surname" name="surname">
+        <input type="text" class="form-control" placeholder="Surname" name="surname" formControlName="surname"
+        [ngClass]="{'is-valid': this.registerForm.controls.surname.status === 'VALID',
+        'is-invalid': this.registerForm.controls.surname.status === 'INVALID' && this.registerForm.controls.surname.touched
+        && this.registerForm.controls.surname.value.length !== 0}"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Only letters are allowed
+          Min length 2, and max length - 32
+        </div>
       </div>
-      <div class="col-md-4">
-        <label for="pesel">Pesel</label>
-        <input type="text" class="form-control" placeholder="Something else" name="pesel">
+      <div class="col-md-3">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" placeholder="Email" name="email" formControlName="email"
+        [ngClass]="{'is-valid': this.registerForm.controls.email.status === 'VALID',
+        'is-invalid': this.registerForm.controls.email.status === 'INVALID' && this.registerForm.controls.email.touched
+        && this.registerForm.controls.email.value.length !== 0}"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provide a valid email.
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label for="login">Login</label>
+        <input type="text" class="form-control" placeholder="Login" name="login" formControlName="login"
+        [ngClass]="{'is-valid': this.registerForm.controls.login.status === 'VALID' && this.availability,
+        'is-invalid': (this.registerForm.controls.login.status === 'INVALID' && this.registerForm.controls.login.value.length !== 0) 
+        || (this.registerForm.controls.login.value.length !== 0 && !this.availability)}"
+        (change)="checkAvailability(this.registerForm.get('login')?.value, this.registerForm.get('login')?.status)"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Provide valid login. Only letters! 
+          <br>
+          Min length: 6, max: 20
+          <br>
+          That login maybe already exists ;/
+        </div>
       </div>
     </div>
     <div class="row">
@@ -32,22 +83,54 @@
 
     <div class="row py-4">
       <div class="col-md-4">
-        <label for="login">Pesel</label>
-        <input type="text" class="form-control" placeholder="Login" name="login">
+        <label for="pesel">Pesel</label>
+        <input type="text" class="form-control" placeholder="Pesel" name="pesel" formControlName="pesel"
+        [ngClass]="{'is-valid': this.registerForm.controls.pesel.status === 'VALID' && !this.registerForm.errors?.peselInvalid,
+        'is-invalid': this.registerForm.errors?.peselInvalid && this.registerForm.controls.pesel.dirty}"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provide a valid pesel.
+        </div>
       </div>
       <div class="col-md-4">
         <label for="password">Password</label>
-        <input type="password" class="form-control" placeholder="Password" name="password">
+        <input type="password" class="form-control" placeholder="Password" name="password" formControlName="password"
+        [ngClass]="{'is-valid': this.registerForm.controls.password.status === 'VALID' && !this.registerForm.errors?.mismatchPassword,
+        'is-invalid': this.registerForm.controls.password.status === 'INVALID' && this.registerForm.controls.password.touched
+        && this.registerForm.controls.password.value.length !== 0 || this.registerForm.errors?.mismatchPassword}"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provide a valid password. Passwords must match!
+        </div>
       </div>
       <div class="col-md-4">
         <label for="repeatPassword">Repeat Password</label>
-        <input type="password" class="form-control" placeholder="Repeat Password" name="repeatPassword">
+        <input type="password" class="form-control" placeholder="Repeat Password" name="repeatPassword" formControlName="repeatPassword"
+      [ngClass]="{'is-valid': this.registerForm.controls.repeatPassword.status === 'VALID' && !this.registerForm.errors?.mismatchPassword,
+        'is-invalid': this.registerForm.controls.repeatPassword.status === 'INVALID' && this.registerForm.controls.repeatPassword.touched
+        && this.registerForm.controls.repeatPassword.value.length !== 0 || this.registerForm.errors?.mismatchPassword}"
+        >
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provide a valid password. Passwords must match!
+        </div>
       </div>
     </div>
 
+    <!-- [disabled]="this.registerForm.status === 'INVALID'" -->
     <div class="d-flex flex-row justify-content-center mt-4 pt-2">
       <div class="col-md-4 text-center pt-2">
-        <button class="btn btn-warning w-50">Register, fella!</button>
+        <button class="btn btn-warning w-50" type="submit" 
+        [disabled]="(this.registerForm.status === 'INVALID') || !this.availability"
+        >Register, fella!</button>
       </div>
     </div>
 

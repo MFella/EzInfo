@@ -49,9 +49,10 @@
 
             </ul>
             <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="text" placeholder="Login">
-              <input class="form-control mr-sm-2" type="password" placeholder="Password">
-              <button class="btn btn-secondary my-2 my-sm-0" type="submit">Login</button>
+              <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login">
+              <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password">
+              <button class="btn btn-secondary my-2 my-sm-0" type="submit" 
+              [disabled]="this.login?.length <= 5 || this.password?.length <= 7">Login</button>
             </form>
     </div>
   </nav>

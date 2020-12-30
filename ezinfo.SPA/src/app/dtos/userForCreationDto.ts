@@ -1,8 +1,7 @@
-export class UserForCreationDto
-{
+export interface UserForCreationDto {
     name: string;
     surname: string;
-    login: string;
+    pesel: string;
     email: string;
     password: string;
 }

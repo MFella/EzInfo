@@ -17,9 +17,9 @@ export class UsersController {
     }
 
     @Get(':id')
-    async find(@Param('id') id: number): Promise<User>
+    async find(@Param('login') login: string): Promise<User>
     {
-        return this.userServ.findOne(id);
+        return this.userServ.findByLogin(login);
         //return this.userServ.find(id);
     }
 
@@ -28,7 +28,8 @@ export class UsersController {
     {
     
         this.userServ.create(user);
-    }
+        //return this.authServ.register(user);
+    } 
 
     @Get('/exists/:login')
     async ifUserExists(@Param('login') login: string): Promise<boolean>

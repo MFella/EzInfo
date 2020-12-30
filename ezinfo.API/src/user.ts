@@ -7,4 +7,6 @@ export class User {
     // readonly passwordSalt: Blob
     @IsString() readonly name: string
     @IsString() readonly surname: string
+    @IsString() @IsOptional() readonly email: string
 }
+  

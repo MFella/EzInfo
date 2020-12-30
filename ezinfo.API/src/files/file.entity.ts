@@ -1,31 +1,35 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()
-export class User{
+export class File{
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
         nullable: false
     })
-    name: string;
+    filename: string;
 
     @Column({
         nullable: false
     })
-    surname: string;
+    downloadLink: string;
 
     @Column({
-        nullable: false,
-       // unique: true
+        nullable: false
     })
     login: string;
 
     @Column({
-        nullable: false,
-        //unique: true
+        nullable: false
     })
-    email: string;
+    isPrivate: boolean;
+ 
+    @Column({
+        nullable: false,
+        default: false
+    })
+    toAll: boolean;
 
     @Column({
         type: "blob",

@@ -9,6 +9,9 @@ import { faCoffee, IconDefinition, faHome,
 })
 export class NavComponent implements OnInit {
 
+  login: any = '';
+  password: any = '';
+
   faCoffee = faCoffee;
   icons: Array<IconDefinition> = [faHome, faSign, faQuestionCircle, faUpload, faFileArchive, faStickyNote]
 
