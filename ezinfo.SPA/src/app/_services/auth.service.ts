@@ -14,7 +14,10 @@ export class AuthService {
 
   currentUser: any;
 
-  constructor(private http: HttpClient, private alertServ: AlertService) { }
+  constructor(private http: HttpClient, private alertServ: AlertService) {
+
+    this.currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}'): null;
+   }
 
   register(userForCreationDto: UserForCreationDto)
   {
@@ -36,10 +39,16 @@ export class AuthService {
       shareReplay(),
       map((res: any) =>
       {
-        if(res)
+        if(res.user)
         {
           this.currentUser = res.user;
         }
+
+        return {
+          res: res.res, 
+          name: res.user.name, 
+          msg: res.msg
+        };
       })
     )
   }
@@ -51,12 +60,14 @@ export class AuthService {
 
   private setSession(authRes: any)
   {
+    console.log('authres');
+    console.log(authRes);
+
     this.currentUser = authRes.user;
     console.log(this.currentUser);
     const expireDate = moment().add(authRes.expiresIn, 'second');
-    console.log(authRes);
     localStorage.setItem('user', JSON.stringify(authRes.user));
-    localStorage.setItem('id_token', authRes.token);
+    localStorage.setItem('id_token', authRes.access_token);
     localStorage.setItem('expires_at', JSON.stringify(expireDate.valueOf()));
   }
 

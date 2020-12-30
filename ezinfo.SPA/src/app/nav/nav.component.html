@@ -9,31 +9,43 @@
 
     <div class="collapse navbar-collapse" id="navbarColor02">
 
-            <ul class="d-flex flex-row justify-content-between navbar-nav ml-auto">
-              <li class="nav-item active">
+            <ul class="navbar-nav ml-auto">
+
+              <li class="nav-item p-2">
                 <a class="nav-link" [routerLink]="['/']"><fa-icon [icon]="icons[0]"></fa-icon> Home
                   <span class="sr-only">(current)</span>
                 </a>
               </li>
 
-              <li class="nav-item">
+              <li class="nav-item p-2">
                 <a class="nav-link" [routerLink]="['register']"><fa-icon [icon]="icons[1]"></fa-icon> Register</a>
               </li>
 
-              <!-- <li class="nav-item">
-                <a class="nav-link" href="#">Login</a>
-              </li> -->
-
-              <li class="nav-item">
+              <li class="nav-item p-2">
                 <a class="nav-link" href="#"><fa-icon [icon]="icons[2]"></fa-icon> About</a>
               </li>
 
-              <li class="nav-item">
+              <li class="nav-item p-2">
                 <a class="nav-link" href="#"><fa-icon [icon]="icons[3]"></fa-icon> Upload</a>
               </li>
 
-              <li class="nav-item">
+              <li class="nav-item p-2">
                 <a class="nav-link" [routerLink]="['/files-list']"><fa-icon [icon]="icons[4]"></fa-icon> Files</a>
+              </li>
+
+
+
+              <li class="nav-item p-2 dropdown" *ngIf="this.authServ.currentUser !== null">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{this.authServ.currentUser.name}}
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-left animate slideIn" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="#">Action</a>
+                  <a class="dropdown-item" href="#">Another action</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" (click)="logout()">Logout</a>
+                </div>
               </li>
 
               <!-- <li class="nav-item dropdown">
@@ -45,15 +57,15 @@
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="#">Separated link</a>
                 </div>
-              </li> -->
-
+              </li> -->     
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login">
-              <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password">
-              <button class="btn btn-secondary my-2 my-sm-0" type="submit" 
-              [disabled]="this.login?.length <= 5 || this.password?.length <= 7">Login</button>
-            </form>
+            <form class="form-inline my-2 my-lg-0" *ngIf="this.authServ.currentUser === null">
+                  <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login">
+                  <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password">
+                  <button class="btn btn-secondary" type="button" (click) = 'login_user(this.login, this.password)' 
+                  [disabled]="this.login?.length <= 5 || this.password?.length <= 7">Login</button>
+                </form>
     </div>
+
   </nav>
   </div>

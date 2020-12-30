@@ -13,15 +13,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastNoAnimationModule, ToastrModule } from 'ngx-toastr';
+import { AddFileComponent } from './add-file/add-file.component';
 
 
 @NgModule({
-  declarations: [				
+  declarations: [					
     AppComponent, 
       NavComponent,
       HomeComponent,
       RegisterComponent,
-      FilesListComponent
+      FilesListComponent,
+      AddFileComponent
    ],
   imports: [
     BrowserModule,

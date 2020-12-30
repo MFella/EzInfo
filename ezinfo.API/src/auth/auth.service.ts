@@ -7,6 +7,7 @@ import { ConfigService } from "@nestjs/config";
 import { Payload } from "./payload.interface";
 import * as argon2 from "argon2";
 import { LoginDto } from "./dto/login.dto";
+import { jwtConstans } from "./constants";
 
 @Injectable()
 export class AuthService{
@@ -43,7 +44,7 @@ export class AuthService{
     public async validate(login: string, password: string)
     {
         const user = await this.usersService.findByLogin(login);
-    
+
         try{
             const convert = Buffer.from(user.passwordHash, 'base64').toString('utf-8');
             const verifiedPassword = await argon2.verify(convert, password);
@@ -58,7 +59,8 @@ export class AuthService{
         }
         catch(e)
         {
-            return null
+          throw new HttpException('User with that credentials doesnt exists!', 404);
+          //return null
         }
     }
  
@@ -67,15 +69,28 @@ export class AuthService{
 
       const res = await this.validate(loginCreds.login, loginCreds.password);
       //const res = await this.usersService.findAll();
+      console.log(res);
+
       if(res !== null)
       {
         const payload = {login: loginCreds.login};
 
         return {
             res: true,
-            access_token: this.jwtServ.sign(payload)
+            msg: 'Successfully loggedIn',
+            expiresIn: jwtConstans.expiresIn,
+            access_token: this.jwtServ.sign(payload),
+            user: res
+        }
+      }else 
+      {
+        return {
+          res: false,
+          msg: 'Cant'
         }
       }
+
+
     }
 
 

@@ -11,7 +11,7 @@ constructor(private toastr: ToastrService) { }
   success(msg: string)
   {
     this.toastr.success(msg, 'Success', {
-      timeOut: 4000,
+      timeOut: 7000,
       positionClass: 'toast-bottom-left'
     });
   }
@@ -19,7 +19,7 @@ constructor(private toastr: ToastrService) { }
   error(msg: string)
   {
     this.toastr.error(msg, 'Error occured', {
-      timeOut: 4000,
+      timeOut: 7000,
       positionClass: 'toast-bottom-right'
     });
   }
@@ -27,7 +27,7 @@ constructor(private toastr: ToastrService) { }
   info(msg: string)
   {
     this.toastr.info(msg, 'Info', {
-      timeOut: 4000,
+      timeOut: 7000,
       positionClass: 'toast-bottom-left'
      // positionClass: 'toast-top-left'
      //positionClass: 'inline'
@@ -37,7 +37,7 @@ constructor(private toastr: ToastrService) { }
   warning(msg: string)
   {
     this.toastr.warning(msg, 'Warning', {
-      timeOut: 4000,
+      timeOut: 7000,
       positionClass: 'toast-bottom-right'
     })
   }
