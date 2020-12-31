@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IconDefinition, faGlobe, faUsers, faLock} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-add-file',
@@ -6,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./add-file.component.scss']
 })
 export class AddFileComponent implements OnInit {
+
+
+  icons: Array<IconDefinition> = [faGlobe, faUsers, faLock]
 
   constructor() { }
 

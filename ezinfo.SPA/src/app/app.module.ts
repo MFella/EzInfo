@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastNoAnimationModule, ToastrModule } from 'ngx-toastr';
 import { AddFileComponent } from './add-file/add-file.component';
+import { AuthInterceptor } from './_services/auth.interceptor';
 
 
 @NgModule({
@@ -37,7 +38,13 @@ import { AddFileComponent } from './add-file/add-file.component';
     BrowserAnimationsModule, 
     ToastrModule.forRoot(),
   ], 
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

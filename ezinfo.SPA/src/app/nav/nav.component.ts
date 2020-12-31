@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { faCoffee, IconDefinition, faHome, 
   faSign, faQuestionCircle, faFileArchive, faUpload, faStickyNote} from '@fortawesome/free-solid-svg-icons';
 import { LoginCredsDto } from '../dtos/loginCredsDto';
@@ -20,7 +21,8 @@ export class NavComponent implements OnInit {
   faCoffee = faCoffee;
   icons: Array<IconDefinition> = [faHome, faSign, faQuestionCircle, faUpload, faFileArchive, faStickyNote]
 
-  constructor(public authServ: AuthService, private alertServ: AlertService) { }
+  constructor(public authServ: AuthService, private alertServ: AlertService,
+    private router: Router) { }
 
   ngOnInit() {
    console.log(this.authServ.currentUser);
@@ -38,6 +40,8 @@ export class NavComponent implements OnInit {
         if(res.res)
         {
           this.alertServ.success(res.msg + ". Welcome back, " + res.name); 
+          this.login = '';
+          this.password = '';
         }
 
       }, err =>
@@ -51,6 +55,7 @@ export class NavComponent implements OnInit {
   logout()
   {
     this.authServ.logout();
+    this.router.navigate(['']);
   }
 
   
