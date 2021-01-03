@@ -1,7 +1,7 @@
 <main class="py-10">
   <div class="container">
     <div class="row pt-2">
-      <div class="col-md-12 pt-2">
+      <form class="col-md-12 pt-2" [formGroup] = "fileForm">
         <div class="card text-center py-10">
           <div class="card-header">
 
@@ -31,27 +31,27 @@
                       </div>
                     </li> -->
   
-                    <label class="nav-item btn btn-success">
+                    <label class="nav-item btn btn-success" (click) = 'random($event)'>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="Everyone" checked >
                         <span class="form-check-label" for="exampleRadios1">
                           <fa-icon [icon]="icons[0]"></fa-icon> Everyone
                         </span>
                       </div>
                     </label>
   
-                    <label class="nav-item btn btn-warning">
+                    <label class="nav-item btn btn-warning" (click) = 'random($event)'>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="Restricted">
                         <span class="form-check-label" for="exampleRadios1">
                           <fa-icon [icon]="icons[1]"></fa-icon> Some People
                         </span>
                       </div>
                     </label>
   
-                    <label class="nav-item btn btn-danger">
+                    <label class="nav-item btn btn-danger" (click) = 'random($event)'>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="OnlyMe">
                         <span class="form-check-label" for="exampleRadios1">
                           <fa-icon [icon]="icons[2]"></fa-icon> Just Me
                         </span>
@@ -71,11 +71,20 @@
             <div class="row">
               <div class="col-md-4 col-xs-12">
                 
-                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
-                  <div class="card-header">Authorized list here, if doc is not public</div>
+                <div class="card text-white bg-primary mb-3" 
+                [ngClass] = "(accessType === ''  || accessType === 'Restricted')? '' : 'not-available' "
+
+                >
+                  <div class="card-header">Authorized list here</div>
                   <div class="card-body">
-                    <h5 class="card-title">Primary card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <h5 class="card-title">Type logins of authorized people. Remember -  <strong>comma</strong> is separator</h5>
+                    <div class="form-group">
+                      <label for="exampleFormControlTextarea1">Example textarea</label>
+                      <textarea class="form-control" id="exampleFormControlTextarea1" 
+                      rows="3" name="loginList" [(ngModel)]="loginList" [ngModelOptions]="{standalone: true}"
+                      (change)="showMe()"
+                      >{{loginList}}</textarea>
+                    </div>
                   </div>
                 </div>
 
@@ -83,26 +92,35 @@
               <div class="col-md-8 col-xs-12">
 
                 <div class="card text-white bg-primary mb-3" >
-                  <div class="card-header">Upload area here</div>
+                  <div class="card-header">Upload Here</div>
                   <div class="card-body">
-                    <h5 class="card-title">Primary card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <h5 class="card-title">Available formats are: ...?</h5>
+                    <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="customFile" 
+                      formControlName = "file"
+                      (change)="showFile($event)">
+                      <label class="custom-file-label" for="customFile" >Choose file</label>
+                    </div>
                   </div>
                 </div>
 
+                <button class="btn btn-info" [disabled]="validateInfo()" type="button" (click)="sendFile()">Send file</button>
               </div>
+
+              
 
             </div>
 
 
 <!-- 
-            <h5 class="card-title">Special title treatment</h5>
+            <h5 class="card-title">Special title  treatment</h5>
             <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
             <a href="#" class="btn btn-primary">Go somewhere</a> -->
 
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </main>

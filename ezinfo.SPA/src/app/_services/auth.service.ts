@@ -77,7 +77,9 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
-    this.alertServ.success('You have been logged out successfully ;)');
+    //this.alertServ.success('You have been logged out successfully ;)');
+    //just make sure, that everything is cleared
+    localStorage.clear();
   }
 
 }

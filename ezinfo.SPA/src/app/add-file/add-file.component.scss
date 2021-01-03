@@ -13,6 +13,17 @@ main{
     //animation-timing-function: ease-in-out;
 }
 
+.not-available
+{
+    opacity: .45;
+    pointer-events: none;
+    //cursor: no-drop;
+}
+
+textarea {
+    resize: none;
+}
+
 
 @keyframes iSeeYou
 {

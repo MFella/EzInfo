@@ -45,7 +45,7 @@ export class AuthController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post('protected')
+    @Get('protected')
     async protected(@Req() request: Request)
     {
         return {msg: "Thats is the protected one"};
