@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Response, Query, Get} from "@nestjs/common";
+import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Response, Query, Get, UploadedFile, UseInterceptors} from "@nestjs/common";
 import { Request } from 'express';
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "src/users/users.service";
@@ -8,12 +8,13 @@ import RegisterDto from "./dto/register.dto";
 import JwtAuthGuard from "./jwt-auth.guard";
 import { LocalAuthGuard } from "./local-auth.guard";
 import { RequestCreds } from "./request-creds.interface";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly authServ: AuthService,
-        private readonly usersServ: UsersService                
+        private readonly usersServ: UsersService
     ){}
 
     @Get('availability')
@@ -49,5 +50,16 @@ export class AuthController {
     async protected(@Req() request: Request)
     {
         return {msg: "Thats is the protected one"};
+    }
+
+
+    @Post('file/')
+    @HttpCode(200)
+    @UseInterceptors(FileInterceptor('file'))
+    async addFile(@Req() request: any, @UploadedFile() file: any)
+    {
+        console.log(file);
+        return {'reached': true};
+
     }
 }

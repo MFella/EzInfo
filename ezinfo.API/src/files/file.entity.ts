@@ -1,3 +1,4 @@
+import { bool, boolean } from '@hapi/joi';
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()
@@ -21,15 +22,10 @@ export class File{
     login: string;
 
     @Column({
+        type: 'bool',
         nullable: false
     })
-    isPrivate: boolean;
- 
-    @Column({
-        nullable: false,
-        default: false
-    })
-    toAll: boolean;
+    isRestricted: boolean;
 
     @Column({
         type: "blob",

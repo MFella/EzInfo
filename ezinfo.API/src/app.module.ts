@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import * as Joi from '@hapi/joi';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
+import { FileModule } from './files/file.module';
 
 // const configuration  = {
 //   JWT_SECRET: Joi.string().required(),
@@ -28,11 +29,17 @@ import { AuthModule } from './auth/auth.module';
         MYSQL_USER: Joi.string().required(),
         MYSQL_PASSWORD: Joi.string().required(),
         MYSQL_DB: Joi.string().required(),
+        AWS_REGION: Joi.string().required(),
+        AWS_ACCESS_KEY_ID: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
         PORT: Joi.number(),
+        AWS_PUBLIC_BUCKET_NAME: Joi.string().required()
       })
     }),
   DatabaseModule,
-  AuthModule],
+  AuthModule,
+  FileModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
