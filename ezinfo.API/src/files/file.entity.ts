@@ -3,7 +3,7 @@ import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()
 export class File{
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: number;
 
     @Column({
@@ -14,7 +14,12 @@ export class File{
     @Column({
         nullable: false
     })
-    downloadLink: string;
+    url: string;
+
+    @Column({
+        nullable: false
+    })
+    key: string;
 
     @Column({
         nullable: false
@@ -24,8 +29,14 @@ export class File{
     @Column({
         type: 'bool',
         nullable: false
-    })
+    }) 
     isRestricted: boolean;
+
+    @Column({
+        //type: 'bool',
+        nullable: false
+    }) 
+    havePassword: boolean;
 
     @Column({
         type: "blob",

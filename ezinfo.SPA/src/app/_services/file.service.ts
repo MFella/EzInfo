@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FileToSendDto } from '../dtos/fileToSendDto';
 import {environment} from '../../environments/environment';
+import { TextToSendDto } from '../dtos/textToSendDto';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,12 @@ export class FileService {
 
     return this.http.post<any>(environment.backUrl + 'file/upload', formData);
 
+  }
+
+  sendText(textToSendDto: TextToSendDto)
+  {
+    
+    return this.http.post<any>(environment.backUrl + 'file/save', textToSendDto);
   }
 
 }

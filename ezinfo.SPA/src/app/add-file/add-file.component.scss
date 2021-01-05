@@ -2,15 +2,15 @@
 main{
     background-image: url('../../assets/upload_doggy.jpg');
     background-size: cover;
-    height: calc(100vh - 4rem);
-    padding-top: 4rem;
+    height: 45em;
+    padding-top: 2rem;
     padding-bottom: 4rem;
 }
 
 .card{
     background-color: rgba(255,255,255,0.95);
-    //animation: iSeeYou 10s infinite;
-    //animation-timing-function: ease-in-out;
+   // animation: iSeeYou 10s infinite;
+   // animation-timing-function: ease-in-out;
 }
 
 .not-available

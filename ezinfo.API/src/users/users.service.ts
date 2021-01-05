@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import {User} from './user.entity';
 import {UserForCreationDto} from './dto/user-for-creation.dto';
 import * as argon2 from 'argon2';
+import {v4 as uuid} from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -66,6 +67,8 @@ export class UsersService {
         user.name = newUser.name;
         user.surname = newUser.surname;
         user.email = newUser.email;
+        user.id = uuid();
+
         try{
             const customHash = await argon2.hash(newUser.password);
             user.passwordHash = customHash;

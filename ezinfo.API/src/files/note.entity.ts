@@ -1,31 +1,32 @@
+import { bool, boolean } from '@hapi/joi';
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()
-export class User{
+export class Note{
     @PrimaryGeneratedColumn('uuid')
     id: number;
 
     @Column({
         nullable: false
     })
-    name: string;
+    content: string;
 
     @Column({
         nullable: false
     })
-    surname: string;
-
-    @Column({
-        nullable: false,
-       // unique: true 
-    })
     login: string;
 
     @Column({
-        nullable: false, 
-        //unique: true
-    })
-    email: string;
+        type: 'bool',
+        nullable: false
+    }) 
+    isRestricted: boolean; 
+
+    @Column({
+        //type: 'bool',
+        nullable: false
+    }) 
+    havePassword: boolean;
 
     @Column({
         type: "blob",
