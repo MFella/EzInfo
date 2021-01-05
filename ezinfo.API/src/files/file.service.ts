@@ -8,6 +8,8 @@ import {v4 as uuid} from 'uuid';
 import * as argon2 from 'argon2';
 import { User } from "src/user";
 import { Note } from "./note.entity";
+import * as crypto from 'crypto';
+import { Sharing } from "./shared.entity";
 
 
 @Injectable()
@@ -18,6 +20,10 @@ export class FileService {
         private fileRepository: Repository<File>,
         @InjectRepository(Note)
         private noteRepository: Repository<Note>,
+        @InjectRepository(User) 
+        private usersRepository: Repository<User>,
+        @InjectRepository(Sharing)
+        private sharingRepository: Repository<Sharing>,
         private readonly configService: ConfigService
     )
     {}
@@ -26,11 +32,6 @@ export class FileService {
     {
         const s3 = new S3();
         const xd = this.configService.get('AWS_PUBLIC_BUCKET_NAME');
-        //console.log(dataBuffer);
-
-        //s3.putObject()
-
-        console.log(`dsadasd: ${xd}, typeofBody: ${typeof(dataBuffer)}`);
 
         try{
 
@@ -106,8 +107,6 @@ export class FileService {
                 havePassword: false   //false -> without additional info in password; true -> with additional info in password
             }); 
 
-            console.log('NewFile is: ');
-            console.log(newFile);
             const {passwordHash, key, ...rest} = newFile;
             return rest;
 
@@ -181,9 +180,6 @@ export class FileService {
 
     async saveText(textToSaveDto: any, user: User)
     {
-        console.log(user);
-        console.log(textToSaveDto);
-
         if(!user)
         {
             throw new HttpException('You are not allowed to do this!', 401);
@@ -203,15 +199,52 @@ export class FileService {
 
             const passHash = await argon2.hash(toHash);
 
+            const algorithm = 'aes-192-cbc';
+            const key = crypto.scryptSync(textToSaveDto.password, 'salt', 24);
+
+            const iv = crypto.randomBytes(16);
+            const cipher = crypto.createCipheriv(algorithm, key, iv);
+            const encrypted = cipher.update(textToSaveDto.text, 'utf8', 'hex') + cipher.final('hex');
+
+            //const decipher = crypto.createDecipheriv(algorithm, key, iv);
+            //const decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+
             const newNote = await this.noteRepository.save({
                 id: newId,
                 //TODO: change to hashedContent
-                content: textToSaveDto.text,
+                content: encrypted,
+                iv: iv,
                 login: user.login,
                 isRestricted: textToSaveDto.accessType === 'Restricted' ? true: false,
                 havePassword: textToSaveDto.password.length === 0 ? false: true,
                 passwordHash: passHash
             });
+
+            if(textToSaveDto.loginList.length !== 0)
+            {
+                const logArr = textToSaveDto.loginList.split(',');
+                
+               logArr.forEach(async(el) =>
+                {
+                    const userFromDb = await this.usersRepository.findOne({where: {login: el}});
+
+                    if(userFromDb)
+                    {
+                        //save him in sharing table
+
+                        await this.sharingRepository.save({
+                            ownerId: user.id.toString(), 
+                            authorizedUserId: userFromDb.id.toString(),
+                            entityId: newId,
+                            isFile: false
+                        })
+
+
+                    }
+                })
+
+            }
+
 
             return newNote;
 
@@ -220,10 +253,79 @@ export class FileService {
             throw new HttpException('Error occured during processing', 500);
         }
         
-        
-
     }
 
+    async retrieveNote(id: string, password: string, user: User)
+    {
+        if(!user)
+        {
+            throw new HttpException('You are not allowed to do this!', 401);
+        }
+
+        //check if user exists... -> later maybe
+        const userFromDb = await this.usersRepository.findOne({login: user.login});
+        
+        if(!userFromDb || userFromDb.login !== user.login)
+        {
+            throw new HttpException('Ha! Faked creds, bro', 401);
+        }
+
+        //try to retrieve note from db
+
+        const noteFromDb = await this.noteRepository.findOne(id);
+
+        //if note belongs to user, or note is 'shared' to that user
+        const authorization = await this.sharingRepository
+        .findOne({where: {authorizedUserId: user.id, entityId: id}});
+
+        if(noteFromDb.login !== user.login || !authorization)
+        {
+            throw new HttpException('You havent got an access for that ;c', 401);
+        }
+
+        const passwordToVerify = noteFromDb.id + '_' + user.login + '_' + password;
+
+        const convert = Buffer.from(noteFromDb.passwordHash, 'base64').toString('utf-8');
+        //try to verify password
+        const matches = await argon2.verify(convert, passwordToVerify);
+
+        if(matches)
+        {   
+            //try to decrypt file content:
+            const algorithm = 'aes-192-cbc'; 
+            const key = crypto.scryptSync(password, 'salt', 24);
+
+            const decipher = crypto.createDecipheriv(algorithm, key, noteFromDb.iv);
+            const decrypted = decipher.update(noteFromDb.content, 'hex', 'utf8') + decipher.final('utf8');
+            
+            return {note: decrypted};
+
+        } else
+        {
+            throw new HttpException('Wrong password, kido', 401);
+        }
+    }
+
+    async retrieveAllNotes(user: User)
+    {
+        const selfnotesFromDb = await this.noteRepository.find({where:{login: user.login}});
+
+        const sharedNotesIdsFromDb = await this.sharingRepository.find({where: {authorizedUserId: user.id}});
+
+        sharedNotesIdsFromDb.forEach(async(el) =>
+        {
+            const noteFromDb = await this.noteRepository.findOne({where: {id: el.entityId}});
+            if(noteFromDb)
+            {
+                selfnotesFromDb.push(noteFromDb);
+            }
+
+        })
+
+        
+        return selfnotesFromDb;
+
+    }
 
 
 }

@@ -28,4 +28,9 @@ export class FileService {
     return this.http.post<any>(environment.backUrl + 'file/save', textToSendDto);
   }
 
+  retrieveNotes(id: string, password: string)
+  {
+    return this.http.get(environment.backUrl + `file/note?id=${id}&password=${password}`);
+  }
+
 }

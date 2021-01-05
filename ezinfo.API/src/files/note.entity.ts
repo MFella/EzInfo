@@ -34,4 +34,10 @@ export class Note{
     })
     passwordHash: string;
 
+
+    @Column({
+        type: "blob",
+        nullable: false
+    })
+    iv: Buffer;
 }

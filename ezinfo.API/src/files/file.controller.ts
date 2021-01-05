@@ -63,5 +63,13 @@ export class FileController{
         return this.fileServ.saveText(request.body, request.user);
     }
 
+    @Get('note')
+    @UseGuards(JwtAuthGuard)
+    async retrieveNote(@Query() query: any, @Req() request: RequestWithUser)
+    {
+        console.log(query);
+        return this.fileServ.retrieveNote(query.id, query.password, request.user);
+    }
+
 
 }
