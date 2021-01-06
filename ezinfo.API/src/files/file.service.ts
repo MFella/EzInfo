@@ -194,7 +194,7 @@ export class FileService {
         try{
 
             const newId = uuid();
-            const toHash = textToSaveDto.password.length === 0 ? newId + '_' + user.login : 
+            const toHash = textToSaveDto.password.length === 0 ? newId + '_' + user.login + '_' : 
             newId + '_' + user.login + '_' + textToSaveDto.password;
 
             const passHash = await argon2.hash(toHash);
@@ -211,7 +211,7 @@ export class FileService {
 
             const newNote = await this.noteRepository.save({
                 id: newId,
-                //TODO: change to hashedContent
+                //TODO: change to hashedContent  
                 content: encrypted,
                 iv: iv,
                 login: user.login,
@@ -223,16 +223,20 @@ export class FileService {
             if(textToSaveDto.loginList.length !== 0)
             {
                 const logArr = textToSaveDto.loginList.split(',');
-                
+                console.log("tutaj zapis do charing");
+                console.log(logArr);
+
                logArr.forEach(async(el) =>
                 {
                     const userFromDb = await this.usersRepository.findOne({where: {login: el}});
+
+                    console.log(userFromDb);
 
                     if(userFromDb)
                     {
                         //save him in sharing table
 
-                        await this.sharingRepository.save({
+                        await this.sharingRepository.create({
                             ownerId: user.id.toString(), 
                             authorizedUserId: userFromDb.id.toString(),
                             entityId: newId,
@@ -264,6 +268,8 @@ export class FileService {
 
         //check if user exists... -> later maybe
         const userFromDb = await this.usersRepository.findOne({login: user.login});
+
+        console.log(userFromDb);
         
         if(!userFromDb || userFromDb.login !== user.login)
         {
@@ -276,14 +282,19 @@ export class FileService {
 
         //if note belongs to user, or note is 'shared' to that user
         const authorization = await this.sharingRepository
-        .findOne({where: {authorizedUserId: user.id, entityId: id}});
+        //.findOne({where: {authorizedUserId: user.id, entityId: id}});
+        .find({where: {authorizedUserId: user.id, entityId: id}});
 
-        if(noteFromDb.login !== user.login || !authorization)
+
+        console.log(noteFromDb.login !== user.login || authorization.length === 0);
+        console.log(authorization.length === 0);
+
+        if((noteFromDb.login !== user.login && authorization.length === 0) && noteFromDb.isRestricted)
         {
-            throw new HttpException('You havent got an access for that ;c', 401);
+            throw new HttpException('You havent got an access for that ;c', 400);
         }
 
-        const passwordToVerify = noteFromDb.id + '_' + user.login + '_' + password;
+        const passwordToVerify = noteFromDb.id + '_' + noteFromDb.login + '_' + password;
 
         const convert = Buffer.from(noteFromDb.passwordHash, 'base64').toString('utf-8');
         //try to verify password
@@ -302,29 +313,49 @@ export class FileService {
 
         } else
         {
-            throw new HttpException('Wrong password, kido', 401);
+            throw new HttpException('Wrong password, kido', 400);
         }
     }
 
     async retrieveAllNotes(user: User)
     {
-        const selfnotesFromDb = await this.noteRepository.find({where:{login: user.login}});
+        if(user === null)
+        {
+            throw new HttpException('You are not allowed', 401);
+        }
+
+        let selfnotesFromDb = await this.noteRepository.find({where:{login: user.login}});
+
+        const notesWithoutRestriction = await this.noteRepository.find({where: {isRestricted: false}});
+
+        selfnotesFromDb = [...selfnotesFromDb, ...notesWithoutRestriction];
+
+        console.log(selfnotesFromDb);
+
+        selfnotesFromDb.forEach(el =>
+            {
+                delete el.iv;
+                delete el.passwordHash;
+            })
 
         const sharedNotesIdsFromDb = await this.sharingRepository.find({where: {authorizedUserId: user.id}});
 
-        sharedNotesIdsFromDb.forEach(async(el) =>
+        console.log(sharedNotesIdsFromDb);
+
+        for(let i = 0; i < sharedNotesIdsFromDb.length; i++)
         {
-            const noteFromDb = await this.noteRepository.findOne({where: {id: el.entityId}});
+            const noteFromDb = await this.noteRepository.findOne({where: {id: sharedNotesIdsFromDb[i].entityId}});
+
             if(noteFromDb)
             {
+                delete noteFromDb.iv;
+                delete noteFromDb.passwordHash;
+
                 selfnotesFromDb.push(noteFromDb);
             }
-
-        })
-
-        
+        }
+  
         return selfnotesFromDb;
-
     }
 
 

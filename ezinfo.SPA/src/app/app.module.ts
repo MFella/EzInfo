@@ -15,6 +15,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastNoAnimationModule, ToastrModule } from 'ngx-toastr';
 import { AddFileComponent } from './add-file/add-file.component';
 import { AuthInterceptor } from './_services/auth.interceptor';
+import { MyFilesResolver } from './_resolvers/my-files.resolver';
 
 
 @NgModule({
@@ -39,6 +40,7 @@ import { AuthInterceptor } from './_services/auth.interceptor';
     ToastrModule.forRoot(),
   ], 
   providers: [
+    MyFilesResolver,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

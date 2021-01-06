@@ -60,11 +60,8 @@ export class AuthService {
 
   private setSession(authRes: any)
   {
-    console.log('authres');
-    console.log(authRes);
 
     this.currentUser = authRes.user;
-    console.log(this.currentUser);
     const expireDate = moment().add(authRes.expiresIn, 'second');
     localStorage.setItem('user', JSON.stringify(authRes.user));
     localStorage.setItem('id_token', authRes.access_token);
@@ -77,9 +74,9 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
-    //this.alertServ.success('You have been logged out successfully ;)');
     //just make sure, that everything is cleared
     localStorage.clear();
+    this.alertServ.info('You have been logged out!');
   }
 
 }

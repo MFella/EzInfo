@@ -67,9 +67,14 @@ export class FileController{
     @UseGuards(JwtAuthGuard)
     async retrieveNote(@Query() query: any, @Req() request: RequestWithUser)
     {
-        console.log(query);
         return this.fileServ.retrieveNote(query.id, query.password, request.user);
     }
 
+    @Get('notes')
+    @UseGuards(JwtAuthGuard)
+    async retrieveAllNotes(@Query() query: any, @Req() request: RequestWithUser)
+    {
+        return this.fileServ.retrieveAllNotes(request.user);
+    }
 
 }

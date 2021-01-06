@@ -4,7 +4,7 @@
     <div class="row pt-4">
       <div class="col-md-12">
         <div class="list-group w-50 mx-auto">
-          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+          <a class="list-group-item list-group-item-action flex-column align-items-start active">
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">List group item heading</h5>
               <small>3 days ago</small>
@@ -12,15 +12,34 @@
             <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
             <small>Donec id elit non mi porta.</small>
           </a>
-          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let item of [1,2,3,4]">
+          <a class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let item of this.sharedText">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Nazwa pliku</h5>
-              <button class="btn btn-primary">Download</button>
+              <h5 class="mb-1">Id: {{item.id}}</h5>
+
+              <div class="buttons">
+                <span class="badge badge-danger mr-2"
+                *ngIf="this.item.havePassword"
+                >Locked?: Yeah</span>
+                <span class="badge badge-success mr-2"
+                *ngIf="!this.item.havePassword"
+                >Locked?: Nope</span>
+                <button class="btn btn-primary btn-sm" (click)="showContent(this.item.id, this.password)" type="button"
+                >Show content</button>
+              </div>
+              
             </div>
-            <p class="mb-1">Published by: User</p>
+            <p class="mb-1">Published by: {{item.login}}</p>
               <div class="d-flex justify-content-between w-100">
-                <small class="text-muted">Type: text/file</small>
-                <small class="text-muted">Published 3 days ago</small>
+                <small class="text-muted">Restricted: {{item.isRestricted}}</small>
+                <!-- <small class="text-muted">Published 3 days ago</small> -->
+
+                <div class="d-flex flex-row justify-content-around align-items-center" *ngIf="this.item.havePassword">
+                  <small class="text-muted pr-1">Password: </small>
+                  <input class="form-control form-control-sm w-100" type="text" placeholder=".form-control-sm"
+                  [(ngModel)]="this.password">
+                </div>
+                
+
               </div> 
           </a>
         </div>
