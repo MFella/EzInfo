@@ -22,11 +22,12 @@ export class FileController{
 
     @Post('upload')
     @HttpCode(200)
+    @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@Req() request: any, @UploadedFile() file: any)
+    async uploadFile(@Req() request: RequestWithUser, @UploadedFile() file: any)
     {
         //console.log(file.originalname);
-        const result = await this.fileServ.uploadFile(file, file.originalname);
+        const result = await this.fileServ.uploadFile(file, file.originalname, request.user, request.body);
         console.log('From file controller: ');
         console.log(result);
 

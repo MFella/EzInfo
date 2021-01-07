@@ -4,19 +4,22 @@ import {Entity, Column, PrimaryGeneratedColumn, PrimaryColumn} from 'typeorm';
 @Entity()
 export class Sharing{
 
-    @PrimaryColumn({
-        nullable: false
-    })
-    ownerId: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({
+        nullable: false
+    }) 
+    ownerId: string;
+
+    @Column({  
         nullable: false
     })
     authorizedUserId: string; 
 
     @Column({
         nullable: false 
-    })
+    }) 
     entityId: string;
 
     @Column({

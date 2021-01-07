@@ -2,7 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { HttpResponse, S3 } from "aws-sdk";
-import { Repository } from "typeorm";
+import { Repository, Not } from "typeorm";
 import { File } from "./file.entity";
 import {v4 as uuid} from 'uuid';
 import * as argon2 from 'argon2';
@@ -28,7 +28,7 @@ export class FileService {
     )
     {}
 
-    async uploadFile(dataBuffer: Buffer, filename: string)
+    async uploadFile(dataBuffer: Buffer, filename: string, user: User, body: any)
     {
         const s3 = new S3();
         const xd = this.configService.get('AWS_PUBLIC_BUCKET_NAME');
@@ -94,13 +94,15 @@ export class FileService {
             console.log(uploadResult);
 
             //const mixed_Base_id = "login_idPliku?_hasloDoPliku"
-            const mixedBaseId = `mojLogin_${createdId}`;
+            const mixedBaseId = `${createdId}_${user.login}_${body.password}`;
+
             const hashed = await argon2.hash(mixedBaseId);
+
             const newFile = await this.fileRepository.save({
                 id: createdId,
                 key: uploadResult.Key,
                 url: uploadResult.Location,
-                login: 'mojLogin',
+                login: user.login,
                 filename: filename,
                 isRestricted: false,    //false -> for everyone; true -> for some group of people
                 passwordHash: hashed,
@@ -235,14 +237,12 @@ export class FileService {
                     if(userFromDb)
                     {
                         //save him in sharing table
-
-                        await this.sharingRepository.create({
+                        const xd = await this.sharingRepository.save({
                             ownerId: user.id.toString(), 
                             authorizedUserId: userFromDb.id.toString(),
                             entityId: newId,
                             isFile: false
-                        })
-
+                        });
 
                     }
                 })
@@ -326,7 +326,7 @@ export class FileService {
 
         let selfnotesFromDb = await this.noteRepository.find({where:{login: user.login}});
 
-        const notesWithoutRestriction = await this.noteRepository.find({where: {isRestricted: false}});
+        const notesWithoutRestriction = await this.noteRepository.find({where: {isRestricted: false, login: Not(user.login)}});
 
         selfnotesFromDb = [...selfnotesFromDb, ...notesWithoutRestriction];
 

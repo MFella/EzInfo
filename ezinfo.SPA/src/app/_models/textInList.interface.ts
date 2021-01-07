@@ -4,4 +4,5 @@ export interface TextInList{
     login: string;
     isRestricted: boolean;
     havePassword: boolean;
+    possiblePassword: string;
 }

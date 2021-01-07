@@ -47,6 +47,8 @@ export class NavComponent implements OnInit {
       }, err =>
       {
         console.log(err);
+        this.login = '';
+        this.password = '';
         this.alertServ.error(err.error.message);
       })
 

@@ -16,7 +16,8 @@ import { ToastNoAnimationModule, ToastrModule } from 'ngx-toastr';
 import { AddFileComponent } from './add-file/add-file.component';
 import { AuthInterceptor } from './_services/auth.interceptor';
 import { MyFilesResolver } from './_resolvers/my-files.resolver';
-
+import { NgxPaginationModule } from 'ngx-pagination';
+import {PaginationModule} from 'ngx-bootstrap/pagination';
 
 @NgModule({
   declarations: [					
@@ -36,6 +37,7 @@ import { MyFilesResolver } from './_resolvers/my-files.resolver';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    PaginationModule.forRoot(),
     BrowserAnimationsModule, 
     ToastrModule.forRoot(),
   ], 
