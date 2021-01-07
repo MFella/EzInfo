@@ -4,14 +4,14 @@
     <div class="row pt-4">
       <div class="col-md-12">
         <div class="list-group w-50 mx-auto">
-          <a class="list-group-item list-group-item-action flex-column align-items-start active">
+          <!-- <a class="list-group-item list-group-item-action flex-column align-items-start active">
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">List group item heading</h5>
               <small>3 days ago</small>
             </div>
             <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
             <small>Donec id elit non mi porta.</small>
-          </a>
+          </a> -->
           <a class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let item of this.sharedText">
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">Id: {{item.id}}</h5>
@@ -23,14 +23,22 @@
                 <span class="badge badge-success mr-2"
                 *ngIf="!this.item.havePassword"
                 >Locked?: Nope</span>
-                <button class="btn btn-primary btn-sm" (click)="showContent(this.item.id, this.item.possiblePassword)" type="button"
-                >Show content</button>
+                <button *ngIf='!this.item.isFile' class="btn btn-primary btn-sm" 
+                (click)="showContent(this.item.id, this.item.possiblePassword)" type="button"
+                >Show content <fa-icon [icon]="icons[5]"></fa-icon></button>
+                <button *ngIf='this.item.isFile' class="btn btn-warning btn-sm" 
+                (click)="downloadFile(this.item.id, this.item.possiblePassword, this.item?.filename)" type="button"
+                >Download <fa-icon [icon]="icons[2]"></fa-icon></button>
               </div>
               
             </div>
             <p class="mb-1">Published by: {{item.login}}</p>
-              <div class="d-flex justify-content-between w-100">
-                <small class="text-muted">Restricted: {{item.isRestricted}}</small>
+            <small class="text-muted" *ngIf="this.item.isFile">File <fa-icon [icon]="icons[1]"></fa-icon></small>
+            <small class="text-muted" *ngIf="!this.item.isFile">Text <fa-icon [icon]="icons[0]"></fa-icon></small>
+            <!-- <fa-icon [icon]="icons[1]"></fa-icon> -->
+              <div class="d-flex justify-content-between align-items-center w-100">
+                <small class="text-muted" *ngIf="this.item.isRestricted">Restricted <fa-icon [icon]="icons[4]"></fa-icon></small>
+                <small class="text-muted" *ngIf="!this.item.isRestricted">Not restricted <fa-icon [icon]="icons[3]"></fa-icon></small>
                 <!-- <small class="text-muted">Published 3 days ago</small> -->
 
                 <div class="d-flex flex-row justify-content-around align-items-center" *ngIf="this.item.havePassword">

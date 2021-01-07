@@ -10,7 +10,10 @@ import { User } from "src/user";
 import { Note } from "./note.entity";
 import * as crypto from 'crypto';
 import { Sharing } from "./shared.entity";
-
+import {Readable} from 'stream';
+import {Response} from 'express';
+import * as fs from 'fs';
+import { resolve } from "path";
 
 @Injectable()
 export class FileService {
@@ -31,8 +34,13 @@ export class FileService {
     async uploadFile(dataBuffer: Buffer, filename: string, user: User, body: any)
     {
         const s3 = new S3();
-        const xd = this.configService.get('AWS_PUBLIC_BUCKET_NAME');
-        console.log(user);
+        // const xd = this.configService.get('AWS_PUBLIC_BUCKET_NAME');
+        // console.log(user);
+
+        if(!user)
+        {
+            throw new HttpException('You are not allowed, or token expired ;c', 401);
+        }
 
         try{
 
@@ -44,52 +52,9 @@ export class FileService {
                 Key: `${createdId}-${filename}`
             }
 
-
-            // const uploadResult = await s3.upload(
-            // {
-            //     Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
-            //     Body: dataBuffer.buffer,
-            //     Key: `${uuid()}-${filename}`
-            // }
-            // )
-            // .promise();
-
             const uploadResult = await s3.upload(options)
             .promise();
-            // .then(async(res) =>
-            // {
-            //     console.log(res);
-            //     //const mixed_Base_id = "login_idPliku?_hasloDoPliku"
-            //     const mixedBaseId = `mojLogin_${createdId}`;
-            //     const hashed = await argon2.hash(mixedBaseId);
-            //     const newFile = await this.fileRepository.save({
-            //         id: createdId,
-            //         key: res.Key,
-            //         url: res.Location,
-            //         login: 'mojLogin',
-            //         filename: filename,
-            //         isRestricted: false,    //if true -> hashed should be different
-            //         passwordHash: hashed
-            //     }); 
 
-            //     console.log(newFile); 
-            //     return newFile;
-            // })
-            // .catch(err =>
-            // {
-            //     console.log(`Error occured: ${err}`);
-            // })
-            // s3.putObject(options, (err, data) => 
-            // {
-            //     if (err)
-            //     {
-            //         console.log(err);
-            //     } else
-            //     {
-            //         console.log('Success');
-            //     }
-            // })
-            //console.log(uploadResult);
 
             //return uploadResult;
             console.log(uploadResult);
@@ -105,12 +70,13 @@ export class FileService {
                 url: uploadResult.Location,
                 login: user.login,
                 filename: filename,
-                isRestricted: false,    //false -> for everyone; true -> for some group of people
+                isRestricted: body.accessType === 'Restricted' ? true: false,    //false -> for everyone; true -> for some group of people
                 passwordHash: hashed,
-                havePassword: false   //false -> without additional info in password; true -> with additional info in password
+                havePassword: body.password.length === 0? false: true   //false -> without additional info in password; true -> with additional info in password
             }); 
 
             const {passwordHash, key, ...rest} = newFile;
+
             return rest;
 
         }
@@ -177,6 +143,92 @@ export class FileService {
         }
   
         return selfFromDb;
+    }
+
+
+    async downloadFile(id: string, password: string, user: User, res: Response)
+    {
+        //how to download file?
+
+        if(user === null)
+        {
+            throw new HttpException('You are not allowed, sorry', 401);
+        }
+
+        const userFromDb = await this.usersRepository.findOne({login: user.login});
+
+        if(!userFromDb || userFromDb.login !== user.login)
+        {
+            throw new HttpException('Ha! Faked creds, bro', 401);
+        }
+
+        //try to retrieve note from db
+
+        const fileFromDb = await this.fileRepository.findOne(id);
+
+        //console.log(noteFromDb);
+
+        //if note belongs to user, or note is 'shared' to that user
+        const authorization = await this.sharingRepository
+        //.findOne({where: {authorizedUserId: user.id, entityId: id}});
+        .find({where: {authorizedUserId: user.id, entityId: id}});
+
+        if((fileFromDb.login !== user.login && authorization.length === 0) && fileFromDb.isRestricted)
+        {
+            throw new HttpException('You havent got an access for that ;c', 400);
+        }
+
+        const passwordToVerify = fileFromDb.id + '_' + fileFromDb.login + '_' + password;
+
+        const convert = Buffer.from(fileFromDb.passwordHash, 'base64').toString('utf-8');
+
+        const matches = await argon2.verify(convert, passwordToVerify);
+
+        if(matches)
+        {
+            try{
+                const stream = new Readable();
+                const s3 = new S3();
+                const options = {
+                    Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+                    Key: fileFromDb.key
+                };
+
+                //const file = await s3.getObject(options).createReadStream();
+
+                console.log('file');
+                //console.log(file);
+                const otherWay = fs.createWriteStream('whatever.txt');
+
+                const file = await s3.getObject(options).createReadStream();
+
+                file.pipe(otherWay).on('error', err =>
+                {
+                    console.error('File Stream: ', err);
+                })
+                .on('close', () =>
+                {
+                    console.log('Done');
+                });
+
+
+                
+
+                console.log('after data');
+                console.log(otherWay);
+
+                return file;
+
+            }
+            catch(e)
+            {
+                throw new HttpException('Error occured during download file', 500);
+            }
+
+        }else{
+
+            throw new HttpException('Wrong password', 400);
+        }
 
     }
 
@@ -310,8 +362,6 @@ export class FileService {
         //check if user exists... -> later maybe
         const userFromDb = await this.usersRepository.findOne({login: user.login});
 
-        console.log(userFromDb);
-        
         if(!userFromDb || userFromDb.login !== user.login)
         {
             throw new HttpException('Ha! Faked creds, bro', 401);
@@ -320,6 +370,8 @@ export class FileService {
         //try to retrieve note from db
 
         const noteFromDb = await this.noteRepository.findOne(id);
+
+        //console.log(noteFromDb);
 
         //if note belongs to user, or note is 'shared' to that user
         const authorization = await this.sharingRepository

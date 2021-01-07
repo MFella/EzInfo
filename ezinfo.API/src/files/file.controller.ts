@@ -1,9 +1,10 @@
-import { Controller, Get, HttpCode, Post, Req, UploadedFile, UseInterceptors, Request, Query, Delete, Body, UseGuards} from "@nestjs/common";
+import { Controller, Get, HttpCode, Post, Req, UploadedFile, UseInterceptors, Request, Query, Delete, Body, UseGuards, Res} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileService } from "./file.service";
 import JwtAuthGuard from "src/auth/jwt-auth.guard";
 import { RequestWithUser } from "src/auth/request-user.interface";
 import {RealIP} from 'nestjs-real-ip';
+import {Response} from 'express';
 
 
 
@@ -20,13 +21,13 @@ export class FileController{
 
 
     @Post('upload')
-    @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(JwtAuthGuard)
     async uploadFile(@Req() request: RequestWithUser, @UploadedFile() file: any)
     {
+        
         const result = await this.fileServ.uploadFile(file, file.originalname, request.user, request.body);
-
+        
         //return await this.fileServ.uploadFile(file, file.originalname);
         return {'reached': true, 'result': result};
     }
@@ -36,13 +37,6 @@ export class FileController{
     @UseGuards(JwtAuthGuard)
     async retrieveAllFiles(@Req() request: RequestWithUser, @RealIP() ip: string)
     {
-        console.log("____________________");
-        //console.log(request?.connection.remoteAddress);
-        console.log("____________________");
-        //console.log(request?.ip);
-        console.log("____________________");
-        console.log(request.destination);
-
         //TODO -> detect id, and catch number of 'trying' requesting ;)
         
         console.log(ip);
@@ -66,6 +60,18 @@ export class FileController{
     async getFile(@Query() query: any)
     {
         return this.fileServ.getObject(query.key);
+    }
+
+    @Get('download')
+    @UseGuards(JwtAuthGuard)
+    async downloadFile(@Query() query: any, @Req() request: RequestWithUser, @Res() res: Response)
+    {
+        const file = await this.fileServ.downloadFile(query.id, query.password, request.user, res); //.pipe(res);
+
+        return file.pipe(res);
+        //console.log(file);
+        //res.attachment(file);
+        //file.pipe(res);
     }
 
     @Post('save')

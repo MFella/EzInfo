@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { FileToSendDto } from '../dtos/fileToSendDto';
 import {environment} from '../../environments/environment';
 import { TextToSendDto } from '../dtos/textToSendDto';
+import {map, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class FileService {
     formData.append('file', fileToSendDto.file);
     formData.append('accessType', fileToSendDto.accessType);
     formData.append('loginList', fileToSendDto.loginList);
+    formData.append('password', fileToSendDto.password);
 
     return this.http.post<any>(environment.backUrl + 'file/upload', formData);
 
@@ -37,10 +39,15 @@ export class FileService {
   {
     return this.http.get(environment.backUrl + `file/note?id=${id}&password=${password}`);
   }
-
+ 
   retrieveFiles()
   {
     return this.http.get(environment.backUrl + 'file/files');
+  }
+
+  downloadFile(id: string, password: string)
+  {
+    return this.http.get(environment.backUrl + `file/download?id=${id}&password=${password}`, {responseType: 'blob'})
   }
 
 }

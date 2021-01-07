@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { IconDefinition, faPenNib, faFileInvoice, 
+  faFileDownload, faGlobe, faUsers, faEye} from '@fortawesome/free-solid-svg-icons';
 import { Pagination } from '../_models/pagination.interface';
 import { RecordInList } from '../_models/recordInList.interface';
 import { AlertService } from '../_services/alert.service';
 import { FileService } from '../_services/file.service';
 import { SweetyService } from '../_services/sweety.service';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'app-files-list',
@@ -15,6 +18,7 @@ export class FilesListComponent implements OnInit {
 
   sharedText!: RecordInList[];
   allFiles!: RecordInList[];
+  retrievedFile!: any;
   page: any = 1;
   rotate: boolean = true;
   // password: string = '';
@@ -22,9 +26,12 @@ export class FilesListComponent implements OnInit {
   currentPage: 1,
   itemsPerPage: 3,
   totalItems: 3,
-  totalPages: 100
-  };
+  totalPages: 100};
   maxSize = 3;
+
+  icons: Array<IconDefinition> = [faPenNib, faFileInvoice, faFileDownload, faGlobe, faUsers, faEye];
+
+
 
   constructor(private route: ActivatedRoute, private fileServ: FileService,
       private alert: AlertService, private sweety: SweetyService) { }
@@ -37,16 +44,24 @@ export class FilesListComponent implements OnInit {
           console.log(data);
           //console.log(data.files);
           console.log(data.files);
-          this.allFiles = data.files;
-          this.sharedText = data.files;
+          //this.allFiles = data.files;
+          this.allFiles = [...data.files, ...data.notes];
+          this.sharedText = [...data.files, ...data.notes];
+
+          for(let i = 0; i < this.allFiles.length; i++)
+          {
+            this.allFiles[i].possiblePassword = '';
+          }
           
+          console.log(this.allFiles.length);
+
           this.pagination = {
             currentPage: 1,
             itemsPerPage: 3,
             totalItems: this.sharedText.length,
             totalPages: Math.ceil(this.pagination.totalItems / this.pagination.itemsPerPage)
           };
-          this.sharedText = data.files.slice(0, 3);
+          this.sharedText = [...data.files, ...data.notes].slice(0, 3);
 
         })
   }
@@ -66,6 +81,28 @@ export class FilesListComponent implements OnInit {
           this.sweety.error(id, err.error.message);
           this.sharedText.forEach(el => el.possiblePassword = '');
         })
+  }
+
+  downloadFile(id: string, password: string, filename: string | undefined)
+  {
+    this.fileServ.downloadFile(id, password)
+      .subscribe((res: any) =>
+      {
+        console.log(res);
+        //handle name of file!
+        this.alert.info('File should be downloading. Work in progress...');
+        const filed = new File([res], filename!);
+        saveAs(filed);
+
+        console.log(filed);
+        //return filed;
+
+        
+      }, (err: any) =>
+      {
+        console.log(err);
+        this.alert.error('Cant download file');
+      })
   }
 
   pageChanged(e: any)

@@ -63,12 +63,16 @@ export class AddFileComponent implements OnInit {
       if(this.sendType === 'File')
       {
 
+        console.log('the password is: ' + this.fileForm.get('password')!.value);
+
         const fileToSendDto: FileToSendDto = Object.assign({}, {
           file: this.file,
           accessType: this.accessType,
           loginList: this.loginList,
-          password: this.fileForm.get('password')!.toString()
+          password: this.fileForm.get('password')!.value.toString()
         });
+
+        console.log(fileToSendDto);
 
         this.fileServ.sendFile(fileToSendDto)
           .subscribe(res =>
