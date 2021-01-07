@@ -32,6 +32,7 @@ export class FileService {
     {
         const s3 = new S3();
         const xd = this.configService.get('AWS_PUBLIC_BUCKET_NAME');
+        console.log(user);
 
         try{
 
