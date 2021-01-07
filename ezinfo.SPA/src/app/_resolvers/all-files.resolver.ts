@@ -12,14 +12,14 @@ import { FileService } from '../_services/file.service';
 @Injectable({
   providedIn: 'root'
 })
-export class MyFilesResolver implements Resolve<boolean> {
+export class AllFilesResolver implements Resolve<boolean> {
 
   constructor(private router: Router, private alert: AlertService, 
     private fileServ: FileService){}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>  {
 
-    return this.fileServ.retrieveNotes()
+    return this.fileServ.retrieveFiles()
       .pipe(
         catchError(err =>
           {

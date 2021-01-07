@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Pagination } from '../_models/pagination.interface';
-import { TextInList } from '../_models/textInList.interface';
+import { RecordInList } from '../_models/recordInList.interface';
 import { AlertService } from '../_services/alert.service';
 import { FileService } from '../_services/file.service';
 import { SweetyService } from '../_services/sweety.service';
@@ -13,8 +13,8 @@ import { SweetyService } from '../_services/sweety.service';
 })
 export class FilesListComponent implements OnInit {
 
-  sharedText!: TextInList[];
-  allFiles!: TextInList[];
+  sharedText!: RecordInList[];
+  allFiles!: RecordInList[];
   page: any = 1;
   rotate: boolean = true;
   // password: string = '';
@@ -34,6 +34,7 @@ export class FilesListComponent implements OnInit {
     this.route.data
       .subscribe((data: any) =>
         {
+          console.log(data);
           //console.log(data.files);
           console.log(data.files);
           this.allFiles = data.files;

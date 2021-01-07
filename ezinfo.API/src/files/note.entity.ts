@@ -23,6 +23,13 @@ export class Note{
     isRestricted: boolean; 
 
     @Column({
+        type: 'bool',
+        nullable: false,
+        default: false
+    })
+    isFile: boolean;
+
+    @Column({
         //type: 'bool',
         nullable: false
     }) 

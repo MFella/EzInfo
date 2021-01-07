@@ -15,9 +15,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastNoAnimationModule, ToastrModule } from 'ngx-toastr';
 import { AddFileComponent } from './add-file/add-file.component';
 import { AuthInterceptor } from './_services/auth.interceptor';
-import { MyFilesResolver } from './_resolvers/my-files.resolver';
+import { AllNotesResolver } from './_resolvers/all-notes.resolver';
 import { NgxPaginationModule } from 'ngx-pagination';
 import {PaginationModule} from 'ngx-bootstrap/pagination';
+import { AllFilesResolver } from './_resolvers/all-files.resolver';
 
 @NgModule({
   declarations: [					
@@ -42,7 +43,8 @@ import {PaginationModule} from 'ngx-bootstrap/pagination';
     ToastrModule.forRoot(),
   ], 
   providers: [
-    MyFilesResolver,
+    AllNotesResolver,
+    AllFilesResolver,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

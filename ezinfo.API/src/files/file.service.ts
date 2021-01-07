@@ -140,6 +140,46 @@ export class FileService {
         })
     }
 
+    async retrieveAllFiles(user: User)
+    {
+        if(user === null)
+        {
+            throw new HttpException('You are not allowed', 401);
+        }
+
+        let selfFromDb = await this.fileRepository.find({where:{login: user.login}});
+
+        const filesWithoutRestriction = await this.fileRepository.find({where: {isRestricted: false, login: Not(user.login)}});
+
+        selfFromDb = [...selfFromDb, ...filesWithoutRestriction];
+
+        selfFromDb.forEach(el =>
+            {
+                delete el.url
+                delete el.passwordHash;
+                delete el.key;
+            })
+
+        const sharedFilesIdsFromDb = await this.sharingRepository.find({where: {authorizedUserId: user.id, isFile: true}});
+
+        for(let i = 0; i < sharedFilesIdsFromDb.length; i++)
+        {
+            const fileFromDb = await this.fileRepository.findOne({where: {id: sharedFilesIdsFromDb[i].entityId}});
+
+            if(fileFromDb)
+            {
+                delete fileFromDb.url
+                delete fileFromDb.passwordHash;
+                delete fileFromDb.key;
+    
+                selfFromDb.push(fileFromDb);
+            }
+        }
+  
+        return selfFromDb;
+
+    }
+
     async deleteFile(id: number)
     {
         const s3 = new S3();
@@ -337,6 +377,7 @@ export class FileService {
             {
                 delete el.iv;
                 delete el.passwordHash;
+                delete el.content;
             })
 
         const sharedNotesIdsFromDb = await this.sharingRepository.find({where: {authorizedUserId: user.id}});
@@ -351,6 +392,7 @@ export class FileService {
             {
                 delete noteFromDb.iv;
                 delete noteFromDb.passwordHash;
+                delete noteFromDb.content;
 
                 selfnotesFromDb.push(noteFromDb);
             }

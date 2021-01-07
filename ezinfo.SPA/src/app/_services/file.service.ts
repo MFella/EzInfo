@@ -38,4 +38,9 @@ export class FileService {
     return this.http.get(environment.backUrl + `file/note?id=${id}&password=${password}`);
   }
 
+  retrieveFiles()
+  {
+    return this.http.get(environment.backUrl + 'file/files');
+  }
+
 }

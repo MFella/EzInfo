@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MyFilesResolver } from './my-files.resolver';
+import { AllFilesResolver } from './all-files.resolver';
 
-describe('MyFilesResolver', () => {
-  let resolver: MyFilesResolver;
+describe('AllFilesResolver', () => {
+  let resolver: AllFilesResolver;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    resolver = TestBed.inject(MyFilesResolver);
+    resolver = TestBed.inject(AllFilesResolver);
   });
 
   it('should be created', () => {

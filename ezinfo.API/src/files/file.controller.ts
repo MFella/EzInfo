@@ -1,11 +1,10 @@
 import { Controller, Get, HttpCode, Post, Req, UploadedFile, UseInterceptors, Request, Query, Delete, Body, UseGuards} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { AuthService } from "src/auth/auth.service";
-import { UsersService } from "src/users/users.service";
 import { FileService } from "./file.service";
-import { Express }from 'express';
 import JwtAuthGuard from "src/auth/jwt-auth.guard";
 import { RequestWithUser } from "src/auth/request-user.interface";
+import {RealIP} from 'nestjs-real-ip';
+
 
 
 //maybe some authorization?
@@ -26,13 +25,30 @@ export class FileController{
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@Req() request: RequestWithUser, @UploadedFile() file: any)
     {
-        //console.log(file.originalname);
         const result = await this.fileServ.uploadFile(file, file.originalname, request.user, request.body);
-        console.log('From file controller: ');
-        console.log(result);
 
         //return await this.fileServ.uploadFile(file, file.originalname);
         return {'reached': true, 'result': result};
+    }
+
+
+    @Get('files')
+    @UseGuards(JwtAuthGuard)
+    async retrieveAllFiles(@Req() request: RequestWithUser, @RealIP() ip: string)
+    {
+        console.log("____________________");
+        //console.log(request?.connection.remoteAddress);
+        console.log("____________________");
+        //console.log(request?.ip);
+        console.log("____________________");
+        console.log(request.destination);
+
+        //TODO -> detect id, and catch number of 'trying' requesting ;)
+        
+        console.log(ip);
+
+
+        return this.fileServ.retrieveAllFiles(request.user);
     }
 
     @Delete('')
@@ -49,8 +65,6 @@ export class FileController{
     @HttpCode(200)
     async getFile(@Query() query: any)
     {
-
-        console.log(query);
         return this.fileServ.getObject(query.key);
     }
 
@@ -59,8 +73,6 @@ export class FileController{
     @UseGuards(JwtAuthGuard)
     async saveText(@Req() request: RequestWithUser) //requestWithUser
     {
-
-        console.log(request.user);
         return this.fileServ.saveText(request.body, request.user);
     }
 

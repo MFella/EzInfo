@@ -39,6 +39,12 @@ export class File{
     havePassword: boolean;
 
     @Column({
+        nullable: false,
+        default: true
+    })
+    isFile: boolean;
+    
+    @Column({
         type: "blob",
         nullable: false
     })
