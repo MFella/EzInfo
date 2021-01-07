@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, Post, Req, UploadedFile, UseInterceptors, Request, Query, Delete, Body, UseGuards, Res} from "@nestjs/common";
+import { Controller, Get, HttpCode, Post, Req, UploadedFile, UseInterceptors, Request, Query, Delete, Body, UseGuards, Res, InternalServerErrorException} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileService } from "./file.service";
 import JwtAuthGuard from "src/auth/jwt-auth.guard";
@@ -67,12 +67,9 @@ export class FileController{
     async downloadFile(@Query() query: any, @Req() request: RequestWithUser, @Res() res: Response)
     {
         const file = await this.fileServ.downloadFile(query.id, query.password, request.user, res); //.pipe(res);
-
+        console.log("DASDSA");
         return file.pipe(res);
-        //console.log(file);
-        //res.attachment(file);
-        //file.pipe(res);
-    }
+    } 
 
     @Post('save')
     @HttpCode(200)

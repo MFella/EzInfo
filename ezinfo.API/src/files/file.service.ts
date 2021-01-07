@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { HttpResponse, S3 } from "aws-sdk";
@@ -36,6 +36,7 @@ export class FileService {
         const s3 = new S3();
         // const xd = this.configService.get('AWS_PUBLIC_BUCKET_NAME');
         // console.log(user);
+        console.log(body);
 
         if(!user)
         {
@@ -55,10 +56,6 @@ export class FileService {
             const uploadResult = await s3.upload(options)
             .promise();
 
-
-            //return uploadResult;
-            console.log(uploadResult);
-
             //const mixed_Base_id = "login_idPliku?_hasloDoPliku"
             const mixedBaseId = `${createdId}_${user.login}_${body.password}`;
 
@@ -75,10 +72,32 @@ export class FileService {
                 havePassword: body.password.length === 0? false: true   //false -> without additional info in password; true -> with additional info in password
             }); 
 
+            if(body.loginList.length !== 0)
+            {
+                const logins = body.loginList.split(',');
+                console.log(logins);
+
+                for(let i = 0; i < logins.length; i++)
+                {
+                    const userFromDb = await this.usersRepository.findOne({where:{login: logins[i]}});
+                    if(userFromDb)
+                    {
+                        
+                        await this.sharingRepository.save({
+                            ownerId: user.id.toString(),
+                            authorizedUserId: userFromDb.id.toString(),
+                            entityId: createdId, 
+                            isFile: true 
+                        });
+                    }
+                }
+
+            }
+
             const {passwordHash, key, ...rest} = newFile;
 
             return rest;
-
+ 
         }
         catch(e)
         {
@@ -130,12 +149,12 @@ export class FileService {
 
         for(let i = 0; i < sharedFilesIdsFromDb.length; i++)
         {
-            const fileFromDb = await this.fileRepository.findOne({where: {id: sharedFilesIdsFromDb[i].entityId}});
+            const fileFromDb = await this.fileRepository.findOne({where: {id: sharedFilesIdsFromDb[i].entityId, login: Not(user.login)}});
 
             if(fileFromDb)
             {
                 delete fileFromDb.url
-                delete fileFromDb.passwordHash;
+                delete fileFromDb.passwordHash; 
                 delete fileFromDb.key;
     
                 selfFromDb.push(fileFromDb);
@@ -162,6 +181,8 @@ export class FileService {
             throw new HttpException('Ha! Faked creds, bro', 401);
         }
 
+        
+
         //try to retrieve note from db
 
         const fileFromDb = await this.fileRepository.findOne(id);
@@ -170,11 +191,11 @@ export class FileService {
 
         //if note belongs to user, or note is 'shared' to that user
         const authorization = await this.sharingRepository
-        //.findOne({where: {authorizedUserId: user.id, entityId: id}});
         .find({where: {authorizedUserId: user.id, entityId: id}});
 
         if((fileFromDb.login !== user.login && authorization.length === 0) && fileFromDb.isRestricted)
         {
+            
             throw new HttpException('You havent got an access for that ;c', 400);
         }
 
@@ -183,6 +204,7 @@ export class FileService {
         const convert = Buffer.from(fileFromDb.passwordHash, 'base64').toString('utf-8');
 
         const matches = await argon2.verify(convert, passwordToVerify);
+
 
         if(matches)
         {
@@ -194,40 +216,34 @@ export class FileService {
                     Key: fileFromDb.key
                 };
 
-                //const file = await s3.getObject(options).createReadStream();
-
                 console.log('file');
-                //console.log(file);
-                const otherWay = fs.createWriteStream('whatever.txt');
-
-                const file = await s3.getObject(options).createReadStream();
-
-                file.pipe(otherWay).on('error', err =>
-                {
-                    console.error('File Stream: ', err);
-                })
-                .on('close', () =>
-                {
-                    console.log('Done');
-                });
-
-
                 
 
-                console.log('after data');
-                console.log(otherWay);
+
+                const file = await s3.getObject(options).createReadStream()
+                .on('error', (err) => {
+                    
+                   //return null
+                   return null;
+                   // or death
+                   //throw new InternalServerErrorException('Cant work anymore');
+
+                })
+                .on('end', () => {console.log('ended')})
+                ;
 
                 return file;
 
-            }
-            catch(e)
-            {
+             }
+             catch(e)
+             {
                 throw new HttpException('Error occured during download file', 500);
             }
 
         }else{
+            console.log('gere')
 
-            throw new HttpException('Wrong password', 400);
+            throw new BadRequestException('Wrong password');//HttpException('Wrong password', 400);
         }
 
     }
@@ -423,7 +439,7 @@ export class FileService {
 
         selfnotesFromDb = [...selfnotesFromDb, ...notesWithoutRestriction];
 
-        console.log(selfnotesFromDb);
+        //console.log(selfnotesFromDb);
 
         selfnotesFromDb.forEach(el =>
             {
@@ -432,13 +448,13 @@ export class FileService {
                 delete el.content;
             })
 
-        const sharedNotesIdsFromDb = await this.sharingRepository.find({where: {authorizedUserId: user.id}});
+        const sharedNotesIdsFromDb = await this.sharingRepository.find({where: {authorizedUserId: user.id, isFile: false}});
 
-        console.log(sharedNotesIdsFromDb);
+        //console.log(sharedNotesIdsFromDb);
 
         for(let i = 0; i < sharedNotesIdsFromDb.length; i++)
         {
-            const noteFromDb = await this.noteRepository.findOne({where: {id: sharedNotesIdsFromDb[i].entityId}});
+            const noteFromDb = await this.noteRepository.findOne({where: {id: sharedNotesIdsFromDb[i].entityId, login: Not(user.login)}});
 
             if(noteFromDb)
             {

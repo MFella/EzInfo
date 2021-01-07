@@ -98,12 +98,20 @@ export class FilesListComponent implements OnInit {
         //return filed;
 
         
-      }, (err: any) =>
+      }, async(err: any) =>
       {
         console.log(err);
-        this.alert.error('Cant download file');
+        if(err.status === 0) 
+        {
+          this.alert.error('Probably this entity doesnt exists in db, or in storage-place');
+        } 
+        else{
+          const hah = JSON.parse(await err.error.text());
+          this.alert.error(`${hah.message}`);
+        }
+
       })
-  }
+  } 
 
   pageChanged(e: any)
   {
