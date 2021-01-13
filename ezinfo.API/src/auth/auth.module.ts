@@ -11,12 +11,15 @@ import { JwtStrategy } from "./jwt.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Attempt } from "./attempt.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { MailModule } from "src/mail/mail.module";
+import { MailService } from "src/mail/mail.service";
 
 @Module({
     imports: [
         UsersModule, 
         PassportModule,
         ConfigModule,
+        MailModule,
         TypeOrmModule.forFeature([Attempt]),
         JwtModule.registerAsync({
             imports: [ConfigModule],
@@ -29,7 +32,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
             }),
         })
     ],
-    providers: [AuthService, LocalStrategy, UsersService, JwtStrategy],
+    providers: [AuthService, LocalStrategy, UsersService, JwtStrategy, MailService],
     //exports: [AuthService],
     controllers: [AuthController]
 })

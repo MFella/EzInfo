@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Response, Query, Get, UploadedFile, UseInterceptors} from "@nestjs/common";
+import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Response, Query, Get, UploadedFile, UseInterceptors, ValidationPipe} from "@nestjs/common";
 import { Request } from 'express';
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "src/users/users.service";
@@ -9,6 +9,7 @@ import JwtAuthGuard from "./jwt-auth.guard";
 import { LocalAuthGuard } from "./local-auth.guard";
 import { RequestCreds } from "./request-creds.interface";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -76,4 +77,10 @@ export class AuthController {
     //     return {'reached': true};
 
     // }
+    @Post('forgotPass')
+    async forgotPass(@Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto): Promise<void>
+    {
+        
+
+    }
 }

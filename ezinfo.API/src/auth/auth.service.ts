@@ -1,6 +1,6 @@
 import { UsersService } from "src/users/users.service";
 import { RegisterDto } from "./dto/register.dto";
-import { HttpCode, HttpException, HttpStatus, Injectable, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, UnauthorizedException, UseGuards } from "@nestjs/common";
 import {MysqlErrorCodes} from '../database/mysqlErrorCodes.enum';
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -11,6 +11,8 @@ import { jwtConstans } from "./constants";
 import { Attempt } from "./attempt.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
+import { MailService } from "src/mail/mail.service";
 
 @Injectable()
 export class AuthService{
@@ -20,7 +22,8 @@ export class AuthService{
         private readonly jwtServ: JwtService,
         private readonly configServ: ConfigService,
         @InjectRepository(Attempt)
-        private attemptRepository: Repository<Attempt>
+        private attemptRepository: Repository<Attempt>,
+        private readonly mailService: MailService
         ){}
 
 
@@ -135,6 +138,51 @@ export class AuthService{
           throw new UnauthorizedException('Cant login, inappropriate login or password');
         }
 
+    }
+
+
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto)
+    {
+        const user = await this.usersService.findByEmail(forgotPasswordDto.email);
+
+        if(!user)
+        {
+          throw new BadRequestException('Invalid email. Try again');
+        }
+
+        const payload = {
+          email: forgotPasswordDto.email
+        };
+
+        const token = this.jwtServ.sign(payload);
+        const link = `http://localhost:3000/auth/confirm?token=${token}`;
+        //store token in database?
+        return await this.mailService.sendMail({
+          from: this.configServ.get<string>('SERIOUS_EMAIL'),
+          to: user.email,
+          subject: 'Forgot Password',
+          html: `
+            <h2>Hi there, ${user.name}</h2>
+            <p>Use this <a href=${link}>link</a> to reset your password.</p>
+          `
+        })
+        
+    }
+
+
+    private async verifyToken(token): Promise<any> {
+
+      const data = this.jwtServ.verify(token);
+      //check in db if token exists
+      // const existence = await this.forgorService.existence(data._id);
+
+      //if(existence)
+      //{
+
+      //return data
+    //  }
+      //throw UnauthorizedException();
+      
     }
 
     // private delay(time)
