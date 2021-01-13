@@ -13,6 +13,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
 import { MailService } from "src/mail/mail.service";
+import { ForgotPasswordService } from "src/forgot-password/forgot-password.service";
+import { HttpResponse } from "aws-sdk";
 
 @Injectable()
 export class AuthService{
@@ -23,7 +25,8 @@ export class AuthService{
         private readonly configServ: ConfigService,
         @InjectRepository(Attempt)
         private attemptRepository: Repository<Attempt>,
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
+        private readonly forgotServ: ForgotPasswordService
         ){}
 
 
@@ -155,18 +158,42 @@ export class AuthService{
         };
 
         const token = this.jwtServ.sign(payload);
-        const link = `http://localhost:3000/auth/confirm?token=${token}`;
         //store token in database?
-        return await this.mailService.sendMail({
-          from: this.configServ.get<string>('SERIOUS_EMAIL'),
-          to: user.email,
-          subject: 'Forgot Password',
-          html: `
-            <h2>Hi there, ${user.name}</h2>
-            <p>Use this <a href=${link}>link</a> to reset your password.</p>
-          `
-        })
-        
+        // encrypt token
+
+            try{
+
+              const saveRes = await this.forgotServ.saveForgetness(forgotPasswordDto.email, token);
+              console.log(saveRes);
+
+                if(saveRes[0])
+                {
+                  const link = `http://localhost:3000/auth/confirm?token=${saveRes[1]}`;
+                  // const xd = await this.mailService.sendMail({
+                  //   from: this.configServ.get<string>('SERIOUS_EMAIL'),
+                  //   to: user.email,
+                  //   subject: 'Forgot Password',
+                  //   html: `
+                  //     <h2>Hi there, ${user.name}</h2>
+                  //     <p>Use this <a href=${link}>link</a> to reset your password.</p>
+                  //   ` 
+                  // });
+
+                  return true;
+                  
+                }else 
+                {
+                  console.log(1);
+
+                  throw new HttpException('Internal error', 500);
+                }
+
+
+            }catch(e)
+            {
+              console.log(2);
+              throw new HttpException('Internal error', 500);
+            }
     }
 
 
@@ -174,7 +201,7 @@ export class AuthService{
 
       const data = this.jwtServ.verify(token);
       //check in db if token exists
-      // const existence = await this.forgorService.existence(data._id);
+      // const existence = await this.forgotService.existence(data._id);
 
       //if(existence)
       //{

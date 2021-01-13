@@ -12,8 +12,7 @@ import * as crypto from 'crypto';
 import { Sharing } from "./shared.entity";
 import {Readable} from 'stream';
 import {Response} from 'express';
-import * as fs from 'fs';
-import { resolve } from "path";
+
 
 @Injectable()
 export class FileService {

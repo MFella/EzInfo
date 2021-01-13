@@ -9,6 +9,7 @@ import * as Joi from '@hapi/joi';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { FileModule } from './files/file.module';
+import { ForgotPasswordModule } from './forgot-password/forgot-password.module';
 
 // const configuration  = {
 //   JWT_SECRET: Joi.string().required(),
@@ -38,7 +39,8 @@ import { FileModule } from './files/file.module';
     }),
   DatabaseModule,
   AuthModule,
-  FileModule
+  FileModule,
+  ForgotPasswordModule
   ],
   controllers: [AppController],
   providers: [AppService],

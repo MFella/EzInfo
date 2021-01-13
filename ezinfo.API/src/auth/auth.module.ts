@@ -13,6 +13,9 @@ import { Attempt } from "./attempt.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { MailModule } from "src/mail/mail.module";
 import { MailService } from "src/mail/mail.service";
+import { ForgotPasswordService } from "src/forgot-password/forgot-password.service";
+import { ForgotPasswordModule } from "src/forgot-password/forgot-password.module";
+import { ForgotPassword } from "src/forgot-password/forgot-password.entity";
 
 @Module({
     imports: [
@@ -20,7 +23,8 @@ import { MailService } from "src/mail/mail.service";
         PassportModule,
         ConfigModule,
         MailModule,
-        TypeOrmModule.forFeature([Attempt]),
+        ForgotPasswordModule,
+        TypeOrmModule.forFeature([Attempt, ForgotPassword]),
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -32,7 +36,14 @@ import { MailService } from "src/mail/mail.service";
             }),
         })
     ],
-    providers: [AuthService, LocalStrategy, UsersService, JwtStrategy, MailService],
+    providers: [
+        AuthService, 
+        LocalStrategy, 
+        UsersService, 
+        JwtStrategy, 
+        MailService,
+        ForgotPasswordService
+    ],
     //exports: [AuthService],
     controllers: [AuthController]
 })

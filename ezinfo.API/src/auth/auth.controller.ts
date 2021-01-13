@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Response, Query, Get, UploadedFile, UseInterceptors, ValidationPipe} from "@nestjs/common";
-import { Request } from 'express';
+import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Query, Get, UploadedFile, UseInterceptors, ValidationPipe} from "@nestjs/common";
+import { Request, Response } from 'express';
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
@@ -78,9 +78,17 @@ export class AuthController {
 
     // }
     @Post('forgotPass')
-    async forgotPass(@Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto): Promise<void>
+    @HttpCode(201)
+    async forgotPass(@Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto, @Res() response: Response): Promise<void>
     {
-        
+        const res = await this.authServ.forgotPassword(forgotPasswordDto);
+        if(res)
+        {
+            console.log("CO POWIESZ");
+            response.json({mes: 'Check your mailbox. There you will find activation link'});
+            response.status(201).send();
+            
+        }
 
     }
 }
