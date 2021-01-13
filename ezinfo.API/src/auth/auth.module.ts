@@ -9,14 +9,15 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
 import { jwtConstans } from "./constants";
 import { JwtStrategy } from "./jwt.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { FileService } from "src/files/file.service";
-import { FileController } from "src/files/file.controller";
+import { Attempt } from "./attempt.entity";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
 @Module({
     imports: [
         UsersModule, 
         PassportModule,
         ConfigModule,
+        TypeOrmModule.forFeature([Attempt]),
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

@@ -28,21 +28,23 @@ export class NavComponent implements OnInit {
    console.log(this.authServ.currentUser);
   }
 
-  login_user(login: string, password: string)
+  async login_user(login: string, password: string)
   {
     const loginCreds: LoginCredsDto = {
       login, password
     };
 
-    return this.authServ.login(loginCreds)
+     // await this.authServ.login(loginCreds);
+      return this.authServ.login(loginCreds)
       .subscribe(res =>
       {
-        if(res.res)
-        {
-          this.alertServ.success(res.msg + ". Welcome back, " + res.name); 
-          this.login = '';
-          this.password = '';
-        }
+          if(res.res)
+          {
+            this.alertServ.success(res.msg + ". Welcome back, " + res.name); 
+            this.router.navigate(['']);
+            this.login = '';
+            this.password = '';
+          }
 
       }, err =>
       {
@@ -51,6 +53,8 @@ export class NavComponent implements OnInit {
         this.password = '';
         this.alertServ.error(err.error.message);
       })
+
+
 
   }
 

@@ -5,7 +5,7 @@ import { LoginCredsDto } from '../dtos/loginCredsDto';
 import { UserForCreationDto } from '../dtos/userForCreationDto';
 import { AlertService } from './alert.service';
 import * as moment from 'moment';
-import {map, shareReplay, tap} from 'rxjs/operators';
+import {delay, map, shareReplay, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -32,25 +32,31 @@ export class AuthService {
   {
     let headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json');
+    //console.log(data);
 
-    return this.http.post(environment.backUrl + 'auth/login', loginCredsDto, {headers})
-    .pipe(
-      tap(r => this.setSession(r)),
-      shareReplay(),
-      map((res: any) =>
-      {
-        if(res.user)
-        {
-          this.currentUser = res.user;
-        }
+      return this.http.post(environment.backUrl + 'auth/login', loginCredsDto, {headers})
+      .pipe(
+        delay(1500),
+        tap(r => this.setSession(r)),
+        shareReplay(),
+        map((res: any) =>
+        { 
 
-        return {
-          res: res.res, 
-          name: res.user.name, 
-          msg: res.msg
-        };
-      })
-    )
+          // make button disabled
+
+
+            if(res.user)
+            {
+              this.currentUser = res.user;
+            }
+  
+            return {
+              res: res.res, 
+              name: res.user.name, 
+              msg: res.msg
+            };
+        }));
+
   }
 
   checkLogin(login: string)

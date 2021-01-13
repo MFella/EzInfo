@@ -1,4 +1,3 @@
-import { bool, boolean } from '@hapi/joi';
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()

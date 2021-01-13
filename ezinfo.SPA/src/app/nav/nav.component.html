@@ -17,7 +17,7 @@
                 </a>
               </li>
 
-              <li class="nav-item p-2">
+              <li class="nav-item p-2" *ngIf="!this.authServ.currentUser">
                 <a class="nav-link" [routerLink]="['register']"><fa-icon [icon]="icons[1]"></fa-icon> Register</a>
               </li>
 

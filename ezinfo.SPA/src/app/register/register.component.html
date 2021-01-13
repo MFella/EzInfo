@@ -5,7 +5,15 @@
 
     <div class="row">
       <div class="col-md-12">
-        <h1>Register</h1>
+        <div class="d-flex justify-content-between">
+          <h1>Register</h1>
+          <div class="d-flex flex-column px-4 w-50 pb-2">
+            <strong>Remember</strong>
+            <small class="text-muted">Password length >= 8, contains at least one special sign, one number and latin letters</small> 
+          </div>
+         
+        </div>
+        
         <hr>
       </div>
     </div>
@@ -102,6 +110,10 @@
         'is-invalid': this.registerForm.controls.password.status === 'INVALID' && this.registerForm.controls.password.touched
         && this.registerForm.controls.password.value.length !== 0 || this.registerForm.errors?.mismatchPassword}"
         >
+        <password-strength-meter [password]="this.registerForm.get('password')?.value"
+        [minPasswordLength]="8" [enableFeedback]="true"
+        ></password-strength-meter>
+
         <div class="valid-feedback">
           Looks good!
         </div>
@@ -120,7 +132,7 @@
           Looks good!
         </div>
         <div class="invalid-feedback">
-          Please provide a valid password. Passwords must match!
+          <!-- Please provide a valid password. Passwords must match! -->
         </div>
       </div>
     </div>

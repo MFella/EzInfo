@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http'
+import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,7 +17,6 @@ import { ToastNoAnimationModule, ToastrModule } from 'ngx-toastr';
 import { AddFileComponent } from './add-file/add-file.component';
 import { AuthInterceptor } from './_services/auth.interceptor';
 import { AllNotesResolver } from './_resolvers/all-notes.resolver';
-import { NgxPaginationModule } from 'ngx-pagination';
 import {PaginationModule} from 'ngx-bootstrap/pagination';
 import { AllFilesResolver } from './_resolvers/all-files.resolver';
 
@@ -38,6 +38,7 @@ import { AllFilesResolver } from './_resolvers/all-files.resolver';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    PasswordStrengthMeterModule,
     PaginationModule.forRoot(),
     BrowserAnimationsModule, 
     ToastrModule.forRoot(),

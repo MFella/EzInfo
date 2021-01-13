@@ -33,8 +33,22 @@ export class AuthController {
     @HttpCode(200)
     //@UseGuards(LocalAuthGuard)
     async login(@Req() loginDto: RequestCreds) {
-        return this.authServ.login(loginDto.body);
+
+
+        console.log(loginDto.headers);
+        //delay
+        const sleep = (time) =>
+        {
+            return new Promise(res => setTimeout(res, time));
+        }
+
+        return sleep(1000).then(async() => 
+        {
+            return await this.authServ.login(loginDto.body);
+        })
     }
+
+    
 
     @UseGuards(JwtAuthGuard)
     @Post('logout')
@@ -53,13 +67,13 @@ export class AuthController {
     }
 
 
-    @Post('file/')
-    @HttpCode(200)
-    @UseInterceptors(FileInterceptor('file'))
-    async addFile(@Req() request: any, @UploadedFile() file: any)
-    {
-        console.log(file);
-        return {'reached': true};
+    // @Post('file/')
+    // @HttpCode(200)
+    // @UseInterceptors(FileInterceptor('file'))
+    // async addFile(@Req() request: any, @UploadedFile() file: any)
+    // {
+    //     console.log(file);
+    //     return {'reached': true};
 
-    }
+    // }
 }

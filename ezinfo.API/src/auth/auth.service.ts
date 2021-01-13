@@ -1,6 +1,6 @@
 import { UsersService } from "src/users/users.service";
 import { RegisterDto } from "./dto/register.dto";
-import { HttpCode, HttpException, HttpStatus, Injectable, UseGuards } from "@nestjs/common";
+import { HttpCode, HttpException, HttpStatus, Injectable, UnauthorizedException, UseGuards } from "@nestjs/common";
 import {MysqlErrorCodes} from '../database/mysqlErrorCodes.enum';
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -8,6 +8,9 @@ import { Payload } from "./payload.interface";
 import * as argon2 from "argon2";
 import { LoginDto } from "./dto/login.dto";
 import { jwtConstans } from "./constants";
+import { Attempt } from "./attempt.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class AuthService{
@@ -15,7 +18,9 @@ export class AuthService{
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtServ: JwtService,
-        private readonly configServ: ConfigService
+        private readonly configServ: ConfigService,
+        @InjectRepository(Attempt)
+        private attemptRepository: Repository<Attempt>
         ){}
 
 
@@ -62,36 +67,80 @@ export class AuthService{
           throw new HttpException('User with that credentials doesnt exists!', 404);
           //return null
         }
+
     }
  
     public async login(loginCreds: LoginDto)
     {
 
       const res = await this.validate(loginCreds.login, loginCreds.password);
-      //const res = await this.usersService.findAll();
-      console.log(res);
 
-      if(res !== null)
-      {
-        const payload = {login: loginCreds.login};
+        if(res !== null)
+        {
+          const payload = {login: loginCreds.login};
 
-        return {
-            res: true,
-            msg: 'Successfully loggedIn',
-            expiresIn: jwtConstans.expiresIn,
-            access_token: this.jwtServ.sign(payload),
-            user: res
+          await this.attemptRepository.update({login: loginCreds.login}, {attempt_number: 0, ban_time: ''})
+
+          return {
+              res: true,
+              msg: 'Successfully loggedIn',
+              expiresIn: jwtConstans.expiresIn,
+              access_token: this.jwtServ.sign(payload),
+              user: res
+          }
+        }else 
+        {
+          const loginFromAttempt = await this.attemptRepository.findOne({where: {login: loginCreds.login}});
+
+          if(!loginFromAttempt)
+          {  
+
+            await this.attemptRepository.save({
+              login: loginCreds.login,
+              attempt_number: 1,
+              ban_time: ''
+            });
+
+          }else
+          {
+
+            loginFromAttempt.attempt_number = loginFromAttempt.attempt_number + 1;
+
+            if(loginFromAttempt.attempt_number === 5 && loginFromAttempt.ban_time === '')
+            {
+              loginFromAttempt.ban_time = Math.floor(new Date().getTime() / 1000).toString();
+
+              await this.attemptRepository.update({login: loginCreds.login}, loginFromAttempt)
+
+            }else if (loginFromAttempt.attempt_number === 6 && loginFromAttempt.ban_time !== '')
+            {
+
+              if(parseInt(loginFromAttempt.ban_time) + 60 < Math.floor(new Date().getTime()/1000))
+              {
+                await this.attemptRepository
+                .update({login: loginCreds.login}, 
+                  {ban_time: Math.floor(new Date().getTime()/1000).toString(), attempt_number: 1});
+              } else
+              {
+                throw new UnauthorizedException('You tried to login too many times. Try again in one minute.');
+              }
+ 
+            } else
+            {
+              await this.attemptRepository.update({login: loginCreds.login}, loginFromAttempt);
+            }  
+
+          }
+
+          throw new UnauthorizedException('Cant login, inappropriate login or password');
         }
-      }else 
-      {
-        return {
-          res: false,
-          msg: 'Cant'
-        }
-      }
-
 
     }
+
+    // private delay(time)
+    // {
+    //   return new Promise(resolve => setTimeout(resolve, time));
+    // }
 
 
     //public async login(dataForLogin: LoginDto)

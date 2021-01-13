@@ -394,10 +394,6 @@ export class FileService {
         //.findOne({where: {authorizedUserId: user.id, entityId: id}});
         .find({where: {authorizedUserId: user.id, entityId: id}});
 
-
-        console.log(noteFromDb.login !== user.login || authorization.length === 0);
-        console.log(authorization.length === 0);
-
         if((noteFromDb.login !== user.login && authorization.length === 0) && noteFromDb.isRestricted)
         {
             throw new HttpException('You havent got an access for that ;c', 400);
