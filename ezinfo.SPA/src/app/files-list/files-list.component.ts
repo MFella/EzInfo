@@ -57,11 +57,11 @@ export class FilesListComponent implements OnInit {
 
           this.pagination = {
             currentPage: 1,
-            itemsPerPage: 3,
+            itemsPerPage: 4,
             totalItems: this.sharedText.length,
             totalPages: Math.ceil(this.pagination.totalItems / this.pagination.itemsPerPage)
           };
-          this.sharedText = [...data.files, ...data.notes].slice(0, 3);
+          this.sharedText = [...data.files, ...data.notes].slice(0, 4);
 
         })
   }

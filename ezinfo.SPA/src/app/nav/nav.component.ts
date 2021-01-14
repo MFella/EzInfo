@@ -6,6 +6,7 @@ import { faCoffee, IconDefinition, faHome,
 import { LoginCredsDto } from '../dtos/loginCredsDto';
 import { AlertService } from '../_services/alert.service';
 import { AuthService } from '../_services/auth.service';
+import { SweetyService } from '../_services/sweety.service';
 
 @Component({
   selector: 'app-nav',
@@ -22,7 +23,7 @@ export class NavComponent implements OnInit {
   icons: Array<IconDefinition> = [faHome, faSign, faQuestionCircle, faUpload, faFileArchive, faStickyNote]
 
   constructor(public authServ: AuthService, private alertServ: AlertService,
-    private router: Router) { }
+    private router: Router, private sweety: SweetyService) { }
 
   ngOnInit() {
    console.log(this.authServ.currentUser);
@@ -64,6 +65,11 @@ export class NavComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  
+  about()
+  {
+    const content = `Main purpose`;
+
+    this.sweety.about("About this project", content);
+  }
 
 }

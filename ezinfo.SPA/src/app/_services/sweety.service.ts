@@ -18,4 +18,21 @@ export class SweetyService {
   {
     Swal.fire(`Cant retrieve message`, msg, 'error');
   }
+
+  about(title: string, text: string)
+  {
+    Swal.fire({
+      title: title,
+      showClass:{
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      },
+      showCloseButton: true,
+      showConfirmButton: true,
+      text: text
+    })
+
+  }
 }

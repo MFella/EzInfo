@@ -2,16 +2,27 @@
 {
     position: relative;
     max-width: 100vw;
-    //height: calc(100vh + 4rem);
-    //height: 100vh;
+    //height: calc(100vh - 4rem);
+
     background-image: url("../../assets/browse_doggy.jpg");
+    background-attachment: scroll;
     background-repeat: no-repeat; 
     background-size: cover; 
     opacity: .95;
-    padding: 3rem;
+    //padding: 3rem;
 }
 
 .list-group
 {
+    min-height: 32rem;
     opacity: .9;
+    .list-group-item{
+
+        transition: all .4s;
+        &:hover{
+            cursor: pointer;
+            opacity: .85;
+
+        }
+    }
 }

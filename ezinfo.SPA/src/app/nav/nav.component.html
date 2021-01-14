@@ -21,8 +21,8 @@
                 <a class="nav-link" [routerLink]="['register']"><fa-icon [icon]="icons[1]"></fa-icon> Register</a>
               </li>
 
-              <li class="nav-item p-2">
-                <a class="nav-link" href="#"><fa-icon [icon]="icons[2]"></fa-icon> About</a>
+              <li class="nav-item p-2" (click)="about()">
+                <a class="nav-link"><fa-icon [icon]="icons[2]"></fa-icon> About</a>
               </li>
 
               <li class="nav-item p-2">
@@ -41,23 +41,13 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-left animate slideIn" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="#">Action</a>
+                  <!-- <a class="dropdown-item" href="#">Action</a>
                   <a class="dropdown-item" href="#">Another action</a>
-                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-divider"></div> -->
                   <a class="dropdown-item" (click)="logout()">Logout</a>
                 </div>
               </li>
-
-              <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <a class="dropdown-item" href="#">Something else here</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Separated link</a>
-                </div>
-              </li> -->     
+  
             </ul>
             <form class="form-inline my-2 my-lg-0" *ngIf="this.authServ.currentUser === null">
                   <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login">

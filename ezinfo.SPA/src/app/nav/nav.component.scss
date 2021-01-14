@@ -22,6 +22,9 @@ ul
 {
     li{
         width: 8rem;
+        &:hover{
+            cursor: pointer;
+        }
     }
 
 }
