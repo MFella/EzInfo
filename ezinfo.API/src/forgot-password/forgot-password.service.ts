@@ -30,14 +30,16 @@ export class ForgotPasswordService {
             //check if exists there
             const existence = await this.forgotRepository.find({where:{email: email}});
 
-            if(!existence){
+            console.log(existence);
 
-            const result = await this.forgotRepository.save({
-                id: newId,
-                tokenHash: encrypted,
-                email: email,
-                iv: iv
-            });
+            if(existence.length === 0){
+
+                const result = await this.forgotRepository.save({  
+                    id: newId,
+                    tokenHash: encrypted,
+                    email: email,
+                    iv: iv
+                });
 
                 if(result)
                 {
@@ -45,6 +47,7 @@ export class ForgotPasswordService {
                 }
 
                 return [false];
+
             }else {
 
                 await this.forgotRepository.update({email: email}, {
@@ -62,6 +65,24 @@ export class ForgotPasswordService {
             return [false];
         }
 
+    }
+
+    async findById(id: string)
+    {
+        return await this.forgotRepository.findOne({where: {id: id}});
+    }
+
+    async deleteForgetness(email: string)
+    {
+        const existence = await this.forgotRepository.findOne({where: {email: email}});
+
+        if(existence)
+        {
+            return await this.forgotRepository.delete({email: email});
+        }
+
+        return true;
+        
     }
 
 }

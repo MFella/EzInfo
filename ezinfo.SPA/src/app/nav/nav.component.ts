@@ -7,6 +7,7 @@ import { LoginCredsDto } from '../dtos/loginCredsDto';
 import { AlertService } from '../_services/alert.service';
 import { AuthService } from '../_services/auth.service';
 import { SweetyService } from '../_services/sweety.service';
+import * as sweetalert2 from '@sweetalert2/ngx-sweetalert2'
 
 @Component({
   selector: 'app-nav',
@@ -72,10 +73,64 @@ export class NavComponent implements OnInit {
     this.sweety.about("About this project", content);
   }
 
+  async changePassword()
+  {
+    
+    const values = await this.sweety.changePassword();
+
+    if(values.isConfirmed)
+    {
+      const pattern = /^^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,20}$/;
+      const password = (<HTMLInputElement>document.querySelector('input#password_for_reset')).value;
+      const repeat_password = (<HTMLInputElement>document.querySelector('input#repeatPassword_for_reset')).value;
+
+      if(!pattern.test(password) || !pattern.test(repeat_password))
+      {
+        this.alertServ.error('Password should contains one capital letter, one special sign and one digit, and length >=7!');
+        return;
+      }
+
+
+      this.authServ.changePassword(password)
+        .subscribe((res: any) =>
+          {
+            this.alertServ.success(res.res);
+
+          }, err =>
+          {
+            this.alertServ.error(err.error.message);
+          })
+
+    }
+
+  }
+
   async displayForgot()
   {
     const email = await this.sweety.forgot();
     console.log(email.value);
+    const pattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+
+    if(!pattern.test(email.value) && email.value !== undefined && email.value?.length !== 0)
+    {
+      this.alertServ.error('Cant send mail - written email doesnt match with email pattern');
+
+    }else if(pattern.test(email.value))
+    {
+
+      this.authServ.forgotPassword(email.value)
+        .subscribe((res: any) =>
+        {
+          console.log(res);
+          this.alertServ.info(res.msg);
+
+        }, err =>
+        {
+          console.log(err);
+          this.alertServ.error(err.error.message);
+        })
+
+    }
 
   }
 

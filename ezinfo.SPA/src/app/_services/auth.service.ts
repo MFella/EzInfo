@@ -42,6 +42,7 @@ export class AuthService {
         map((res: any) =>
         { 
 
+          console.log(res);
           // make button disabled
 
 
@@ -63,6 +64,42 @@ export class AuthService {
   {
     return this.http.get(environment.backUrl + `auth/availability?login=${login}`);
   }
+
+  forgotPassword(email: string)
+  {
+
+    return this.http.post(environment.backUrl + 'auth/forgotPass', {email});
+  }
+
+  sendConfirmation(id: string)
+  {
+    return this.http.get(environment.backUrl + `auth/confirm?token=${id}`)
+    .pipe(
+      delay(1500),
+      tap((r: any) => this.setSession(r.token)),
+      shareReplay(),
+      map((res: any) =>
+      { 
+          if(res.token.user)
+          {
+            this.currentUser = res.token.user;
+          }
+
+          return {
+            res: res.token.res, 
+            name: res.token.user.name, 
+            msg: res.token.msg
+          };
+      }));
+  }
+
+  changePassword(password: string)
+  {
+
+    return this.http.post(environment.backUrl + 'auth/change', {password: password});
+
+  }
+
 
   private setSession(authRes: any)
   {

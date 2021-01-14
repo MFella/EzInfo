@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { text } from '@fortawesome/fontawesome-svg-core';
-import Swal from 'sweetalert2';
+import { repeat } from 'rxjs/operators';
+import Swal, { SweetAlertResult } from 'sweetalert2';
 
 
 @Injectable({
@@ -51,7 +52,7 @@ export class SweetyService {
           popup: 'animate__animated animate__flipOutX'
         },
           input: 'text',
-          inputLabel: 'You email',
+          inputLabel: 'Your email',
           inputPlaceholder: 'e.g. example@gmail.com',
           showCancelButton: true,
           showCloseButton: true,
@@ -62,8 +63,39 @@ export class SweetyService {
           //     return 'Yyou need to write something';
           //   }
           // }
+
+        
     })
+    return value;
+  }
 
+  async changePassword(): Promise<SweetAlertResult> {
 
+    const value = await Swal.fire({
+      title: 'Reset your password',
+      text: `Remember about the restrictions associated with passwords.
+      Password length must be greater than 7, contains at least one number and one special sign.
+      Passwords should match.`,
+      focusConfirm: false,
+      inputLabel: 'Password',
+      html: 
+        `<p class="text-center">Remember about the restrictions associated with passwords.
+        Password length must be greater than 7, contains at least one number and one special sign.
+        For sure, passwords must match.</p>`+
+        '<input type="password" id="password_for_reset" class="swal2-input" placeholder="Password">' + 
+        '<input type="password" id="repeatPassword_for_reset" class="swal2-input" placeholder="Repeat Password">',
+      showCancelButton: true,
+      showCloseButton: true,
+      showConfirmButton: true,
+      confirmButtonText: 'Change password'  
+    });
+
+    const password = (<HTMLInputElement>document.querySelector('input#password_for_reset')).value;
+    const repeat_password = (<HTMLInputElement>document.querySelector('input#repeatPassword_for_reset')).value;
+    console.log(password);
+    console.log(repeat_password);
+
+    //return [value, password, repeat_password];
+    return value;
   }
 }

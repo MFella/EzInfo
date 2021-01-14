@@ -1,6 +1,6 @@
 import { UsersService } from "src/users/users.service";
 import { RegisterDto } from "./dto/register.dto";
-import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from "@nestjs/common";
 import {MysqlErrorCodes} from '../database/mysqlErrorCodes.enum';
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -14,7 +14,9 @@ import { Repository } from "typeorm";
 import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
 import { MailService } from "src/mail/mail.service";
 import { ForgotPasswordService } from "src/forgot-password/forgot-password.service";
-import { HttpResponse } from "aws-sdk";
+import * as crypto from 'crypto';
+import { isUUID } from "class-validator";
+import { User } from "src/user";
 
 @Injectable()
 export class AuthService{
@@ -168,8 +170,8 @@ export class AuthService{
 
                 if(saveRes[0])
                 {
-                  const link = `http://localhost:3000/auth/confirm?token=${saveRes[1]}`;
-                  // const xd =
+                  const link = `http://localhost:4200/reset?token=${saveRes[1]}`;
+
                   const result = await this.mailService.sendMail({
                     from: this.configServ.get<string>('SERIOUS_EMAIL'),
                     to: user.email,
@@ -179,9 +181,9 @@ export class AuthService{
                       <p>Use this <a href=${link}>link</a> to reset your password.</p>
                     ` 
                   });
-                  //console.log(xd);
 
                   return result;
+                  //return true;
                   
                 }else 
                 {
@@ -214,21 +216,125 @@ export class AuthService{
       
     }
 
-    // private delay(time)
-    // {
-    //   return new Promise(resolve => setTimeout(resolve, time));
-    // }
+    async validateId(id: string)
+    {
+      const uuid = isUUID(id);
+      console.log(id);
+      console.log(uuid);
+
+      if(!uuid)
+      {
+        // tbh -> uuid is invalid, but dont say that
+        throw new UnauthorizedException('You are not allowed to do this');
+      }
+
+      const forgotOne = await this.forgotServ.findById(id);
+      console.log(forgotOne);
+
+      if(!forgotOne)
+      {
+        // tbh -> that uuid doesnt exists in db, so shame on you
+        throw new UnauthorizedException('You are not allowed to do this');
+      }
+      else{
+
+        try{
+
+          const algorithm = 'camellia-192-cbc'; 
+          const key = crypto.scryptSync(forgotOne.id.toString(), 'salt', 24);
+
+          const decipher = crypto.createDecipheriv(algorithm, key, forgotOne.iv);
+
+          const stringedToken = Buffer.from(forgotOne.tokenHash, 'base64').toString('utf-8');
+
+          const decryptedToken = decipher.update(stringedToken, 'hex', 'utf8') + decipher.final('utf8');
+
+          const identity = this.jwtServ.verify(decryptedToken);
+
+          console.log(identity);
+
+          if(identity.email !== forgotOne.email)
+          {
+            throw new BadRequestException('Emails doesnt match');
+          }
+
+          //try to find guy with that email
+          const userFromDb = await this.usersService.findByEmail(identity.email);
+
+          if(!userFromDb)
+          {
+            throw new HttpException('User doesnt exists', 404);
+          }
+
+          const payload = {login: userFromDb.login};
+
+          const {passwordHash, ...userToReturn} = userFromDb;
+
+          return {
+            res: true,
+            msg: 'Successfully loggedIn',
+            expiresIn: jwtConstans.expiresIn,
+            access_token: this.jwtServ.sign(payload),
+            user: userToReturn
+          };
+
+        }catch(e)
+        {
+          console.log(e);
+          if(e.name === 'TokenExpiredError')
+          {
+            throw new HttpException('Password reset time has elapsed. Try to send email again', 401);
+          }
+
+          throw new InternalServerErrorException('Error occured during checking identity');
+        }
+      } 
+    }
 
 
-    //public async login(dataForLogin: LoginDto)
-    // public getCookieWithJwtAccessToken(login: string) {
-    //     const payload: Payload = { login };
-    //     const token = this.jwtServ.sign(payload, {
-    //       secret: this.configServ.get('JWT_ACCESS_TOKEN_SECRET'),
-    //       expiresIn: `${this.configServ.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
-    //     });
-    //     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configServ.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
-    //   }
+    async changePassword(user: User, password: string)
+    {
+      const pattern = /^^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+
+      if(!pattern.test(password))
+      {
+        throw new BadRequestException('Bad pattern of password');
+      }
+
+      if(!user)
+      {
+        throw new UnauthorizedException('You are not allowed to do such a thing');
+      }
+
+      try{
+            const userFromDb = await this.usersService.findByLogin(user.login);
+            const deleteResult = await this.forgotServ.deleteForgetness(user.email);
+
+            if(!deleteResult)
+            {
+              //...
+            }
+
+            if(!userFromDb)
+            {
+              throw new HttpException('You shouldnt exists!', 418);
+            }
+
+            const result = await this.usersService.changePassword(userFromDb, password);
+
+            if(result.affected === 1)
+            {
+              return true;
+
+            } else throw new InternalServerErrorException('Cant change - something went wrong');
+          }
+          catch(e){
+
+            throw new InternalServerErrorException('Error occured during changing password');
+            
+          }
+            
+    }
 
       public getCookieWithJwtRefreshToken(login: string) {
         const payload: Payload = { login };

@@ -1,15 +1,14 @@
-import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Query, Get, UploadedFile, UseInterceptors, ValidationPipe} from "@nestjs/common";
+import { Body, Controller, Post, Req, UseGuards, Res, HttpCode, Query, Get, UploadedFile, UseInterceptors, ValidationPipe, Redirect} from "@nestjs/common";
 import { Request, Response } from 'express';
-import { AuthGuard } from "@nestjs/passport";
+
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
-import { LoginDto } from "./dto/login.dto";
 import RegisterDto from "./dto/register.dto";
 import JwtAuthGuard from "./jwt-auth.guard";
-import { LocalAuthGuard } from "./local-auth.guard";
 import { RequestCreds } from "./request-creds.interface";
-import { FileInterceptor } from "@nestjs/platform-express";
 import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
+import { RequestWithPassword } from "./request-password.interface";
+import { RequestWithUser } from "./request-user.interface";
 
 @Controller('auth')
 export class AuthController {
@@ -84,9 +83,43 @@ export class AuthController {
         const res = await this.authServ.forgotPassword(forgotPasswordDto);
         if(res)
         {
-            response.json({mes: 'Check your mailbox. There you will find activation link'});
+            response.json({msg: 'Check your mailbox. There you will find activation link'});
             response.status(201).send();
             
+        }
+    }
+
+    @Get('confirm')
+    //@Redirect('https://localhost:4200', 302)
+    async confirmPassword(@Query() query: any, @Res() response: Response): Promise<void>
+    {
+       // console.log(query);
+        const tokened = await this.authServ.validateId(query.token);
+
+        console.log(tokened);
+        response.json({token: tokened});
+        response.send();
+
+        //return await this.authServ.validateId(query.token);
+    }
+
+    @Post('change')
+    @UseGuards(JwtAuthGuard)
+    async changePassword(@Req() requestWithUser: RequestWithUser, @Body() body, @Res() response: Response)
+    {
+        const change = this.authServ.changePassword(requestWithUser.user, body.password);
+        
+        if(change)
+        {
+            response.json({res: 'Your password has been changed'});
+            response.status(201);
+            response.send();
+
+        }else{
+
+            response.json({res: 'Cant change password'});
+            response.status(200);
+            response.send();
         }
 
     }

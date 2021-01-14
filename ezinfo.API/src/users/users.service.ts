@@ -72,7 +72,6 @@ export class UsersService {
         try{
             const customHash = await argon2.hash(newUser.password);
             user.passwordHash = customHash;
-            console.log(`Hashed password: ${customHash}`);
 
         }catch(err)
         {
@@ -95,11 +94,7 @@ export class UsersService {
 
     async findByLogin(login: string): Promise<User> {
 
-        // const user:User = this.users[id];
 
-        // if(!user) throw new Error('No user found ;/.');
-
-        // return user;
         const user = await this.usersRepository.findOne({
             where:{
                 login
@@ -107,28 +102,15 @@ export class UsersService {
         });
 
         return user;
+    }
 
-        //const user = await this.usersRepository.findOne(login);
-        // console.log(`User is: ${user}`);
-        // try{
-        //     //the way of retriving hash from blob
-        //     const convert = Buffer.from(user.passwordHash, 'base64').toString('utf-8');
+    async changePassword(user: User, password: string)
+    {
+        const customHash = await argon2.hash(password);
+        user.passwordHash = customHash;
 
-        //     if(await argon2.verify(convert, "kaczorek99"))
-        //     {
-        //         console.log("No tak, to sie zgadza");
-        //     }
-        //     else{
-        //         console.log("Lipa")
-        //     }
-
-        // }catch(e)
-        // {
-        //     console.log(`error occured: ${e}`);
-        // }
-
+        return await this.usersRepository.update({login: user.login}, user);
         
-        //return await this.usersRepository.findOne(login);
     }
 
     async ifUserExists(login: string)

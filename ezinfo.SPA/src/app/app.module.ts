@@ -19,15 +19,18 @@ import { AuthInterceptor } from './_services/auth.interceptor';
 import { AllNotesResolver } from './_resolvers/all-notes.resolver';
 import {PaginationModule} from 'ngx-bootstrap/pagination';
 import { AllFilesResolver } from './_resolvers/all-files.resolver';
+import { ResetWaitComponent } from './reset-wait/reset-wait.component';
 
 @NgModule({
-  declarations: [					
+  declarations: [							
     AppComponent, 
       NavComponent,
       HomeComponent,
-      RegisterComponent,
+      RegisterComponent, 
       FilesListComponent,
-      AddFileComponent
+      AddFileComponent,
+      ResetWaitComponent,
+      ResetWaitComponent
    ],
   imports: [
     BrowserModule,
@@ -37,7 +40,7 @@ import { AllFilesResolver } from './_resolvers/all-files.resolver';
     FontAwesomeModule, 
     FormsModule,
     ReactiveFormsModule,
-    CommonModule,
+    CommonModule, 
     PasswordStrengthMeterModule,
     PaginationModule.forRoot(),
     BrowserAnimationsModule, 

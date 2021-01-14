@@ -383,10 +383,7 @@ export class FileService {
         }
 
         //try to retrieve note from db
-
         const noteFromDb = await this.noteRepository.findOne(id);
-
-        //console.log(noteFromDb);
 
         //if note belongs to user, or note is 'shared' to that user
         const authorization = await this.sharingRepository
