@@ -14,14 +14,14 @@
 
 .list-group
 {
-    min-height: 32rem;
+    min-height: 31.2rem;
     opacity: .9;
     .list-group-item{
 
         transition: all .4s;
         &:hover{
             cursor: pointer;
-            opacity: .85;
+            opacity: .87;
 
         }
     }

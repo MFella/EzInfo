@@ -2,9 +2,12 @@
 main{
     background-image: url('../../assets/upload_doggy.jpg');
     background-size: cover;
-    height: 45em;
-    padding-top: 2rem;
-    padding-bottom: 4rem;
+    background-attachment: scroll;
+    //height: 45em;
+   // padding-top: 2rem;
+   // padding-bottom: 4rem;
+   padding-top: 1.3rem;
+   padding-bottom: 2rem;
 }
 
 .card{
@@ -24,6 +27,9 @@ textarea {
     resize: none;
 }
 
+.card.type{
+    min-height: 17.7rem;
+}
 
 @keyframes iSeeYou
 {

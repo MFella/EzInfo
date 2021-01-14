@@ -6,7 +6,7 @@
 
 nav
 {
-    height: 4rem;
+    height: 6rem;
 
 }
 
@@ -16,6 +16,18 @@ nav
     font-size: 2rem;
     text-decoration: underline;
     transform: skewX(-7deg);
+}
+
+.pass_flex{
+    padding-top: 1.3rem;
+}
+
+small
+{
+    color: #fff;
+    &:hover{
+        cursor: pointer;
+    }
 }
 
 ul

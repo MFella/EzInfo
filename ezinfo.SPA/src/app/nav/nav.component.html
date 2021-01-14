@@ -33,8 +33,6 @@
                 <a class="nav-link" [routerLink]="['/files-list']"><fa-icon [icon]="icons[4]"></fa-icon> Files</a>
               </li>
 
-
-
               <li class="nav-item p-2 dropdown" *ngIf="this.authServ.currentUser !== null">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {{this.authServ.currentUser.name}}
@@ -51,7 +49,12 @@
             </ul>
             <form class="form-inline my-2 my-lg-0" *ngIf="this.authServ.currentUser === null">
                   <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login">
-                  <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password">
+                  <div class="d-flex flex-column justify-content-between pass_flex">
+                    <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password">
+                    <small class="text-muted pl-1" (click)="displayForgot()">Forgot the password?</small>
+                  </div>
+
+
                   <button class="btn btn-secondary" type="button" (click) = 'login_user(this.login, this.password)' 
                   [disabled]="this.login?.length <= 5 || this.password?.length <= 7">Login</button>
                 </form>

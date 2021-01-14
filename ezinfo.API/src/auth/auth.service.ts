@@ -169,17 +169,19 @@ export class AuthService{
                 if(saveRes[0])
                 {
                   const link = `http://localhost:3000/auth/confirm?token=${saveRes[1]}`;
-                  // const xd = await this.mailService.sendMail({
-                  //   from: this.configServ.get<string>('SERIOUS_EMAIL'),
-                  //   to: user.email,
-                  //   subject: 'Forgot Password',
-                  //   html: `
-                  //     <h2>Hi there, ${user.name}</h2>
-                  //     <p>Use this <a href=${link}>link</a> to reset your password.</p>
-                  //   ` 
-                  // });
+                  // const xd =
+                  const result = await this.mailService.sendMail({
+                    from: this.configServ.get<string>('SERIOUS_EMAIL'),
+                    to: user.email,
+                    subject: 'Forgot Password',
+                    html: `
+                      <h2>Hi there, ${user.name}</h2>
+                      <p>Use this <a href=${link}>link</a> to reset your password.</p>
+                    ` 
+                  });
+                  //console.log(xd);
 
-                  return true;
+                  return result;
                   
                 }else 
                 {

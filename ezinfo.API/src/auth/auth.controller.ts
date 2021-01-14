@@ -84,7 +84,6 @@ export class AuthController {
         const res = await this.authServ.forgotPassword(forgotPasswordDto);
         if(res)
         {
-            console.log("CO POWIESZ");
             response.json({mes: 'Check your mailbox. There you will find activation link'});
             response.status(201).send();
             

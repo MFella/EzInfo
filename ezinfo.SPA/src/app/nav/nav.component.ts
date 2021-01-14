@@ -72,4 +72,11 @@ export class NavComponent implements OnInit {
     this.sweety.about("About this project", content);
   }
 
+  async displayForgot()
+  {
+    const email = await this.sweety.forgot();
+    console.log(email.value);
+
+  }
+
 }
