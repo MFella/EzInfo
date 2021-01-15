@@ -1,0 +1,11 @@
+FROM node:10
+
+WORKDIR /usr/src/app/ezinfo.API
+
+COPY package*.json ./
+
+RUN npm install && npm i -g @nestjs/cli
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start:dev"]
