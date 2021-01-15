@@ -34,7 +34,21 @@ export class AuthService{
 
     public async register(dataForRegister: RegisterDto)
     {
-        //const hashedPass = await argon2.hash(dataForRegister.password);
+
+      const userByEmail = await this.usersService.findByEmail(dataForRegister.email);
+      const userByLogin = await this.usersService.findByLogin(dataForRegister.login);
+
+      if(userByEmail)
+      {
+        throw new BadRequestException('User with that email already exists');
+      }
+
+      if(userByLogin)
+      {
+        throw new BadRequestException('User with that login already exists');
+      }
+      
+
 
         try{
             const createdUser = await this.usersService.create(dataForRegister);
@@ -43,7 +57,6 @@ export class AuthService{
 
         }catch(e)
         {
-            console.log(e);
 
             if(e?.code === MysqlErrorCodes.ER_DUP_UNIQUE)
             {
@@ -56,12 +69,11 @@ export class AuthService{
 
     public async validate(login: string, password: string)
     {
-        const user = await this.usersService.findByLogin(login);
-
         try{
+            const user = await this.usersService.findByLogin(login);
             const convert = Buffer.from(user.passwordHash, 'base64').toString('utf-8');
             const verifiedPassword = await argon2.verify(convert, password);
-            //console.log(`Verified password? ${verifiedPassword}`);
+           
 
             if(user && verifiedPassword)
             {
@@ -73,13 +85,13 @@ export class AuthService{
         catch(e)
         {
           throw new HttpException('User with that credentials doesnt exists!', 404);
-          //return null
         }
 
     }
  
     public async login(loginCreds: LoginDto)
     {
+      
 
       const res = await this.validate(loginCreds.login, loginCreds.password);
 
@@ -90,6 +102,7 @@ export class AuthService{
           await this.attemptRepository.update({login: loginCreds.login}, {attempt_number: 0, ban_time: ''})
 
           return {
+              //csrfToken: req.csrfToken(),
               res: true,
               msg: 'Successfully loggedIn',
               expiresIn: jwtConstans.expiresIn,
@@ -166,11 +179,11 @@ export class AuthService{
             try{
 
               const saveRes = await this.forgotServ.saveForgetness(forgotPasswordDto.email, token);
-              console.log(saveRes);
+             
 
                 if(saveRes[0])
                 {
-                  const link = `http://localhost:4200/reset?token=${saveRes[1]}`;
+                  const link = `https://localhost:4200/reset?token=${saveRes[1]}`;
 
                   const result = await this.mailService.sendMail({
                     from: this.configServ.get<string>('SERIOUS_EMAIL'),
@@ -178,7 +191,7 @@ export class AuthService{
                     subject: 'Forgot Password',
                     html: `
                       <h2>Hi there, ${user.name}</h2>
-                      <p>Use this <a href=${link}>link</a> to reset your password.</p>
+                      <p>Use this <a href=${link}>link</a> to reset your password. You've got 10 minutes. Good luck.</p>
                     ` 
                   });
 
@@ -187,7 +200,6 @@ export class AuthService{
                   
                 }else 
                 {
-                  console.log(1);
 
                   throw new HttpException('Internal error', 500);
                 }
@@ -195,32 +207,16 @@ export class AuthService{
 
             }catch(e)
             {
-              console.log(2);
+         
               throw new HttpException('Internal error', 500);
             }
     }
 
 
-    private async verifyToken(token): Promise<any> {
-
-      const data = this.jwtServ.verify(token);
-      //check in db if token exists
-      // const existence = await this.forgotService.existence(data._id);
-
-      //if(existence)
-      //{
-
-      //return data
-    //  }
-      //throw UnauthorizedException();
-      
-    }
-
     async validateId(id: string)
     {
       const uuid = isUUID(id);
-      console.log(id);
-      console.log(uuid);
+
 
       if(!uuid)
       {
@@ -229,7 +225,7 @@ export class AuthService{
       }
 
       const forgotOne = await this.forgotServ.findById(id);
-      console.log(forgotOne);
+    
 
       if(!forgotOne)
       {
@@ -251,8 +247,6 @@ export class AuthService{
 
           const identity = this.jwtServ.verify(decryptedToken);
 
-          console.log(identity);
-
           if(identity.email !== forgotOne.email)
           {
             throw new BadRequestException('Emails doesnt match');
@@ -266,9 +260,13 @@ export class AuthService{
             throw new HttpException('User doesnt exists', 404);
           }
 
-          const payload = {login: userFromDb.login};
+          const payload = {login: userFromDb.login};  
 
           const {passwordHash, ...userToReturn} = userFromDb;
+
+          //delete token from db
+  
+          await this.forgotServ.deleteForgetness(userFromDb.email);
 
           return {
             res: true,
@@ -280,10 +278,9 @@ export class AuthService{
 
         }catch(e)
         {
-          console.log(e);
           if(e.name === 'TokenExpiredError')
           {
-            throw new HttpException('Password reset time has elapsed. Try to send email again', 401);
+            throw new HttpException('Password reset time has elapsed. Try to send remind-email again', 401);
           }
 
           throw new InternalServerErrorException('Error occured during checking identity');
@@ -308,12 +305,12 @@ export class AuthService{
 
       try{
             const userFromDb = await this.usersService.findByLogin(user.login);
-            const deleteResult = await this.forgotServ.deleteForgetness(user.email);
+            //const deleteResult = await this.forgotServ.deleteForgetness(user.email);
 
-            if(!deleteResult)
-            {
-              //...
-            }
+            // if(!deleteResult)
+            // {
+            //   //...
+            // }
 
             if(!userFromDb)
             {

@@ -11,6 +11,8 @@ import { SweetyService } from '../_services/sweety.service';
 })
 export class ResetWaitComponent implements OnInit {
 
+  public load = true;
+
   constructor(private route: ActivatedRoute, private router: Router,
     private alert: AlertService, private authServ: AuthService, private sweety: SweetyService) { }
 
@@ -41,6 +43,7 @@ export class ResetWaitComponent implements OnInit {
                   if(!pattern.test(password) || !pattern.test(repeat_password))
                   {
                     this.alert.error('Password should contains one capital letter, one special sign and one digit, and length >=7!');
+                    this.router.navigate(['']);
                     return;
                   }
             
@@ -57,10 +60,10 @@ export class ResetWaitComponent implements OnInit {
                         this.router.navigate(['']);
                       })
             
+                }else {
+                  this.router.navigate(['']);
                 }
-
-
-
+                
               }, err =>
               {
                 this.alert.error('Error ocured during retriving data');

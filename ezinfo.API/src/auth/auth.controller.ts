@@ -9,6 +9,7 @@ import { RequestCreds } from "./request-creds.interface";
 import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
 import { RequestWithPassword } from "./request-password.interface";
 import { RequestWithUser } from "./request-user.interface";
+import { classToPlain } from "class-transformer";
 
 @Controller('auth')
 export class AuthController {
@@ -32,10 +33,9 @@ export class AuthController {
     @Post('login')
     @HttpCode(200)
     //@UseGuards(LocalAuthGuard)
-    async login(@Req() loginDto: RequestCreds) {
+    async login(@Req() loginDto: any) 
+    {
 
-
-        console.log(loginDto.headers);
         //delay
         const sleep = (time) =>
         {
@@ -67,15 +67,6 @@ export class AuthController {
     }
 
 
-    // @Post('file/')
-    // @HttpCode(200)
-    // @UseInterceptors(FileInterceptor('file'))
-    // async addFile(@Req() request: any, @UploadedFile() file: any)
-    // {
-    //     console.log(file);
-    //     return {'reached': true};
-
-    // }
     @Post('forgotPass')
     @HttpCode(201)
     async forgotPass(@Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto, @Res() response: Response): Promise<void>
@@ -93,14 +84,11 @@ export class AuthController {
     //@Redirect('https://localhost:4200', 302)
     async confirmPassword(@Query() query: any, @Res() response: Response): Promise<void>
     {
-       // console.log(query);
         const tokened = await this.authServ.validateId(query.token);
 
-        console.log(tokened);
+
         response.json({token: tokened});
         response.send();
-
-        //return await this.authServ.validateId(query.token);
     }
 
     @Post('change')
@@ -121,6 +109,18 @@ export class AuthController {
             response.status(200);
             response.send();
         }
-
     }
+
+    // @Get('who-am-I')
+    // async whoAmI(@Req() req: any, @Res({passthrough: true}) res: Response)//RequestWithUser)
+    // {
+    //     const user = req.user ? req.user : undefined;
+ 
+    //     console.log(req);
+    //     res.cookie('xsrf-token', req.csrfToken());
+    //     return{
+    //         user,
+    //         csrfToken: req.csrfToken()
+    //     }
+    // }
 }

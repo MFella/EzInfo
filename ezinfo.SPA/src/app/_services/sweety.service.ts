@@ -13,12 +13,35 @@ export class SweetyService {
 
   success(id: string, msg: string)
   {
-    Swal.fire(`Message retrieved`, msg, "success");
+    //Swal.fire(`Message retrieved`, msg, "success");
+    Swal.fire({
+      title: 'Message retrieved',
+      text: msg,
+      icon: 'success',
+      showClass: {
+        popup: 'animate__animated animate__rotateIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__rotateOut'
+      }
+    })
+  
   }
 
   error(id: string, msg: string)
   {
-    Swal.fire(`Cant retrieve message`, msg, 'error');
+    //Swal.fire(`Cant retrieve message`, msg, 'error');
+    Swal.fire({
+      title: 'Message retrieved',
+      text: msg,
+      icon: 'error',
+      showClass: {
+        popup: 'animate__animated animate__zoomInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__rollOut'
+      }
+    })
   }
 
   about(title: string, text: string)
@@ -26,10 +49,10 @@ export class SweetyService {
     Swal.fire({
       title: title,
       showClass:{
-        popup: 'animate__animated animate__fadeInDown'
+        popup: 'animate__animated animate__flipInY'
       },
       hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
+        popup: 'animate__animated animate__fadeOutDownBig'
       },
       showCloseButton: true,
       showConfirmButton: true,
@@ -87,7 +110,13 @@ export class SweetyService {
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
-      confirmButtonText: 'Change password'  
+      confirmButtonText: 'Change password',
+      showClass: {
+        popup: 'animate__animated animate__fadeInTopLeft'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__bounceOutLeft'
+      }
     });
 
     const password = (<HTMLInputElement>document.querySelector('input#password_for_reset')).value;

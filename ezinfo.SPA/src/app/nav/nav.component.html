@@ -25,11 +25,11 @@
                 <a class="nav-link"><fa-icon [icon]="icons[2]"></fa-icon> About</a>
               </li>
 
-              <li class="nav-item p-2">
+              <li class="nav-item p-2" *ngIf="this.authServ.currentUser">
                 <a class="nav-link" [routerLink]="['add-file']"><fa-icon [icon]="icons[3]"></fa-icon> Upload</a>
               </li>
 
-              <li class="nav-item p-2">
+              <li class="nav-item p-2" *ngIf="this.authServ.currentUser">
                 <a class="nav-link" [routerLink]="['/files-list']"><fa-icon [icon]="icons[4]"></fa-icon> Files</a>
               </li>
 

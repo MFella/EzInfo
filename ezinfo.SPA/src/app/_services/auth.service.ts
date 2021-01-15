@@ -93,14 +93,18 @@ export class AuthService {
       }));
   }
 
+  public whoAmI()
+  { 
+    return this.http.get(environment.backUrl + 'auth/who-am-I');
+  }
+
   changePassword(password: string)
   {
 
     return this.http.post(environment.backUrl + 'auth/change', {password: password});
 
   }
-
-
+  
   private setSession(authRes: any)
   {
 

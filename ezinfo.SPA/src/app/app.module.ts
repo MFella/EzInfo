@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http'
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import {HttpClientModule, HttpClientXsrfModule, HTTP_INTERCEPTORS} from '@angular/common/http'
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -20,12 +20,16 @@ import { AllNotesResolver } from './_resolvers/all-notes.resolver';
 import {PaginationModule} from 'ngx-bootstrap/pagination';
 import { AllFilesResolver } from './_resolvers/all-files.resolver';
 import { ResetWaitComponent } from './reset-wait/reset-wait.component';
+import { NgxSpinnerModule } from "ngx-spinner";
+import { NgxLoadingXModule } from 'ngx-loading-x';
+
+
 
 @NgModule({
   declarations: [							
     AppComponent, 
       NavComponent,
-      HomeComponent,
+      HomeComponent, 
       RegisterComponent, 
       FilesListComponent,
       AddFileComponent,
@@ -37,7 +41,11 @@ import { ResetWaitComponent } from './reset-wait/reset-wait.component';
     HttpClientModule,
     BrowserModule,
     AppRoutingModule, 
-    FontAwesomeModule, 
+    FontAwesomeModule,
+    HttpClientXsrfModule.withOptions({
+      cookieName: 'xsrf-token',
+      headerName: 'xsrf-token'
+    }),
     FormsModule,
     ReactiveFormsModule,
     CommonModule, 
@@ -55,6 +63,7 @@ import { ResetWaitComponent } from './reset-wait/reset-wait.component';
       multi: true
     }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }

@@ -73,6 +73,7 @@ export class FilesListComponent implements OnInit {
     this.fileServ.retrieveNote(id, password)
       .subscribe((res:any) =>
         {
+          password = '';
           //console.log(res);
           this.sweety.success(id, res.note);
           this.sharedText.forEach(el => el.possiblePassword = '');
@@ -80,6 +81,7 @@ export class FilesListComponent implements OnInit {
         {
           this.sweety.error(id, err.error.message);
           this.sharedText.forEach(el => el.possiblePassword = '');
+          password = '';
         })
   }
 
@@ -88,26 +90,22 @@ export class FilesListComponent implements OnInit {
     this.fileServ.downloadFile(id, password)
       .subscribe((res: any) =>
       {
-        console.log(res);
+        password = '';
         //handle name of file!
         this.alert.info('File should be downloading. Work in progress...');
         const filed = new File([res], filename!);
         saveAs(filed);
-
-        console.log(filed);
-        //return filed;
-
         
       }, async(err: any) =>
       {
-        console.log(err);
+        password = '';
         if(err.status === 0) 
         {
           this.alert.error('Probably this entity doesnt exists in db, or in storage-place');
         } 
         else{
-          const hah = JSON.parse(await err.error.text());
-          this.alert.error(`${hah.message}`);
+          const hah = JSON.parse(await err.error.text()); 
+          this.sweety.error(id, `${hah.message}`); 
         }
 
       })

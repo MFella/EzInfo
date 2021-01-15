@@ -44,13 +44,6 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  // loginAvailable(fg: FormGroup)
-  // {
-  //   return this.availability === true? null : 
-  //   {
-  //     'loginAvailable': false
-  //   }
-  // }
 
   checkPeselValidation(fg: FormGroup)
   {
@@ -94,7 +87,7 @@ export class RegisterComponent implements OnInit {
       {
         this.alertServ.success("You have been registered successfully!");
         this.router.navigate(['/']);
-      }, err =>
+      }, (err: any) =>
       {
         console.log(err);
         let errMess = "";
@@ -103,7 +96,7 @@ export class RegisterComponent implements OnInit {
           errMess += item + " ";
         }
 
-        this.alertServ.error(errMess);
+        this.alertServ.error(err.error.message);
 
       })
   }

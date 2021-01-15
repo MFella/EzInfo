@@ -18,19 +18,20 @@ async function bootstrap() {
     key: fs.readFileSync('./ssl/key.pem'),
     cert: fs.readFileSync('./ssl/cert.pem')
   };
+  
 
   const app = await NestFactory.create(AppModule, {
     httpsOptions
   });
+  app.enableCors();
 
   app.useGlobalPipes(new ValidationPipe());
   //app.useGlobalInterceptors(new ExcludeNullInterceptor())
-  app.use(cookieParser());
-  
-  app.enableCors();
+  const configService = app.get(ConfigService);
+  app.use(cookieParser(configService.get('COOKIE_SECRET')));
   app.use(helmet());
 
-  const configService = app.get(ConfigService);
+  
   config.update({
     accessKeyId: configService.get('AWS_ACCESS_KEY_ID'),
     secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
@@ -41,10 +42,56 @@ async function bootstrap() {
     windowMs: 15 * 60 * 1000,
     max: 200
   })
+  // should work, but it doesnt work ;)
+
+  //app.use(csurf({cookie: { key: 'xsrf-token', sameSite: true}})); 
+  // app.use(function (req, res, next) {
+  //   console.log(req.cookies._csrf);
+    
+  //   res.cookie('xsrf-token', req.headers['xsrf-token']);
+  //   res.locals.csrftoken = req.headers['xsrf-token'];
+  //   next();
+  // });
+
+  // handling csrf errors
+  // app.use((err, req, res, next) =>
+  // {
+  //   console.log(req.headers);
+  //   if (err.code !== 'EBADCSRFTOKEN') return next(err)
+  //   // handle CSRF token errors here
+  //   res.status(403)
+  //   res.json({
+  //     code : 403,
+  //     msg:'invalid csrf token'
+  //   })
+  // });
+
+  // app.use(function (req, res, next) {
+  // console.log(req.headers);
+  
+  // res.cookie('xsrf-token', req.headers['xsrf-token']);
+  // res.locals.csrftoken = req.headers['xsrf-token'];
+  // next();
+
+  // });
+  
+  // app.use((err, req, res, next) =>
+  // {
+  //   console.log(req.headers);
+  //   if (err.code !== 'EBADCSRFTOKEN') return next(err)
+  //   // handle CSRF token errors here
+  //   res.status(403)
+  //   res.json({
+  //     code : 403,
+  //     msg:'invalid csrf token'
+  //   })
+  // });
 
   app.use(limiter);
   await app.listen(process.env.PORT);
-  app.use(csurf());
+  
+  app.use(csurf({cookie: true}));
+  
 }
 bootstrap();
  

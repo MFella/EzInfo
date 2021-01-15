@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AppService } from './app.service';
 
 @Controller()
@@ -8,5 +9,13 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get()
+  async yeah(@Req() req, @Res() response: Response)
+  {
+    console.log("co tam?");
+    response.cookie('XSRF-TOKEN', req.csrfToken())
+    response.json({});
   }
 }

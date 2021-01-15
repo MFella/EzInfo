@@ -50,6 +50,13 @@
 
               </div> 
           </a>
+
+          <div class="card text-white bg-info mb-3" *ngIf="this.sharedText.length === 0">
+            <div class="card-header text-center">No more to say</div>
+            <div class="card-body">
+              <p class="card-text text-center">Right now, you haven't got nothing here. Add something to see it</p>
+            </div>
+          </div>
         </div>
       </div>
 

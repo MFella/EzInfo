@@ -208,7 +208,7 @@ export class FileService {
         if(matches)
         {
             try{
-                const stream = new Readable();
+                //const stream = new Readable();
                 const s3 = new S3();
                 const options = {
                     Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
@@ -217,7 +217,9 @@ export class FileService {
 
                 console.log('file');
                 
+                // const files = await s3.getObject(options);
 
+                // console.log(files);
 
                 const file = await s3.getObject(options).createReadStream()
                 .on('error', (err) => {
@@ -240,7 +242,6 @@ export class FileService {
             }
 
         }else{
-            console.log('gere')
 
             throw new BadRequestException('Wrong password');//HttpException('Wrong password', 400);
         }
