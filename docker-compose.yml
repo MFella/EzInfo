@@ -25,6 +25,8 @@ services:
       dockerfile: Dockerfile-dev
     ports:
       - "4201:4201"
+    expose:
+      - '4201'
     container_name: ezinfo-spa
     volumes:
       - ./ezinfo.SPA:/usr/src/app/ezinfo.SPA
