@@ -23,7 +23,7 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     const idToken = localStorage.getItem('id_token');
-    // const csrf = localStorage.getItem('XSRF-TOKEN');
+    const csrf = localStorage.getItem('XSRF-TOKEN');
     // console.log(csrf);
 
     if(idToken)
@@ -51,29 +51,33 @@ export class AuthInterceptor implements HttpInterceptor {
         )
 
     } 
-    // else if(csrf)
-    // {
-    //   const cloned = request.clone({
-    //     //headers: request.headers.set('XSRF-TOKEN', 'vf1jHsBd-OCHOi_qHB232NQpgbCR9IverZhI')
-    //     headers: new HttpHeaders({
-    //       'XSRF-TOKEN': csrf
-    //     })
-    //   });
+    else if(csrf)
+    {
 
-    //   return next.handle(cloned)
-    //     .pipe(
-    //       catchError((response: HttpErrorResponse) =>
-    //       {
-    //         if(response instanceof HttpErrorResponse && response.status === 403){
+      console.log('WITH CSRF');
+      const cloned = request.clone({
+        //headers: request.headers.set('XSRF-TOKEN', 'vf1jHsBd-OCHOi_qHB232NQpgbCR9IverZhI')
+        withCredentials: true,
+        headers: new HttpHeaders({
+          'XSRF-TOKEN': csrf,
+          //'Cookie': '_csrf=' + csrf
+        })
+      });
 
-    //           this.router.navigate(['']);
-    //         }
+      return next.handle(cloned)
+        .pipe(
+          catchError((response: HttpErrorResponse) =>
+          {
+            if(response instanceof HttpErrorResponse && response.status === 403){
 
-    //         return throwError(response);
-    //       })
-    //     )
+              this.router.navigate(['']);
+            }
 
-    // }
+            return throwError(response);
+          })
+        )
+
+    }
     else
     {
       return next.handle(request);

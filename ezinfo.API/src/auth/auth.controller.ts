@@ -111,16 +111,18 @@ export class AuthController {
         }
     }
 
-    // @Get('who-am-I')
-    // async whoAmI(@Req() req: any, @Res({passthrough: true}) res: Response)//RequestWithUser)
-    // {
-    //     const user = req.user ? req.user : undefined;
- 
-    //     console.log(req);
-    //     res.cookie('xsrf-token', req.csrfToken());
-    //     return{
-    //         user,
-    //         csrfToken: req.csrfToken()
-    //     }
-    // }
+    @Get('who-am-I')
+    async whoAmI(@Req() req: any, @Res({passthrough: true}) res: Response)//RequestWithUser)
+    {
+        const user = req.user ? req.user : undefined;
+        console.log(req.session);
+        const xsrf = req.csrfToken(); 
+        res.cookie('XSRF-TOKEN', xsrf, {maxAge: 900000, httpOnly: true});
+      //  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+        return{
+            user,
+            csrfToken: xsrf
+        }
+    }
 }

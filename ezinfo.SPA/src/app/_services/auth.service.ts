@@ -95,7 +95,7 @@ export class AuthService {
 
   public whoAmI()
   { 
-    return this.http.get(environment.backUrl + 'auth/who-am-I');
+    return this.http.get(environment.backUrl + 'auth/who-am-I', {withCredentials: true});
   }
 
   changePassword(password: string)

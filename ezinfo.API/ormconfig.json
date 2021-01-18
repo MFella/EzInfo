@@ -1,7 +1,7 @@
 {
     "type": "mysql",
-    "host": "ezinfo_db",
-    "port": 3320,
+    "host": "127.0.0.1",
+    "port": 3310,
     "username": "root",
     "password": "root",
     "database": "ezinfo",

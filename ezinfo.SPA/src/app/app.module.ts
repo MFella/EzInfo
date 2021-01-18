@@ -22,6 +22,7 @@ import { AllFilesResolver } from './_resolvers/all-files.resolver';
 import { ResetWaitComponent } from './reset-wait/reset-wait.component';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { NgxLoadingXModule } from 'ngx-loading-x';
+import { CookieService } from 'ngx-cookie-service';
 
 
 
@@ -43,8 +44,8 @@ import { NgxLoadingXModule } from 'ngx-loading-x';
     AppRoutingModule, 
     FontAwesomeModule,
     HttpClientXsrfModule.withOptions({
-      cookieName: 'xsrf-token',
-      headerName: 'xsrf-token'
+      cookieName: 'XSRF-TOKEN',
+      headerName: 'XSRF-TOKEN'
     }),
     FormsModule,
     ReactiveFormsModule,
@@ -57,6 +58,7 @@ import { NgxLoadingXModule } from 'ngx-loading-x';
   providers: [
     AllNotesResolver,
     AllFilesResolver,
+    CookieService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

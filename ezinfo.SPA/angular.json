@@ -77,7 +77,8 @@
             "browserTarget": "ezinfo-app:build",
             "ssl": true,
             "sslCert": "./ssl/cert.pem",
-            "sslKey": "./ssl/key.pem"
+            "sslKey": "./ssl/key.pem",
+            "proxyConfig": "./proxy.conf.json"
           },
           "configurations": {
             "production": {
