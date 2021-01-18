@@ -22,7 +22,7 @@ import { AllFilesResolver } from './_resolvers/all-files.resolver';
 import { ResetWaitComponent } from './reset-wait/reset-wait.component';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { NgxLoadingXModule } from 'ngx-loading-x';
-import { CookieService } from 'ngx-cookie-service';
+//import { CookieService } from 'ngx-cookie-service';
 
 
 
@@ -58,7 +58,7 @@ import { CookieService } from 'ngx-cookie-service';
   providers: [
     AllNotesResolver,
     AllFilesResolver,
-    CookieService,
+    //CookieService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

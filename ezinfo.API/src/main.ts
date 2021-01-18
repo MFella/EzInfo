@@ -9,7 +9,6 @@ import * as fs from 'fs';
 import * as csurf from 'csurf';
 import * as helmet from 'helmet';
 import * as rateLimit from 'express-rate-limit';
-import * as session from 'express-session';
 
 dotenv.config()
 
@@ -43,11 +42,11 @@ async function bootstrap() {
 
   app.use(
     helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"],
-        //scriptSrc: ["'self'", "example.com"],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
+     directives: {
+       defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "example.com"],
+       objectSrc: ["'none'"],
+       upgradeInsecureRequests: [],
       },
     })
   );

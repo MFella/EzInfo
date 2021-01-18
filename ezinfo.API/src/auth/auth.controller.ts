@@ -5,11 +5,8 @@ import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import RegisterDto from "./dto/register.dto";
 import JwtAuthGuard from "./jwt-auth.guard";
-import { RequestCreds } from "./request-creds.interface";
 import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
-import { RequestWithPassword } from "./request-password.interface";
 import { RequestWithUser } from "./request-user.interface";
-import { classToPlain } from "class-transformer";
 
 @Controller('auth')
 export class AuthController {

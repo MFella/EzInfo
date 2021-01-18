@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './_services/auth.service';
 
 @Component({
@@ -10,7 +9,7 @@ import { AuthService } from './_services/auth.service';
 export class AppComponent implements OnInit {
   title = 'ezinfo-app';
 
-  constructor(private authServ: AuthService, private cookieServ: CookieService){}
+  constructor(private authServ: AuthService){}
 
   ngOnInit()
   {
@@ -19,7 +18,6 @@ export class AppComponent implements OnInit {
     {
       console.log(res);
       localStorage.setItem('XSRF-TOKEN', res.csrfToken);
-      //this.cookieServ.set('XSRF-TOKEN', res.csrfToken);
     })
 
   }
