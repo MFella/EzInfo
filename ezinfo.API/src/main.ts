@@ -44,10 +44,11 @@ async function bootstrap() {
     helmet.contentSecurityPolicy({
      directives: {
        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "example.com"],
+       // scriptSrc: ["'self'", "example.com"],
        objectSrc: ["'none'"],
        upgradeInsecureRequests: [],
       },
+      reportOnly: true
     })
   );
 
