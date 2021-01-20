@@ -3,6 +3,25 @@
 
 Ezinfo application was created in order to store files and notes in safe way.
 
+## Overview
+
+Entire project focuses on security issues. There are lots of solutions in this project made to prevent cyber attacks.
+
+In inplementation we can distinguish:
+
+* safe password storage(used [argon2](https://www.npmjs.com/package/argon2) algorithm)
+* safe storage of notes(argon2 + decryption/encryption of content)
+* storage of files(used [AWS S3](https://aws.amazon.com/s3/))
+* HTTPS connection
+* number of requests are limited
+* number of log in attempts are limited
+* recovery of password(change password to be honest - via email)
+* verification of password strength
+* safe headers
+* CORS
+* Content Security Policy
+* XSRF Protection
+
 ## Getting Started
 
 Whole project using Docker, but(if you haven't got Docker, or your Docker failed) there is alternative for that in case of emergency.
@@ -52,11 +71,22 @@ npm run start:dev
 ```
 Those two commands, should run frontend application(on port 4200 as default), and backend server(on port 3000).
 
+## Independent things
+
+Project is using AWS S3 cloud storage. The full setup of bucket initialization(on AWS S3) you can find [here](https://docs.aws.amazon.com/quickstarts/latest/s3backup/step-1-create-bucket.html). Moreover, the service which is used to 'sending recovery email' is provided by [sendgrid](https://sendgrid.com/). The tutorial how to init account
+on Sendgrid you can find [over there](https://sendgrid.com/docs/for-developers/sending-email/api-getting-started/). When you've got this, you should add your own (in '.env' file) config variables, such as: 
+* Aws public bucket name - name of your bucket
+* Aws region - name of region where your bucket is located
+* Aws secret access key
+* Aws access key id
+* Sendgrid api key
+* Email which is registered in sendgrid api
+
 ## Built With
 
 * [Angular](https://angular.io/) - The frontend framework used
 * [Nestjs](https://docs.nestjs.com/) - The backend framework used
-* [MySQL](https://rometools.github.io/rome/) - As a database
+* [MySQL](https://www.mysql.com/) - As a database
 * [Docker](https://www.docker.com/) - Tool for shipping and running applications.
 
 ## License
