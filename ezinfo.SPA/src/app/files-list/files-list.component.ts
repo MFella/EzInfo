@@ -57,11 +57,11 @@ export class FilesListComponent implements OnInit {
 
           this.pagination = {
             currentPage: 1,
-            itemsPerPage: 4,
+            itemsPerPage: 3,
             totalItems: this.sharedText.length,
             totalPages: Math.ceil(this.pagination.totalItems / this.pagination.itemsPerPage)
           };
-          this.sharedText = [...data.files, ...data.notes].slice(0, 4);
+          this.sharedText = [...data.files, ...data.notes].slice(0, 3);
 
         })
   }
@@ -116,6 +116,23 @@ export class FilesListComponent implements OnInit {
     this.pagination.currentPage = e.page;
     this.pagination.itemsPerPage = e.itemsPerPage;
     this.sharedText = this.allFiles.slice((e.page-1)*(e.itemsPerPage), (e.page)*(e.itemsPerPage))
+
+    console.log(document.querySelector('.list-group'));
+
+    if(this.pagination.currentPage > e.page)
+    {
+
+    }else 
+    {
+
+    }
+
+    (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
+    (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
+    (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '2s';
+    (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('--animate-repeat', '2');
+    (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('animation-fill-mode', 'forwards');
+
   }
 
 }
