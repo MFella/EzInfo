@@ -3,17 +3,18 @@
 body{
     //background-image: url("../../assets/dogy.jpg");
     background-color: rgba(152,33,12,0.6);
-    height: 100vh;
-    overflow-y: hidden;
+    //height: 100vh;
+    //overflow-y: hidden;
 }
 
 .container
 {
     position: absolute;
     max-width: 100vw;
-    min-height: calc(100vh - 6rem);
+    
     //height: calc(100vh - 4rem);
     background-image: url("../../assets/dogy.jpg");
+    min-height: calc(100vh - 6rem);
     background-repeat: no-repeat; 
     background-size: cover; 
     opacity: .94;
@@ -36,12 +37,29 @@ body{
 
 }
 .card-body{
-    max-height: 50rem;
-    min-height: 60vh;
+    //max-height: 50rem;
+    //min-height: 60vh;
     //overflow-y: scroll;
 
 }
 
 .card-text{
     font-size: 1.2rem;
+}
+
+
+@media only screen and (max-width: 500px)
+{
+    .card{
+        width: 100% !important;
+    
+        .card-body{
+            padding-left: .13rem;
+            padding-right: .13rem;
+        }
+
+    }
+
+    
+
 }

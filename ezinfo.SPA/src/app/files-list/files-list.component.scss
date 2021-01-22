@@ -1,6 +1,6 @@
 .container
 {
-    overflow-x: hidden;
+    //overflow-x: hidden;
     position: relative;
     max-width: 100vw;
     min-height: calc(100vh - 6rem);
@@ -32,3 +32,99 @@
         }
     }
 }
+
+pager{
+    display: none;
+}
+
+.file_password
+{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+
+}
+
+.file_id_show
+{
+    display: flex;
+
+    justify-content: space-between;
+
+}
+
+@media only screen and (max-width: 1300px)
+{
+    .list-group{
+       width: 100% !important;
+    }
+
+    .file_id_show
+    {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+}
+
+
+@media only screen and (max-width: 500px)
+{
+    // a.list-group-item
+    // {
+    //     padding-left: .4rem;
+    //     padding-right: .4rem;
+    // }    
+    pagination{
+        display: none;
+    }
+
+    .container{
+        padding-bottom: 5rem !important;
+    }
+
+    pager{
+        opacity: .96;
+        position: fixed;
+        padding: 0 !important;
+        margin: 0 !important;
+        z-index: 1000;
+        display: flex;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100vw !important;
+        right: 0;
+        //padding-left: 15vw !important;
+        bottom: 0;
+        //top: 0;
+        background-color: #eb6864;
+
+
+        *{
+            display: none;
+        }
+    }
+
+
+    .file_id_show > h5{
+        text-align: center;
+        padding-bottom: .3rem;
+    }
+
+    .file_password{
+
+        small{
+            display: none;
+        }
+    
+        input{
+            transform:  translateX(1.6rem);
+            width: 75% !important;
+        }
+    }
+
+
+}
+

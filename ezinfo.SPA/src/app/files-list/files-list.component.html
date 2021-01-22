@@ -1,6 +1,8 @@
 <main>
   <div class="container py-4">
 
+
+
     <div class="row py-4">
       <div class="col-md-12">
         <div class="list-group w-50 mx-auto">
@@ -12,8 +14,8 @@
             <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
             <small>Donec id elit non mi porta.</small>
           </a> -->
-          <a class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let item of this.sharedText">
-            <div class="d-flex w-100 justify-content-between">
+          <a class="list-group-item list-group-item-action align-items-start" *ngFor="let item of this.sharedText">
+            <div class="file_id_show">
               <h5 class="mb-1">Id: {{item.id}}</h5>
 
               <div class="buttons">
@@ -41,7 +43,7 @@
                 <small class="text-muted" *ngIf="!this.item.isRestricted">Not restricted <fa-icon [icon]="icons[3]"></fa-icon></small>
                 <!-- <small class="text-muted">Published 3 days ago</small> -->
 
-                <div class="d-flex flex-row justify-content-around align-items-center" *ngIf="this.item.havePassword">
+                <div class="file_password" *ngIf="this.item.havePassword">
                   <small class="text-muted pr-1">Password: </small>
                   <input class="form-control form-control-sm w-100" type="password" placeholder="Password"
                   [(ngModel)]="this.item.possiblePassword">
@@ -81,6 +83,27 @@
         (pageChanged)="pageChanged($event)" [itemsPerPage]="this.pagination.itemsPerPage"
         *ngIf="this.pagination.totalItems !== 0"
         ></pagination>
+
+        <!-- <pager
+        [totalItems]="this.pagination.totalItems"
+        
+        (pageChanged)="pageChanged($event)"
+        pageBtnClass="btn btn-warning mr-2"
+        [itemsPerPage]="this.pagination.itemsPerPage"
+        class="sm_pager">
+      </pager> -->
+
+      <div class="mini_pager">
+        <pager
+        [totalItems]="this.pagination.totalItems"
+        
+        (pageChanged)="pageChanged($event)"
+        pageBtnClass="btn btn-warning mr-2 mt-3"
+        [itemsPerPage]="this.pagination.itemsPerPage"
+        class="text-center">
+        </pager>
+      </div>
+
       </div>
     </nav>
   </div>

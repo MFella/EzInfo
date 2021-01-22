@@ -56,3 +56,19 @@ textarea {
         padding-right: 1.25rem;
     }
 }
+
+@media only screen and (max-width: 356px)
+{
+    .card-header.media_type
+    {
+        padding-left: .8rem;
+        padding-right: .8rem;
+    }
+
+    .pure_text, .some_file
+    {
+        font-size: .85rem;
+        padding: .35rem;
+    }
+
+}
