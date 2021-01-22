@@ -56,7 +56,7 @@ export class SweetyService {
       },
       showCloseButton: true,
       showConfirmButton: true,
-      text: text
+      html: text
     })
   }
 
@@ -118,11 +118,6 @@ export class SweetyService {
         popup: 'animate__animated animate__bounceOutLeft'
       }
     });
-
-    const password = (<HTMLInputElement>document.querySelector('input#password_for_reset')).value;
-    const repeat_password = (<HTMLInputElement>document.querySelector('input#repeatPassword_for_reset')).value;
-    console.log(password);
-    console.log(repeat_password);
 
     //return [value, password, repeat_password];
     return value;

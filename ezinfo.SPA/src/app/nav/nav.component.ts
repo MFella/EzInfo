@@ -50,7 +50,6 @@ export class NavComponent implements OnInit {
 
       }, err =>
       {
-        console.log(err);
         this.login = '';
         this.password = '';
         this.alertServ.error(err.error.message);
@@ -68,7 +67,14 @@ export class NavComponent implements OnInit {
 
   about()
   {
-    const content = `Main purpose`;
+    const content = 
+    `Main purpose of this project was to be maximum safety. 
+    The most important implemented things: password hashing,
+    encrypting/dedcrypting content of notes, storing files
+    in storage service(AWS S3), safe headers, XSRF protection.
+    More information about this project you can find in 
+    <a href="https://github.com/MFella/EzInfo" target="_blank">readme</a> on github.
+    `;
 
     this.sweety.about("About this project", content);
   }
@@ -108,7 +114,6 @@ export class NavComponent implements OnInit {
   async displayForgot()
   {
     const email = await this.sweety.forgot();
-    console.log(email.value);
     const pattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
 
     if(!pattern.test(email.value) && email.value !== undefined && email.value?.length !== 0)
@@ -121,12 +126,10 @@ export class NavComponent implements OnInit {
       this.authServ.forgotPassword(email.value)
         .subscribe((res: any) =>
         {
-          console.log(res);
           this.alertServ.info(res.msg);
 
         }, err =>
         {
-          console.log(err);
           this.alertServ.error(err.error.message);
         })
 
