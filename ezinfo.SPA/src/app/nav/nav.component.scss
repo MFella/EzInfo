@@ -123,6 +123,11 @@ form
 @media only screen and (max-width: 992px)
 {
 
+    nav{
+        padding-bottom: clamp(15px, 15%, 40px) !important;
+        padding-top: clamp(20px, 2%, 25px) !important;
+    }
+
     form{
         display: flex;
         flex-direction: row;
@@ -149,7 +154,9 @@ form
     }
 
     .navbar-collapse{
+        
         padding: 1rem;
+        //margin-top: 1rem;
         border-radius: .5rem;
         background-color: rgba(235,104,100,0.95);
     }

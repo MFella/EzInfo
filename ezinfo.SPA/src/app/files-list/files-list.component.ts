@@ -113,25 +113,35 @@ export class FilesListComponent implements OnInit {
 
   pageChanged(e: any)
   {
-    this.pagination.currentPage = e.page;
-    this.pagination.itemsPerPage = e.itemsPerPage;
-    this.sharedText = this.allFiles.slice((e.page-1)*(e.itemsPerPage), (e.page)*(e.itemsPerPage))
-
-    console.log(document.querySelector('.list-group'));
 
     if(this.pagination.currentPage > e.page)
     {
+      (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
+      (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInRight';
+      (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '1s';
+      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('--animate-repeat', '2');
+      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('animation-fill-mode', 'forwards');
 
     }else 
     {
-
+      (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
+      console.log('else');
+      (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
+      (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '1s';
+      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('--animate-repeat', '2');
+      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('animation-fill-mode', 'forwards');
     }
 
-    (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
-    (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
-    (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '2s';
-    (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('--animate-repeat', '2');
-    (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('animation-fill-mode', 'forwards');
+   // setTimeout(() => 
+   // {
+      this.pagination.currentPage = e.page;
+      this.pagination.itemsPerPage = e.itemsPerPage;
+      this.sharedText = this.allFiles.slice((e.page-1)*(e.itemsPerPage), (e.page)*(e.itemsPerPage));
+
+   // }, 1000);
+
+
+    //console.log(document.querySelector('.list-group'));
 
   }
 
