@@ -1,11 +1,5 @@
 
 build:
-  ezinfo-api:
+  docker:
     web: Dockerfile
-    worker: ezinfo.API/Dockerfile-dev
-  ezinfo-spa:
-    web: Dockerfile
-    worker: ezinfo.SPA/Dockerfile-dev
-  db:
-    image: mysql
-    restart: always
+    worker: worker/Dockerfile
