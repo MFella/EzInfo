@@ -1,5 +1,5 @@
 
 build:
   docker:
-    web: Dockerfile
-    worker: worker/Dockerfile
+    ezinfo-spa: Dockerfile
+    worker: ezinfo.SPA/Dockerfile
