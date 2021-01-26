@@ -1,56 +1,11 @@
-version: '3.8'
 
-networks: 
-  app-tier:
-    driver: bridge
-
-services:
+build:
   ezinfo-api:
-    build:
-      context: ./ezinfo.API
-      dockerfile: Dockerfile-dev
-    ports: 
-      - "3000:3000"
-    container_name: ezinfo-api
-    networks: 
-      - app-tier
-    volumes:
-      - ./ezinfo.API:/usr/src/app/ezinfo.API
-      - /usr/src/app/ezinfo.API/node_modules
-    depends_on: 
-      - db 
+    web: Dockerfile
+    worker: ezinfo.API/Dockerfile-dev
   ezinfo-spa:
-    build:
-      context: ./ezinfo.SPA
-      dockerfile: Dockerfile-dev
-    ports:
-      - "4201:4201"
-    expose:
-      - '4201'
-    container_name: ezinfo-spa
-    volumes:
-      - ./ezinfo.SPA:/usr/src/app/ezinfo.SPA
-      - /usr/src/app/ezinfo.SPA/node_modules
+    web: Dockerfile
+    worker: ezinfo.SPA/Dockerfile-dev
   db:
     image: mysql
     restart: always
-    container_name: ezinfo_db
-    networks:
-      - app-tier
-    #command: --init-file /data/application/init.sql
-    environment: 
-      MYSQL_TCP_PORT: '3320'
-      MYSQL_DATABASE: 'ezinfo'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: 'root'
-      MYSQL_ROOT_PASSWORD: 'root'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    ports:
-      - '3320:3320'
-    expose:
-      - '3320'
-    volumes: 
-      - 'ezinfo-db:/var/lib/mysql'
-      - ./init.sql:/data/application/init.sql
-volumes:
-  ezinfo-db:
