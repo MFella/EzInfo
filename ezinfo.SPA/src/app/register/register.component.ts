@@ -13,7 +13,7 @@ export class RegisterComponent implements OnInit {
 
   registerForm!: FormGroup;
   availability: boolean = false;
-  password!: string;
+  password!: string; 
 
   constructor(private fb: FormBuilder, private authServ: AuthService,
     private alertServ: AlertService, private router: Router) { }

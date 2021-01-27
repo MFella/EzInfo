@@ -20,10 +20,11 @@ async function bootstrap() {
   };
   
 
-  const app = await NestFactory.create(AppModule, 
-    {
-    httpsOptions
-    }
+  const app = await NestFactory.create(AppModule
+     , 
+     {
+     httpsOptions
+     }
   );
   app.enableCors({
     origin: ["https://localhost:4201", "https://localhost:4200"],
@@ -39,7 +40,7 @@ async function bootstrap() {
   app.use(cookieParser(configService.get('COOKIE_SECRET')));
 
   app.use(helmet());
-
+  
   app.use(
     helmet.contentSecurityPolicy({
      directives: {
@@ -76,10 +77,10 @@ async function bootstrap() {
     key: 'xsrf-token',
     path: '/',
     httpOnly: true,
-    secure: true,
+    secure: true, 
     signed: true,
     sameSite: false,
-    domain: 'https://localhost:4200',
+    domain: 'https://localhost:4201',
     maxAge: 24*60*60*1000  //24h
   },
   ignoreMethods: ['GET'],

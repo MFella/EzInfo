@@ -11,9 +11,10 @@ main{
     //height: 45em;
    // padding-top: 2rem;
    // padding-bottom: 4rem;
-   min-height: calc(100vh - 6rem);
-   padding-top: 1.3rem;
+   min-height: calc(100vh);
+   //padding-top: 1.3rem;
    padding-bottom: 1rem;
+   padding-top: clamp(8rem, 2%, 11rem) !important;
 }
  
 .card{

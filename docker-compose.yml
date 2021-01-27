@@ -10,7 +10,7 @@ services:
       context: ./ezinfo.API
       dockerfile: Dockerfile-dev
     ports: 
-      - "3000:3000"
+      - "3082:3082"
     container_name: ezinfo-api
     networks: 
       - app-tier

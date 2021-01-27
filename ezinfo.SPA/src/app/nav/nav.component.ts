@@ -7,7 +7,9 @@ import { LoginCredsDto } from '../dtos/loginCredsDto';
 import { AlertService } from '../_services/alert.service';
 import { AuthService } from '../_services/auth.service';
 import { SweetyService } from '../_services/sweety.service';
-import * as sweetalert2 from '@sweetalert2/ngx-sweetalert2'
+
+
+declare const toggle: any;
 
 @Component({
   selector: 'app-nav',
@@ -135,6 +137,12 @@ export class NavComponent implements OnInit {
 
     }
 
+  }
+
+  tryToggle()
+  {
+    console.log('try to toggle');
+    toggle();
   }
 
 }
