@@ -73,6 +73,7 @@ async function bootstrap() {
   //   resave: false,
   //   saveUninitialized: false
   // }))
+<<<<<<< HEAD
   app.use(csurf({cookie: {
     key: 'xsrf-token',
     path: '/',
@@ -88,6 +89,24 @@ async function bootstrap() {
   {
     return req.cookies['XSRF-TOKEN'];
   }
+=======
+  app.use(csurf({cookie: true
+  //   {
+  //   key: 'xsrf-token',
+  //   path: '/',
+  //   httpOnly: true,
+  //   secure: true,
+  //   signed: true,
+  //   sameSite: false,
+  //   domain: 'https://localhost:4200',
+  //   maxAge: 24*60*60*1000  //24h
+  // },
+  // ignoreMethods: ['GET'],
+  // value: (req) =>
+  // {
+  //   return req.cookies['XSRF-TOKEN'];
+  // }
+>>>>>>> 49f59218011d7c791f7914a5b4925ea9260bac34
 }));
 
   // app.use((req, res, next) =>
@@ -111,8 +130,10 @@ async function bootstrap() {
 
   app.use((err, req, res, next) =>
   {
-
+    
     if(req.headers['xsrf-token'] === req.cookies['XSRF-TOKEN']) return next()
+
+    //return next();
 
     if (err.code !== 'EBADCSRFTOKEN') return next(err)
     // handle CSRF token errors here 
