@@ -116,7 +116,7 @@ export class FilesListComponent implements OnInit {
     if(this.pagination.currentPage > e.page)
     {
       (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
-      (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'flash';
+      (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'headShake';
       (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '.95s';
 
 

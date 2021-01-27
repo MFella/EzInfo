@@ -48,6 +48,7 @@ export class NavComponent implements OnInit {
             this.router.navigate(['']);
             this.login = '';
             this.password = '';
+            toggle();
           }
 
       }, err =>
@@ -141,7 +142,6 @@ export class NavComponent implements OnInit {
 
   tryToggle()
   {
-    console.log('try to toggle');
     toggle();
   }
 

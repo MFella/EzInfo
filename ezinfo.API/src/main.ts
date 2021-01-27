@@ -19,7 +19,7 @@ async function bootstrap() {
     cert: fs.readFileSync('./ssl/cert.pem')
   };
   
-
+ 
   const app = await NestFactory.create(AppModule
      , 
      {
@@ -73,11 +73,11 @@ async function bootstrap() {
   //   resave: false,
   //   saveUninitialized: false
   // }))
-<<<<<<< HEAD
+
   app.use(csurf({cookie: {
     key: 'xsrf-token',
     path: '/',
-    httpOnly: true,
+    httpOnly: true, 
     secure: true, 
     signed: true,
     sameSite: false,
@@ -89,7 +89,8 @@ async function bootstrap() {
   {
     return req.cookies['XSRF-TOKEN'];
   }
-=======
+  }));
+
   app.use(csurf({cookie: true
   //   {
   //   key: 'xsrf-token',
@@ -106,8 +107,7 @@ async function bootstrap() {
   // {
   //   return req.cookies['XSRF-TOKEN'];
   // }
->>>>>>> 49f59218011d7c791f7914a5b4925ea9260bac34
-}));
+  }));
 
   // app.use((req, res, next) =>
   // {
