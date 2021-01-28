@@ -10,7 +10,7 @@ nav
    // padding-bottom: clamp(15px, 15%, 40px) !important;
    // padding-top: clamp(20px, 2%, 25px) !important;
     position: fixed !important;
-    z-index: 2000 !important;
+    z-index: 1 !important;
     width: 100% !important;
 }
 
@@ -90,7 +90,7 @@ form
 
 #navbarColor02
 {
-    z-index: 1000;
+    z-index: 1;
 }
 
 .navbar-collapse{

@@ -18,11 +18,9 @@
 
 .list-group
 {
-    margin-top: clamp(3vh, 6vh, 1000px);
-    min-height: 24.7rem;
-    //animation: fadeOutLeft; /* referring directly to the animation's @keyframe declaration */
-    //animation-duration: 1s; /* don't forget to set a duration! */
-    //animation-fill-mode: forwards;
+    margin-top: clamp(1vh, 2vh, 1000px);
+    min-height: 26rem;
+
     opacity: .9;
     .list-group-item{
 
@@ -60,6 +58,7 @@ pager{
 {
     .list-group{
        width: 100% !important;
+       min-height: 31rem !important;
     }
 
     .file_id_show

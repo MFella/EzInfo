@@ -173,9 +173,7 @@ export class AuthService{
         };
 
         const token = this.jwtServ.sign(payload);
-        //store token in database?
-        // encrypt token
-
+        
             try{
 
               const saveRes = await this.forgotServ.saveForgetness(forgotPasswordDto.email, token);
@@ -305,12 +303,6 @@ export class AuthService{
 
       try{
             const userFromDb = await this.usersService.findByLogin(user.login);
-            //const deleteResult = await this.forgotServ.deleteForgetness(user.email);
-
-            // if(!deleteResult)
-            // {
-            //   //...
-            // }
 
             if(!userFromDb)
             {
@@ -333,24 +325,6 @@ export class AuthService{
             
     }
 
-      public getCookieWithJwtRefreshToken(login: string) {
-        const payload: Payload = { login };
-        const token = this.jwtServ.sign(payload, {
-          secret: this.configServ.get('JWT_REFRESH_TOKEN_SECRET'),
-          expiresIn: `${this.configServ.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s`
-        });
-        const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configServ.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
-        return {
-          cookie,
-          token
-        }
-      }
-
-    public getCookieWithJwtToken(login: string) {
-        const payload = { login };
-        const token = this.jwtServ.sign(payload);
-        return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configServ.get('JWT_EXPIRATION_TIME')}`;
-    }
     
       public getCookiesForLogOut() {
         return [

@@ -64,6 +64,7 @@ export class NavComponent implements OnInit {
 
   logout()
   {
+    toggle();
     this.authServ.logout();
     this.router.navigate(['']);
   }
@@ -84,7 +85,7 @@ export class NavComponent implements OnInit {
 
   async changePassword()
   {
-    
+    toggle();
     const values = await this.sweety.changePassword();
 
     if(values.isConfirmed)

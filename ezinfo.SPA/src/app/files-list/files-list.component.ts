@@ -116,22 +116,28 @@ export class FilesListComponent implements OnInit {
     if(this.pagination.currentPage > e.page)
     {
       (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
-      (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'headShake';
+      //(<HTMLElement>document.querySelector('.list-group')!).style.animation = 'headShake';
       (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '.95s';
 
-
-      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('--animate-repeat', '2');
-      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('animation-fill-mode', 'forwards');
+      setTimeout(() =>
+      {
+        (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'headShake';
+        (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '.95s';
+      }, 1);
 
     }else 
     {
       (<HTMLElement>document.querySelector('.list-group')!).style.animation = '';
-      (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
+      //(<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
       (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '.5s';
 
 
-      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('--animate-repeat', '2');
-      // (<HTMLElement>document.querySelector('.list-group')!).style.setProperty('animation-fill-mode', 'forwards');
+      setTimeout(() =>
+      {
+        (<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
+        (<HTMLElement>document.querySelector('.list-group')!).style.animationDuration = '.5s';
+      }, 1);
+
     }
 
 

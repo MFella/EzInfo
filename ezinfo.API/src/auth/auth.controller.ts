@@ -78,7 +78,6 @@ export class AuthController {
     }
 
     @Get('confirm')
-    //@Redirect('https://localhost:4200', 302)
     async confirmPassword(@Query() query: any, @Res() response: Response): Promise<void>
     {
         const tokened = await this.authServ.validateId(query.token);
@@ -114,8 +113,6 @@ export class AuthController {
         const user = req.user ? req.user : undefined;
         const xsrf = req.csrfToken(); 
         res.cookie('XSRF-TOKEN', xsrf, {maxAge: 900000, httpOnly: true});
-      //  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
         return{
             user,
             csrfToken: xsrf

@@ -33,8 +33,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  //app.useGlobalInterceptors(new ExcludeNullInterceptor())
-
   const configService = app.get(ConfigService);
 
   app.use(cookieParser(configService.get('COOKIE_SECRET')));
@@ -64,15 +62,6 @@ async function bootstrap() {
     windowMs: 15 * 60 * 1000,
     max: 200
   })
-  // should work, but it doesnt work ;)
-
-  //app.use(csurf({cookie: { key: 'xsrf-token', sameSite: false}})); 
-  //app.use(csurf({cookie: true}))
-  // app.use(session({
-  //   secret: configService.get('COOKIE_SECRET'),
-  //   resave: false,
-  //   saveUninitialized: false
-  // }))
 
   app.use(csurf({cookie: {
     key: 'xsrf-token',
@@ -82,7 +71,7 @@ async function bootstrap() {
     signed: true,
     sameSite: false,
     domain: 'https://localhost:4201',
-    maxAge: 24*60*60*1000  //24h
+    maxAge: 24*60*60*1000  
   },
   ignoreMethods: ['GET'],
   value: (req) =>
@@ -90,41 +79,6 @@ async function bootstrap() {
     return req.cookies['XSRF-TOKEN'];
   }
   }));
-
-  app.use(csurf({cookie: true
-  //   {
-  //   key: 'xsrf-token',
-  //   path: '/',
-  //   httpOnly: true,
-  //   secure: true,
-  //   signed: true,
-  //   sameSite: false,
-  //   domain: 'https://localhost:4200',
-  //   maxAge: 24*60*60*1000  //24h
-  // },
-  // ignoreMethods: ['GET'],
-  // value: (req) =>
-  // {
-  //   return req.cookies['XSRF-TOKEN'];
-  // }
-  }));
-
-  // app.use((req, res, next) =>
-  // {
-  //   const csrfTokenToFront = req.csrfToken();
-  //   res.locals.token = csrfTokenToFront
-  //   console.log('Wchode tutaj?');
-  //   res.cookie('XSRF-TOKEN', csrfTokenToFront);
-  //   next();
-
-  // })
-
-  // app.use((err, req, res, next) =>
-  // {
-  //   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  //   console.log(req.cookies)
-  //   next();
-  // })
   
   app.use(limiter);
 

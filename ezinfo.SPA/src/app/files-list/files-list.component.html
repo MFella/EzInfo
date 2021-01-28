@@ -39,8 +39,8 @@
             <small class="text-muted" *ngIf="!this.item.isFile">Text <fa-icon [icon]="icons[0]"></fa-icon></small>
             <!-- <fa-icon [icon]="icons[1]"></fa-icon> -->
               <div class="d-flex justify-content-between align-items-center w-100">
-                <small class="text-muted" *ngIf="this.item.isRestricted">Restricted <fa-icon [icon]="icons[4]"></fa-icon></small>
-                <small class="text-muted" *ngIf="!this.item.isRestricted">Not restricted <fa-icon [icon]="icons[3]"></fa-icon></small>
+                <small class="text-muted w-100" *ngIf="this.item.isRestricted">Restricted <fa-icon [icon]="icons[4]"></fa-icon></small>
+                <small class="text-muted w-100" *ngIf="!this.item.isRestricted">Not restricted <fa-icon [icon]="icons[3]"></fa-icon></small>
                 <!-- <small class="text-muted">Published 3 days ago</small> -->
 
                 <div class="file_password" *ngIf="this.item.havePassword">
