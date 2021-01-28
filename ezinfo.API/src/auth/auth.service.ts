@@ -181,7 +181,7 @@ export class AuthService{
 
                 if(saveRes[0])
                 {
-                  const link = `https://localhost:4200/reset?token=${saveRes[1]}`;
+                  const link = `https://localhost:4201/reset?token=${saveRes[1]}`;
 
                   const result = await this.mailService.sendMail({
                     from: this.configServ.get<string>('SERIOUS_EMAIL'),
@@ -194,7 +194,6 @@ export class AuthService{
                   });
 
                   return result;
-                  //return true;
                   
                 }else 
                 {
