@@ -50,16 +50,15 @@ export class AuthService{
       
 
 
-        try{
+        try {
             const createdUser = await this.usersService.create(dataForRegister);
 
             return createdUser;
 
-        }catch(e)
+        } catch(e: unknown)
         {
 
-            if(e?.code === MysqlErrorCodes.ER_DUP_UNIQUE)
-            {
+            if ((e as any).code === MysqlErrorCodes.ER_DUP_UNIQUE) {
                 throw new HttpException('User with that email already exists!', HttpStatus.BAD_REQUEST);
             }
             throw new HttpException('Something went wrong ;/', HttpStatus.INTERNAL_SERVER_ERROR);
