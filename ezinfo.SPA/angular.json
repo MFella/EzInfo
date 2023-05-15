@@ -138,7 +138,6 @@
       }
     }
   },
-  "defaultProject": "ezinfo-app",
   "cli": {
     "analytics": "7b83bd3c-195d-40b7-8b3b-5b3c661781ae"
   }

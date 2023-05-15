@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, FormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertService } from '../_services/alert.service';
 import { AuthService } from '../_services/auth.service';
@@ -11,11 +11,11 @@ import { AuthService } from '../_services/auth.service';
 })
 export class RegisterComponent implements OnInit {
 
-  registerForm!: FormGroup;
+  registerForm!: UntypedFormGroup;
   availability: boolean = false;
   password!: string; 
 
-  constructor(private fb: FormBuilder, private authServ: AuthService,
+  constructor(private fb: UntypedFormBuilder, private authServ: AuthService,
     private alertServ: AlertService, private router: Router) { }
 
   ngOnInit() {
@@ -36,7 +36,7 @@ export class RegisterComponent implements OnInit {
     }, {validators: [this.passMatch, this.checkPeselValidation]})
   }
 
-  passMatch(fg: FormGroup)
+  passMatch(fg: UntypedFormGroup)
   {
     return fg.get('password')!.value === fg.get('repeatPassword')!.value ? null : 
     {
@@ -45,7 +45,7 @@ export class RegisterComponent implements OnInit {
   }
 
 
-  checkPeselValidation(fg: FormGroup)
+  checkPeselValidation(fg: UntypedFormGroup)
   {
 
     const pesel = fg.get('pesel')!.value;
@@ -70,7 +70,7 @@ export class RegisterComponent implements OnInit {
   }
 
 
-  peselValid(fg: FormGroup)
+  peselValid(fg: UntypedFormGroup)
   {
     const pesel = fg.get('pesel')!.value;
     return this.checkPeselValidation(fg.get('pesel')!.value) ? null :

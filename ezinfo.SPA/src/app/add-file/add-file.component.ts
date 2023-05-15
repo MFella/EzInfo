@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IconDefinition, faGlobe, faUsers, faLock, faPenFancy, faFileImage} from '@fortawesome/free-solid-svg-icons';
 import { FileToSendDto } from '../dtos/fileToSendDto';
@@ -22,11 +22,11 @@ export class AddFileComponent implements OnInit {
   withPassword: boolean = false;
   passwordValue: string = '';
   file: any = null;
-  fileForm!: FormGroup;
+  fileForm!: UntypedFormGroup;
 
   icons: Array<IconDefinition> = [faGlobe, faUsers, faLock, faPenFancy, faFileImage]
 
-  constructor(private alert: AlertService, private fb: FormBuilder,
+  constructor(private alert: AlertService, private fb: UntypedFormBuilder,
     private fileServ: FileService, private router: Router) {}
 
   ngOnInit() {
