@@ -27,11 +27,8 @@ export class AuthInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     const idToken = localStorage.getItem('id_token');
     const csrf = localStorage.getItem('XSRF-TOKEN');
-    // console.log(csrf);
-
     if (idToken) {
       const cloned = request.clone({
-        //headers: request.headers.set('Authorization', 'Bearer ' + idToken, 'XSRF-TOKEN', csrf)
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + idToken,
         }),
@@ -52,7 +49,6 @@ export class AuthInterceptor implements HttpInterceptor {
         })
       );
     } else if (csrf) {
-      console.log('WITH CSRF');
       const cloned = request.clone({
         //headers: request.headers.set('XSRF-TOKEN', 'vf1jHsBd-OCHOi_qHB232NQpgbCR9IverZhI')
         withCredentials: true,

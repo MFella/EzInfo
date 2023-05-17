@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   faCoffee,
@@ -22,7 +22,7 @@ declare const toggle: any;
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
 })
-export class NavComponent implements OnInit {
+export class NavComponent {
   login: any = '';
   password: any = '';
 
@@ -42,10 +42,6 @@ export class NavComponent implements OnInit {
     private router: Router,
     private sweety: SweetyService
   ) {}
-
-  ngOnInit() {
-    console.log(this.authServ.currentUser);
-  }
 
   async login_user(login: string, password: string) {
     const loginCreds: LoginCredsDto = {

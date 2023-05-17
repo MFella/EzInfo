@@ -25,11 +25,6 @@
     .list-group-item{
 
         transition: all .4s;
-        &:hover{
-            cursor: pointer;
-            opacity: .87;
-
-        }
     }
 }
 

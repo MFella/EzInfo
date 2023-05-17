@@ -1,30 +1,28 @@
-import { bool, boolean } from '@hapi/joi';
-import {Entity, Column, PrimaryGeneratedColumn, PrimaryColumn} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Sharing{
+export class Sharing {
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @Column({
+    nullable: false,
+  })
+  ownerId: string;
 
-    @Column({
-        nullable: false
-    }) 
-    ownerId: string;
+  @Column({
+    nullable: false,
+  })
+  authorizedUserId: string;
 
-    @Column({  
-        nullable: false
-    })
-    authorizedUserId: string; 
+  @Column({
+    nullable: false,
+  })
+  entityId: string;
 
-    @Column({
-        nullable: false 
-    }) 
-    entityId: string;
-
-    @Column({
-        type: 'bool',
-        nullable: false
-    }) 
-    isFile: boolean; 
+  @Column({
+    type: "bool",
+    nullable: false,
+  })
+  isFile: boolean;
 }

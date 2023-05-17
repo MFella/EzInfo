@@ -1,53 +1,44 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import {UsersService} from './users.service';
-import {User} from '../user';
-import {Users} from '../users';
-import { exception } from 'console';
-import { UserForCreationDto } from './dto/user-for-creation.dto';
+import { InternalServerErrorException } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { UsersService } from "./users.service";
+import { User } from "../user";
+import { Users } from "../users";
+import { UserForCreationDto } from "./dto/user-for-creation.dto";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
+  constructor(private readonly userServ: UsersService) {}
 
-    constructor(private readonly userServ: UsersService){}
+  @Get()
+  async index(): Promise<Users> {
+    return this.userServ.findAll();
+  }
 
-    @Get()
-    async index(): Promise<Users>{
+  @Get(":id")
+  async find(@Param("login") login: string): Promise<User> {
+    return this.userServ.findByLogin(login);
+    //return this.userServ.find(id);
+  }
 
-        return this.userServ.findAll();
-    }
+  @Post()
+  create(@Body() user: UserForCreationDto) {
+    this.userServ.create(user);
+    //return this.authServ.register(user);
+  }
 
-    @Get(':id')
-    async find(@Param('login') login: string): Promise<User>
-    {
-        return this.userServ.findByLogin(login);
-        //return this.userServ.find(id);
-    }
+  @Get("/exists/:login")
+  async ifUserExists(@Param("login") login: string): Promise<boolean> {
+    return this.userServ.ifUserExists(login);
+  }
 
-    @Post()
-    create(@Body() user: UserForCreationDto)
-    {
-    
-        this.userServ.create(user);
-        //return this.authServ.register(user);
-    } 
+  @Put()
+  update(@Body() user: User) {
+    //this.userServ.update(user);
+    throw new InternalServerErrorException("Not implemented yet");
+  }
 
-    @Get('/exists/:login')
-    async ifUserExists(@Param('login') login: string): Promise<boolean>
-    {
-        return this.userServ.ifUserExists(login);
-    }
-
-    @Put()
-    update(@Body() user: User)
-    {
-        //this.userServ.update(user);
-        throw new exception("Not implemented yet");
-    }
-
-    @Delete(':id')
-    delete(@Param('id') id: number)
-    {
-        this.userServ.delete(id);
-    }
-
+  @Delete(":id")
+  delete(@Param("id") id: number) {
+    this.userServ.delete(id);
+  }
 }

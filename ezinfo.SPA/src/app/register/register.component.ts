@@ -29,7 +29,8 @@ export class RegisterComponent implements OnInit {
     this.initForm();
   }
 
-  initForm() { //Validators.pattern(/^[A-Za-z0-9]+$/)
+  initForm() {
+    //Validators.pattern(/^[A-Za-z0-9]+$/)
     this.registerForm = this.fb.group(
       {
         name: [
@@ -159,7 +160,6 @@ export class RegisterComponent implements OnInit {
         this.router.navigate(['/']);
       },
       (err: any) => {
-        console.log(err);
         let errMess = '';
         for (const item in err.error.message) {
           errMess += item + ' ';
@@ -176,7 +176,7 @@ export class RegisterComponent implements OnInit {
         this.availability = res.available;
       },
       (err) => {
-        console.log(err);
+        console.warn(err);
       }
     );
   }

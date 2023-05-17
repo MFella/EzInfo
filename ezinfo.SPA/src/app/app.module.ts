@@ -1,6 +1,6 @@
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   HttpClientModule,
   HttpClientXsrfModule,
@@ -19,12 +19,15 @@ import { AuthInterceptor } from './_services/auth.interceptor';
 import { AllNotesResolver } from './_resolvers/all-notes.resolver';
 import { AllFilesResolver } from './_resolvers/all-files.resolver';
 import { ResetWaitComponent } from './reset-wait/reset-wait.component';
+
+import { BrowserModule } from '@angular/platform-browser';
+import { ToastrModule } from 'ngx-toastr';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NO_ERRORS_SCHEMA,
 } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
   declarations: [
@@ -38,6 +41,7 @@ import { BrowserModule } from '@angular/platform-browser';
     ResetWaitComponent,
   ],
   imports: [
+    FontAwesomeModule,
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
@@ -48,10 +52,9 @@ import { BrowserModule } from '@angular/platform-browser';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    // PaginationModule.forRoot(),
     PasswordStrengthMeterModule.forRoot(),
     BrowserAnimationsModule,
-    // ToastrModule.forRoot(),
+    ToastrModule.forRoot(),
   ],
   providers: [
     AllNotesResolver,

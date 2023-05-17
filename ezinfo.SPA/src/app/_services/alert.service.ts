@@ -1,48 +1,39 @@
-import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AlertService {
+  constructor(private toastr: ToastrService) {}
 
-constructor(private toastr: ToastrService) { }
-
-  success(msg: string)
-  {
+  success(msg: string) {
     this.toastr.success(msg, 'Success', {
       timeOut: 7000,
-      positionClass: 'toast-bottom-left'
+      positionClass: 'toast-bottom-left',
     });
   }
 
-  error(msg: string)
-  {
+  error(msg: string) {
     this.toastr.error(msg, 'Error occured', {
       timeOut: 7000,
-      positionClass: 'toast-bottom-right'
+      positionClass: 'toast-bottom-right',
     });
   }
 
-  info(msg: string)
-  {
+  info(msg: string) {
     this.toastr.info(msg, 'Info', {
       timeOut: 7000,
-      positionClass: 'toast-bottom-left'
-     // positionClass: 'toast-top-left'
-     //positionClass: 'inline'
-    })
+      positionClass: 'toast-bottom-left',
+      // positionClass: 'toast-top-left'
+      //positionClass: 'inline'
+    });
   }
 
-  warning(msg: string)
-  {
+  warning(msg: string) {
     this.toastr.warning(msg, 'Warning', {
       timeOut: 7000,
-      positionClass: 'toast-bottom-right'
-    })
+      positionClass: 'toast-bottom-right',
+    });
   }
-
-  
-
-
 }

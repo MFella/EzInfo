@@ -1,152 +1,107 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { exception } from 'console';
+import { HttpException, Injectable } from "@nestjs/common";
 //import {User} from '../user';
-import {Users} from '../users';
-import {InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import {User} from './user.entity';
-import {UserForCreationDto} from './dto/user-for-creation.dto';
-import * as argon2 from 'argon2';
-import {v4 as uuid} from 'uuid';
+import { Users } from "../users";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./user.entity";
+import { UserForCreationDto } from "./dto/user-for-creation.dto";
+import * as argon2 from "argon2";
+import { v4 as uuid } from "uuid";
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-    constructor(
-        @InjectRepository(User)
-        private usersRepository: Repository<User>,
-    ){}
+  private readonly users: Users = {
+    1: {
+      id: 1,
+      login: "Czarek",
+      name: "Czarek",
+      surname: "Surname",
+      email: "how@wp.pl",
+    },
+    2: {
+      id: 2,
+      login: "Marek",
+      name: "Zegare",
+      surname: "Hahaha",
+      email: "DSADSA",
+    },
+  };
 
-    private readonly users: Users = {
-        1:{
-            id: 1,
-            login: "Czarek",
-            name: "Czarek",
-            surname: "Surname",
-            email: "how@wp.pl"
-        },
-        2:{
-            id: 2,
-            login: "Marek",
-            name: "Zegare",
-            surname: "Hahaha",
-            email: "DSADSA"
-        },
+  findAll(): Promise<Array<User>> {
+    return this.usersRepository.find();
+  }
 
-    };
- 
-    findAll(): Promise<Array<User>>{
-        return this.usersRepository.find();
+  public async checkIfExists(login: string) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { login } });
+
+      if (user) {
+        return { available: false };
+      } else return { available: true };
+    } catch (e) {
+      throw new HttpException("Something went wrong", 500);
+    }
+  }
+
+  async create(newUser: UserForCreationDto) {
+    const user = new User();
+    user.login = newUser.login;
+    user.name = newUser.name;
+    user.surname = newUser.surname;
+    user.email = newUser.email;
+    user.id = uuid();
+
+    try {
+      const customHash = await argon2.hash(newUser.password);
+      user.passwordHash = customHash;
+    } catch (err) {
+      console.warn(err);
     }
 
-    public async checkIfExists(login: string)
-    {
-        try{
-            console.log(`Login is: ${login}`);
-            console.log(login);
+    const res = await this.usersRepository.save(user);
 
-            const user = await this.usersRepository.findOne({where: {login}})
+    const { passwordHash, id, ...result } = res;
 
-            if(user)
-            {
-                return {"available": false};
+    return result;
+  }
 
-            } else return {"available": true};
-        }
-        catch(e)
-        {
-            throw new HttpException("Something went wrong", 500);
-        }
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.usersRepository.findOne({ where: { email: email } });
 
-    }
+    return user;
+  }
 
-    async create(newUser: UserForCreationDto)
-    {
-        const user = new User();
-        user.login = newUser.login;
-        user.name = newUser.name;
-        user.surname = newUser.surname;
-        user.email = newUser.email;
-        user.id = uuid();
+  async findByLogin(login: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        login,
+      },
+    });
 
-        try{
-            const customHash = await argon2.hash(newUser.password);
-            user.passwordHash = customHash;
+    return user;
+  }
 
-        }catch(err)
-        {
-            console.log(err);
-        }
+  async changePassword(user: User, password: string) {
+    const customHash = await argon2.hash(password);
+    user.passwordHash = customHash;
 
-        const res = await this.usersRepository.save(user);
+    return await this.usersRepository.update({ login: user.login }, user);
+  }
 
-        const {passwordHash, id,  ...result} = res;
+  async ifUserExists(login: string) {
+    const hipoUser = await this.usersRepository.findBy({ login: login });
 
-        return result;
-    }
+    if (hipoUser.length === 0) {
+      return true;
+    } else return false;
+  }
 
-    async findByEmail(email: string): Promise<User | null>
-    {
-        const user = await this.usersRepository.findOne({where:{email: email}});
-
-        return user;
-    }
-
-    async findByLogin(login: string): Promise<User> {
-
-
-        const user = await this.usersRepository.findOne({
-            where:{
-                login
-            }
-        });
-
-        return user;
-    }
-
-    async changePassword(user: User, password: string)
-    {
-        const customHash = await argon2.hash(password);
-        user.passwordHash = customHash;
-
-        return await this.usersRepository.update({login: user.login}, user);
-        
-    }
-
-    async ifUserExists(login: string)
-    {
-        const hipoUser = await this.usersRepository.find({login: login});
-        console.log(hipoUser);
-
-        if(hipoUser.length === 0)
-        {
-            return true;
-        }else return false;
-
-    }
-
-
-    // async registerUser(user: UserForCreationDto)
-    // {
-    //     if(await this.usersRepository.find({login: user.login}))
-
-    // }
-
-    // update(user: User)
-    // {
-    //     if(!this.users[user.id]) throw new Error('No user found ;c');
-
-    //     this.users[user.id] = user;
-    // }
-
-    async delete(id: number) {
-        // const user: User = this.users[id];
-        // if(!user) throw new Error('No user found');
-
-        // delete this.users[id];
-
-        await this.usersRepository.delete(id);
-    }
-
-
+  async delete(id: number) {
+    await this.usersRepository.delete(id);
+  }
 }

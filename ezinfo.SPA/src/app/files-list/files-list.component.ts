@@ -6,6 +6,7 @@ import {
   faGlobe,
   faUsers,
   faEye,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { Pagination } from '../_models/pagination.interface';
 import { RecordInList } from '../_models/recordInList.interface';
@@ -42,6 +43,7 @@ export class FilesListComponent implements OnInit {
     faGlobe,
     faUsers,
     faEye,
+    faTrash,
   ];
 
   constructor(
@@ -53,18 +55,12 @@ export class FilesListComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
-      console.log(data);
-      //console.log(data.files);
-      console.log(data.files);
-      //this.allFiles = data.files;
       this.allFiles = [...data.files, ...data.notes];
       this.sharedText = [...data.files, ...data.notes];
 
       for (let i = 0; i < this.allFiles.length; i++) {
         this.allFiles[i].possiblePassword = '';
       }
-
-      console.log(this.allFiles.length);
 
       this.pagination = {
         currentPage: 1,
@@ -82,7 +78,6 @@ export class FilesListComponent implements OnInit {
     this.fileServ.retrieveNote(id, password).subscribe(
       (res: any) => {
         password = '';
-        //console.log(res);
         this.sweety.success(id, res.note);
         this.sharedText.forEach((el) => (el.possiblePassword = ''));
       },
@@ -156,5 +151,9 @@ export class FilesListComponent implements OnInit {
       (e.page - 1) * e.itemsPerPage,
       e.page * e.itemsPerPage
     );
+  }
+
+  deleteFile(itemId: string): void {
+    this.sweety.confirm(itemId);
   }
 }

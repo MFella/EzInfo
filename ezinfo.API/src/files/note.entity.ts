@@ -1,50 +1,48 @@
-import { bool, boolean } from '@hapi/joi';
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Note{
-    @PrimaryGeneratedColumn('uuid')
-    id: number;
+export class Note {
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column({
-        nullable: false
-    })
-    content: string;
+  @Column({
+    nullable: false,
+  })
+  content: string;
 
-    @Column({
-        nullable: false
-    })
-    login: string;
+  @Column({
+    nullable: false,
+  })
+  login: string;
 
-    @Column({
-        type: 'bool',
-        nullable: false
-    }) 
-    isRestricted: boolean; 
+  @Column({
+    type: "bool",
+    nullable: false,
+  })
+  isRestricted: boolean;
 
-    @Column({
-        type: 'bool',
-        nullable: false,
-        default: false
-    })
-    isFile: boolean;
+  @Column({
+    type: "bool",
+    nullable: false,
+    default: false,
+  })
+  isFile: boolean;
 
-    @Column({
-        //type: 'bool',
-        nullable: false
-    }) 
-    havePassword: boolean;
+  @Column({
+    //type: 'bool',
+    nullable: false,
+  })
+  havePassword: boolean;
 
-    @Column({
-        type: "blob",
-        nullable: false
-    })
-    passwordHash: string;
+  @Column({
+    type: "blob",
+    nullable: false,
+  })
+  passwordHash: string;
 
-
-    @Column({
-        type: "blob",
-        nullable: false
-    })
-    iv: Buffer;
+  @Column({
+    type: "blob",
+    nullable: false,
+  })
+  iv: Buffer;
 }

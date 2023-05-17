@@ -6,14 +6,6 @@
     <div class="row py-4">
       <div class="col-md-12">
         <div class="list-group w-50 mx-auto">
-          <!-- <a class="list-group-item list-group-item-action flex-column align-items-start active">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">List group item heading</h5>
-              <small>3 days ago</small>
-            </div>
-            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-            <small>Donec id elit non mi porta.</small>
-          </a> -->
           <a class="list-group-item list-group-item-action align-items-start" *ngFor="let item of this.sharedText">
             <div class="file_id_show">
               <h5 class="mb-1">Id: {{item.id}}</h5>
@@ -25,7 +17,8 @@
                 <span class="badge badge-success mr-2"
                 *ngIf="!this.item.havePassword"
                 >Locked?: Nope</span>
-                <button *ngIf='!this.item.isFile' class="btn btn-primary btn-sm" 
+                <button *ngIf='!this.item.isFile' class="btn btn-primary btn-sm"
+                [disabled]="item.havePassword && item.possiblePassword === ''"
                 (click)="showContent(this.item.id, this.item.possiblePassword)" type="button"
                 >Show content <fa-icon [icon]="icons[5]"></fa-icon></button>
                 <button *ngIf='this.item.isFile' class="btn btn-warning btn-sm" 
@@ -37,18 +30,19 @@
             <p class="mb-1">Published by: {{item.login}}</p>
             <small class="text-muted" *ngIf="this.item.isFile">File <fa-icon [icon]="icons[1]"></fa-icon></small>
             <small class="text-muted" *ngIf="!this.item.isFile">Text <fa-icon [icon]="icons[0]"></fa-icon></small>
-            <!-- <fa-icon [icon]="icons[1]"></fa-icon> -->
               <div class="d-flex justify-content-between align-items-center w-100">
                 <small class="text-muted w-100" *ngIf="this.item.isRestricted">Restricted <fa-icon [icon]="icons[4]"></fa-icon></small>
                 <small class="text-muted w-100" *ngIf="!this.item.isRestricted">Not restricted <fa-icon [icon]="icons[3]"></fa-icon></small>
-                <!-- <small class="text-muted">Published 3 days ago</small> -->
-
                 <div class="file_password" *ngIf="this.item.havePassword">
                   <small class="text-muted pr-1">Password: </small>
                   <input class="form-control form-control-sm w-100" type="password" placeholder="Password"
                   [(ngModel)]="this.item.possiblePassword">
                 </div>
-                
+                <div class="delete-file ml-2">
+                  <button *ngIf='true' class="btn btn-danger btn-sm" 
+                  (click)="deleteFile(this.item.id)" type="button"
+                  > <fa-icon [icon]="icons[6]"></fa-icon></button>
+                </div>
 
               </div> 
           </a>
@@ -56,7 +50,7 @@
           <div class="card text-white bg-info mb-3" *ngIf="this.sharedText.length === 0">
             <div class="card-header text-center">No more to say</div>
             <div class="card-body">
-              <p class="card-text text-center">Right now, you haven't got nothing here. Add something to see it</p>
+              <p class="card-text text-center">Right now, you've got nothing here. Add files to fill list</p>
             </div>
           </div>
         </div>

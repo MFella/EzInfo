@@ -1,99 +1,100 @@
 import { Injectable } from '@angular/core';
-import { text } from '@fortawesome/fontawesome-svg-core';
-import { repeat } from 'rxjs/operators';
 import Swal, { SweetAlertResult } from 'sweetalert2';
-
+import { FileService } from './file.service';
+import { firstValueFrom } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SweetyService {
+  constructor(private readonly fileService: FileService) {}
 
-  constructor() { }
-
-  success(id: string, msg: string)
-  {
+  success(id: string, msg: string) {
     //Swal.fire(`Message retrieved`, msg, "success");
     Swal.fire({
       title: 'Message retrieved',
       text: msg,
       icon: 'success',
       showClass: {
-        popup: 'animate__animated animate__rotateIn'
+        popup: 'animate__animated animate__rotateIn',
       },
       hideClass: {
-        popup: 'animate__animated animate__rotateOut'
-      }
-    })
-  
+        popup: 'animate__animated animate__rotateOut',
+      },
+    });
   }
 
-  error(id: string, msg: string)
-  {
+  error(id: string, msg: string) {
     //Swal.fire(`Cant retrieve message`, msg, 'error');
     Swal.fire({
       title: 'Message retrieved',
       text: msg,
       icon: 'error',
       showClass: {
-        popup: 'animate__animated animate__zoomInDown'
+        popup: 'animate__animated animate__zoomInDown',
       },
       hideClass: {
-        popup: 'animate__animated animate__rollOut'
-      }
-    })
+        popup: 'animate__animated animate__rollOut',
+      },
+    });
   }
 
-  about(title: string, text: string)
-  {
+  about(title: string, text: string) {
     Swal.fire({
       title: title,
-      showClass:{
-        popup: 'animate__animated animate__flipInY'
+      showClass: {
+        popup: 'animate__animated animate__flipInY',
       },
       hideClass: {
-        popup: 'animate__animated animate__fadeOutDownBig'
+        popup: 'animate__animated animate__fadeOutDownBig',
       },
       showCloseButton: true,
       showConfirmButton: true,
-      html: text
-    })
+      html: text,
+    });
   }
 
-  async forgot()
-  {
-   const value =  await Swal.fire({
-        icon: 'question',
-        title: 'Did you forget your password?',
-        text: `That's happen sometimes, its usual thing. 
+  async forgot() {
+    const value = await Swal.fire({
+      icon: 'question',
+      title: 'Did you forget your password?',
+      text: `That's happen sometimes, its usual thing. 
         Just write down your email. We will send you mail
         with recovery link.`,
-        showClass: {
-          popup: 'animate__animated animate__jackInTheBox'
-        },
-        hideClass: {
-          popup: 'animate__animated animate__flipOutX'
-        },
-          input: 'text',
-          inputLabel: 'Your email',
-          inputPlaceholder: 'e.g. example@gmail.com',
-          showCancelButton: true,
-          showCloseButton: true,
-          // inputValidator: (value) =>
-          // {
-          //   if(!value)
-          //   {
-          //     return 'Yyou need to write something';
-          //   }
-          // }
-
-        
-    })
+      showClass: {
+        popup: 'animate__animated animate__jackInTheBox',
+      },
+      hideClass: {
+        popup: 'animate__animated animate__flipOutX',
+      },
+      input: 'text',
+      inputLabel: 'Your email',
+      inputPlaceholder: 'e.g. example@gmail.com',
+      showCancelButton: true,
+      showCloseButton: true,
+    });
     return value;
   }
 
-  async changePassword(): Promise<SweetAlertResult> {
+  async confirm(itemId: string): Promise<boolean> {
+    const value = await Swal.fire({
+      title: 'Enter destruction code',
+      text: 'XYYY-XYYY-XYYY => XXX',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      preConfirm: (code: string) => {
+        return firstValueFrom(this.fileService.deleteItem(code, itemId))
+          .then((response: any) => console.log(response))
+          .catch((err: HttpErrorResponse) => console.log(err));
+      },
+    });
 
+    return value.isConfirmed;
+  }
+
+  async changePassword(): Promise<SweetAlertResult> {
     const value = await Swal.fire({
       title: 'Reset your password',
       text: `Remember about the restrictions associated with passwords.
@@ -101,22 +102,22 @@ export class SweetyService {
       Passwords should match.`,
       focusConfirm: false,
       inputLabel: 'Password',
-      html: 
+      html:
         `<p class="text-center">Remember about the restrictions associated with passwords.
         Password length must be greater than 7, contains at least one number and one special sign.
-        For sure, passwords must match.</p>`+
-        '<input type="password" id="password_for_reset" class="swal2-input" placeholder="Password">' + 
+        For sure, passwords must match.</p>` +
+        '<input type="password" id="password_for_reset" class="swal2-input" placeholder="Password">' +
         '<input type="password" id="repeatPassword_for_reset" class="swal2-input" placeholder="Repeat Password">',
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       confirmButtonText: 'Change password',
       showClass: {
-        popup: 'animate__animated animate__fadeInTopLeft'
+        popup: 'animate__animated animate__fadeInTopLeft',
       },
       hideClass: {
-        popup: 'animate__animated animate__bounceOutLeft'
-      }
+        popup: 'animate__animated animate__bounceOutLeft',
+      },
     });
 
     //return [value, password, repeat_password];

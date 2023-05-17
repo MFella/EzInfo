@@ -68,7 +68,6 @@ export class ResetWaitComponent implements OnInit {
         (err) => {
           this.alert.error('Error ocured during retriving data');
           this.router.navigate(['']);
-          console.log(err);
         }
       );
     });

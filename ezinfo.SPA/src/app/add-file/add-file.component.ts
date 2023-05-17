@@ -67,9 +67,7 @@ export class AddFileComponent implements OnInit {
     this.accessType = type;
   }
 
-  showMe() {
-    console.log(this.loginList);
-  }
+  showMe() {}
 
   showFile(e: any) {
     const file = e.target.files;
@@ -80,8 +78,6 @@ export class AddFileComponent implements OnInit {
     if (!this.validateInfo()) {
       // do my thing
       if (this.sendType === 'File') {
-        console.log('the password is: ' + this.fileForm.get('password')!.value);
-
         const fileToSendDto: FileToSendDto = Object.assign(
           {},
           {
@@ -91,8 +87,6 @@ export class AddFileComponent implements OnInit {
             password: this.fileForm.get('password')!.value.toString(),
           }
         );
-
-        console.log(fileToSendDto);
 
         this.fileServ.sendFile(fileToSendDto).subscribe(
           (res) => {
@@ -122,6 +116,7 @@ export class AddFileComponent implements OnInit {
           },
           (err) => {
             this.alert.error(`Error occured while saving note. Error: ${err}`);
+            console.log(err);
           }
         );
       }
