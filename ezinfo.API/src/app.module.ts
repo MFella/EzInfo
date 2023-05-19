@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Connection } from "typeorm";
 import { AppController } from "./app.controller";
@@ -10,14 +9,7 @@ import { DatabaseModule } from "./database/database.module";
 import { AuthModule } from "./auth/auth.module";
 import { FileModule } from "./files/file.module";
 import { ForgotPasswordModule } from "./forgot-password/forgot-password.module";
-
-// const configuration  = {
-//   JWT_SECRET: Joi.string().required(),
-//   JWT_EXPIRATION_TIME: Joi.string().required(),
-//   AWS_REGION: Joi.string().required(),
-//   AWS_ACCESS_KEY_ID: Joi.string().required(),
-//   AWS_SECRET_ACCESS_KEY: Joi.string().required()
-// };
+import { MailerModule } from "@nestjs-modules/mailer";
 
 @Module({
   imports: [
@@ -35,6 +27,16 @@ import { ForgotPasswordModule } from "./forgot-password/forgot-password.module";
         PORT: Joi.number(),
         AWS_PUBLIC_BUCKET_NAME: Joi.string().required(),
       }),
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
+        },
+      },
     }),
     DatabaseModule,
     AuthModule,

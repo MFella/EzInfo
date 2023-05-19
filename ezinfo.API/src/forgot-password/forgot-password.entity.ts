@@ -3,7 +3,12 @@ import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
 @Entity()
 export class ForgotPassword {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
+
+  @Column({
+    nullable: false,
+  })
+  id: string;
 
   @Column({
     nullable: false,

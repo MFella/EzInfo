@@ -172,9 +172,10 @@ export class AuthService {
         const algorithm = "camellia-192-cbc";
         const key = crypto.scryptSync(forgotOne.id.toString(), "salt", 24);
 
-        const decipher = crypto.createDecipheriv(algorithm, key, forgotOne.iv);
+        console.log(forgotOne.iv.buffer);
+        const decipher = crypto.createDecipheriv(algorithm, key, forgotOne.iv.buffer as Buffer);
 
-        const stringedToken = Buffer.from(forgotOne.tokenHash, "base64").toString("utf-8");
+        const stringedToken = forgotOne.tokenHash;
 
         const decryptedToken = decipher.update(stringedToken, "hex", "utf8") + decipher.final("utf8");
 
@@ -211,6 +212,7 @@ export class AuthService {
           throw new HttpException("Password reset time has elapsed. Try to send remind-email again", 401);
         }
 
+        console.log(e);
         throw new InternalServerErrorException("Error occured during checking identity");
       }
     }

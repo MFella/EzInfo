@@ -57,7 +57,7 @@ export class ForgotPasswordService {
   }
 
   async findById(id: string) {
-    return await this.forgotRepository.findOneBy({ id: parseInt(id) });
+    return await this.forgotRepository.findOne({ where: { id } });
   }
 
   async deleteForgetness(email: string) {
