@@ -1,3 +1,4 @@
+import { AlertService } from './alert.service';
 import { Injectable } from '@angular/core';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 import { FileService } from './file.service';
@@ -8,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   providedIn: 'root',
 })
 export class SweetyService {
-  constructor(private readonly fileService: FileService) {}
+  constructor() {}
 
   success(id: string, msg: string) {
     //Swal.fire(`Message retrieved`, msg, "success");
@@ -77,18 +78,17 @@ export class SweetyService {
     return value;
   }
 
-  async confirm(itemId: string): Promise<boolean> {
+  async confirm(
+    itemId: string,
+    preConfirmCb: (code: string) => void
+  ): Promise<boolean> {
     const value = await Swal.fire({
       title: 'Enter destruction code',
       text: 'XYYY-XYYY-XYYY => XXX',
       input: 'text',
       showCancelButton: true,
       confirmButtonText: 'Delete',
-      preConfirm: (code: string) => {
-        return firstValueFrom(this.fileService.deleteItem(code, itemId))
-          .then((response: any) => console.log(response))
-          .catch((err: HttpErrorResponse) => console.log(err));
-      },
+      preConfirm: preConfirmCb,
     });
 
     return value.isConfirmed;

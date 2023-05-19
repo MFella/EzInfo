@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -12,10 +13,10 @@ import {
   faLock,
   faPenFancy,
   faFileImage,
+  faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { FileToSendDto } from '../dtos/fileToSendDto';
 import { TextToSendDto } from '../dtos/textToSendDto';
-import { HTMLInputEvent } from '../_models/HTMLInputEvent.interface';
 import { AlertService } from '../_services/alert.service';
 import { FileService } from '../_services/file.service';
 
@@ -25,14 +26,19 @@ import { FileService } from '../_services/file.service';
   styleUrls: ['./add-file.component.scss'],
 })
 export class AddFileComponent implements OnInit {
+  passwordInputType: 'text' | 'password' = 'password';
+
+  addFileInputLabel: string = 'Choose File';
+
   accessType: string = 'Everyone';
   sendType: string = 'File';
   loginList: string = '';
   contentText: string = '';
   withPassword: boolean = false;
   passwordValue: string = '';
-  file: any = null;
+  file: File | null = null;
   fileForm!: UntypedFormGroup;
+  availableFileFormats: Array<string> = ['.jpeg', '.png', '.csv', '.svg'];
 
   icons: Array<IconDefinition> = [
     faGlobe,
@@ -40,6 +46,7 @@ export class AddFileComponent implements OnInit {
     faLock,
     faPenFancy,
     faFileImage,
+    faEye,
   ];
 
   constructor(
@@ -63,25 +70,22 @@ export class AddFileComponent implements OnInit {
     });
   }
 
-  random(e: Event, type: string) {
+  setAccessType(type: string) {
     this.accessType = type;
   }
 
-  showMe() {}
-
-  showFile(e: any) {
-    const file = e.target.files;
+  chooseFile(e: any) {
     this.file = e.target.files.item(0);
+    this.addFileInputLabel = this.file?.name ?? 'Choose File';
   }
 
   sendFile() {
     if (!this.validateInfo()) {
-      // do my thing
       if (this.sendType === 'File') {
         const fileToSendDto: FileToSendDto = Object.assign(
           {},
           {
-            file: this.file,
+            file: this.file as File,
             accessType: this.accessType,
             loginList: this.loginList,
             password: this.fileForm.get('password')!.value.toString(),
@@ -89,12 +93,12 @@ export class AddFileComponent implements OnInit {
         );
 
         this.fileServ.sendFile(fileToSendDto).subscribe(
-          (res) => {
+          () => {
             this.alert.success('Saved correctly! See this in your infos!');
             this.router.navigate(['']);
           },
-          (err) => {
-            this.alert.error(`Some error occured: ${err}`);
+          (err: HttpErrorResponse) => {
+            this.alert.error(`Some error occured: ${err.error?.message}`);
           }
         );
       } else {
@@ -152,5 +156,13 @@ export class AddFileComponent implements OnInit {
     }
 
     return false;
+  }
+
+  togglePasswordInputType(): void {
+    if (!this.withPassword) {
+      return;
+    }
+    this.passwordInputType =
+      this.passwordInputType === 'password' ? 'text' : 'password';
   }
 }

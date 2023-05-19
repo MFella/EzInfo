@@ -1,23 +1,22 @@
-import { bool, boolean } from '@hapi/joi';
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ObjectIdColumn, ObjectId } from "typeorm";
 
 @Entity()
-export class Attempt{
-    @PrimaryGeneratedColumn('uuid')
-    id: number;
+export class Attempt {
+  @ObjectIdColumn()
+  id: ObjectId;
 
-    @Column({
-        nullable: false
-    })
-    login: string;
+  @Column({
+    nullable: false,
+  })
+  login: string;
 
-    @Column({
-        nullable: false
-    })
-    attempt_number: number;
+  @Column({
+    nullable: false,
+  })
+  attempt_number: number;
 
-    @Column({
-        nullable: true
-    })
-    ban_time: string; 
+  @Column({
+    nullable: true,
+  })
+  ban_time: string;
 }

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MongoRepository, Repository } from "typeorm";
 import { ForgotPassword } from "./forgot-password.entity";
 import { v4 as uuid } from "uuid";
 import * as crypto from "crypto";
@@ -9,7 +9,7 @@ import * as crypto from "crypto";
 export class ForgotPasswordService {
   constructor(
     @InjectRepository(ForgotPassword)
-    private forgotRepository: Repository<ForgotPassword>,
+    private forgotRepository: MongoRepository<ForgotPassword>,
   ) {}
 
   async saveForgetness(email: string, token: string) {

@@ -18,7 +18,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json",
+    "migrate:create": "ts-node ./node_modules/typeorm/cli.js migration:create -n",
+    "migrate:up": "ts-node ./node_modules/typeorm/cli.js migration:run",
+    "migrate:down": "ts-node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.332.0",
@@ -28,6 +32,7 @@
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.4.0",
     "@nestjs/jwt": "^10.0.3",
+    "@nestjs/mongoose": "^9.2.2",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.4.0",
     "@nestjs/platform-fastify": "^9.4.0",
@@ -51,6 +56,7 @@
     "fastify-csrf": "^3.0.1",
     "helmet": "^4.3.1",
     "mailgun-js": "^0.22.0",
+    "mongoose": "^7.1.1",
     "mysql": "^2.18.1",
     "nestjs-real-ip": "^2.2.0",
     "nodemailer": "^6.4.17",

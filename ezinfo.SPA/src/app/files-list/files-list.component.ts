@@ -16,6 +16,9 @@ import { SweetyService } from '../_services/sweety.service';
 import { saveAs } from 'file-saver';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../_services/auth.service';
 
 @Component({
   selector: 'app-files-list',
@@ -46,11 +49,14 @@ export class FilesListComponent implements OnInit {
     faTrash,
   ];
 
+  itemIdToDelete!: string;
+
   constructor(
     private route: ActivatedRoute,
     private fileServ: FileService,
     private alert: AlertService,
-    private sweety: SweetyService
+    private sweety: SweetyService,
+    private readonly authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -154,6 +160,26 @@ export class FilesListComponent implements OnInit {
   }
 
   deleteFile(itemId: string): void {
-    this.sweety.confirm(itemId);
+    this.itemIdToDelete = itemId;
+    this.sweety.confirm(itemId, this.deleteFileConfirmCb.bind(this));
+  }
+
+  canDeleteFile(login: string): boolean {
+    return this.authService.currentUser.login === login;
+  }
+
+  private deleteFileConfirmCb(code: string): void {
+    firstValueFrom(this.fileServ.deleteItem(code, this.itemIdToDelete))
+      .then((response: { deleted: boolean; message: string }) => {
+        if (!response.deleted) {
+          this.alert.error(response.message);
+        } else {
+          this.alert.info(response.message);
+        }
+      })
+      .catch((err: HttpErrorResponse) => {
+        console.log(err.error);
+        this.alert.error(err.error?.message?.join(' '));
+      });
   }
 }

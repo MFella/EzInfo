@@ -1,8 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, ObjectIdColumn, ObjectId } from "typeorm";
 
 @Entity()
 export class File {
-  @PrimaryGeneratedColumn("uuid")
+  @ObjectIdColumn()
+  _id: ObjectId;
+
+  @Column({
+    nullable: false,
+  })
   id: string;
 
   @Column({

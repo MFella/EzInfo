@@ -2,7 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 //import {User} from '../user';
 import { Users } from "../users";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MongoRepository, Repository } from "typeorm";
 import { User } from "./user.entity";
 import { UserForCreationDto } from "./dto/user-for-creation.dto";
 import * as argon2 from "argon2";
@@ -12,25 +12,8 @@ import { v4 as uuid } from "uuid";
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersRepository: MongoRepository<User>,
   ) {}
-
-  private readonly users: Users = {
-    1: {
-      id: 1,
-      login: "Czarek",
-      name: "Czarek",
-      surname: "Surname",
-      email: "how@wp.pl",
-    },
-    2: {
-      id: 2,
-      login: "Marek",
-      name: "Zegare",
-      surname: "Hahaha",
-      email: "DSADSA",
-    },
-  };
 
   findAll(): Promise<Array<User>> {
     return this.usersRepository.find();
@@ -38,12 +21,12 @@ export class UsersService {
 
   public async checkIfExists(login: string) {
     try {
-      const user = await this.usersRepository.findOne({ where: { login } });
-
+      const user = await this.usersRepository.findOneBy({ login });
       if (user) {
         return { available: false };
       } else return { available: true };
     } catch (e) {
+      console.log(e);
       throw new HttpException("Something went wrong", 500);
     }
   }

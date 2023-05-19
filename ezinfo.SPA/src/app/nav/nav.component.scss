@@ -22,8 +22,18 @@ nav
     transform: skewX(-7deg);
 }
 
-.pass_flex{
+.pass_flex {
     padding-top: 1.3rem;
+    position: relative;
+
+    .request-pending-spinner-loader {
+        position: absolute;
+        right: 1rem;
+        width: 1rem;
+        height: 1rem;
+        top: 38%;
+        border-width: .1rem;
+    }
 }
 
 small

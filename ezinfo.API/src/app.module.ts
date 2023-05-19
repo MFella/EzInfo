@@ -24,11 +24,11 @@ import { ForgotPasswordModule } from "./forgot-password/forgot-password.module";
     UsersModule,
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        MYSQL_HOST: Joi.string().required(),
-        MYSQL_PORT: Joi.number().required(),
-        MYSQL_USER: Joi.string().required(),
-        MYSQL_PASSWORD: Joi.string().required(),
-        MYSQL_DB: Joi.string().required(),
+        MONGODB_HOST: Joi.string().required(),
+        MONGODB_PORT: Joi.number().required(),
+        MONGODB_USER: Joi.string().required(),
+        MONGODB_PASSWORD: Joi.string().required(),
+        MONGODB_DB: Joi.string().required(),
         AWS_REGION: Joi.string().required(),
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),

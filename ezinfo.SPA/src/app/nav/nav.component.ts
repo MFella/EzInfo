@@ -25,6 +25,7 @@ declare const toggle: any;
 export class NavComponent {
   login: any = '';
   password: any = '';
+  isLoginRequestPending: boolean = false;
 
   faCoffee = faCoffee;
   icons: Array<IconDefinition> = [
@@ -49,7 +50,7 @@ export class NavComponent {
       password,
     };
 
-    // await this.authServ.login(loginCreds);
+    this.isLoginRequestPending = true;
     return this.authServ.login(loginCreds).subscribe(
       (res) => {
         if (res.res) {
@@ -59,11 +60,13 @@ export class NavComponent {
           this.password = '';
           toggle();
         }
+        this.isLoginRequestPending = false;
       },
       (err) => {
         this.login = '';
         this.password = '';
         this.alertServ.error(err.error.message);
+        this.isLoginRequestPending = false;
       }
     );
   }

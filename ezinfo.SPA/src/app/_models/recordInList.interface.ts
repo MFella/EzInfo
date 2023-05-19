@@ -7,5 +7,4 @@ export interface RecordInList {
   possiblePassword: string;
   isFile: boolean;
   filename?: string;
-  amIOwner: boolean;
 }

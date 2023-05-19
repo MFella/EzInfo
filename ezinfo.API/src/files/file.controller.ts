@@ -24,15 +24,10 @@ import { Response } from "express";
 import { DeleteItemQuery } from "src/types/deleteItemQuery";
 import { DeleteItemResponse } from "src/types/deleteItemResponse";
 
-//maybe some authorization?
-
 @Controller("file")
 export class FileController {
-  constructor(
-    // private readonly authServ: AuthService,
-    // private readonly usersServ: UsersService,
-    private readonly fileServ: FileService,
-  ) {}
+  private static readonly UPLOAD_FILE_MAX_SIZE: number = 2 ** 23;
+  constructor(private readonly fileServ: FileService) {}
 
   @Post("upload")
   @UseInterceptors(FileInterceptor("file"))
@@ -41,7 +36,7 @@ export class FileController {
     @Req() request: RequestWithUser,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 5000 })],
+        validators: [new MaxFileSizeValidator({ maxSize: FileController.UPLOAD_FILE_MAX_SIZE })],
       }),
     )
     file: Express.Multer.File,
@@ -53,18 +48,7 @@ export class FileController {
   @Get("files")
   @UseGuards(JwtAuthGuard)
   async retrieveAllFiles(@Req() request: RequestWithUser, @RealIP() ip: string) {
-    //TODO -> detect id, and catch number of 'trying' requesting ;)
-
     return this.fileServ.retrieveAllFiles(request.user);
-  }
-
-  @Delete("")
-  @HttpCode(204)
-  async deleteFile(@Query() query: any) {
-    const id = query.id;
-    const res = await this.fileServ.deleteFile(id);
-
-    return res;
   }
 
   @Get("")

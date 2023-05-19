@@ -14,13 +14,14 @@ import { Attempt } from "src/auth/attempt.entity";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: "mysql",
-        host: configService.get("MYSQL_HOST"),
-        port: configService.get("MYSQL_PORT"),
-        username: configService.get("MYSQL_USER"),
-        password: configService.get("MYSQL_PASSWORD"),
-        database: configService.get("MYSQL_DB"),
-        synchronize: true, // appropriate in production
+        type: "mongodb",
+        host: configService.get("MONGODB_HOST"),
+        port: configService.get("MONGODB_PORT"),
+        username: configService.get("MONGODB_USER"),
+        password: configService.get("MONGODB_PASSWORD"),
+        database: configService.get("MONGODB_DB"),
+        synchronize: true,
+        autoLoadEntities: true,
         entities: [
           // __dirname + "/../**/*.entity{.ts,.js}",
           File,

@@ -31,7 +31,7 @@
                       </div>
                     </li> -->
   
-                    <label class="nav-item btn btn-success" (change) = 'random($event, "Everyone")'>
+                    <label class="nav-item btn btn-success" (change) = 'setAccessType("Everyone")'>
                       <div class="form-check">
                         <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="Everyone" checked >
                         <span class="form-check-label" for="exampleRadios1">
@@ -40,7 +40,7 @@
                       </div>
                     </label>
   
-                    <label class="nav-item btn btn-warning" (change) = 'random($event, "Restricted")'>
+                    <label class="nav-item btn btn-warning" (change) = 'setAccessType("Restricted")'>
                       <div class="form-check">
                         <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios4" value="Restricted">
                         <span class="form-check-label" for="exampleRadios1">
@@ -80,15 +80,15 @@
                           <label class="form-check-label" for="defaultCheck1" (change)="changePassOpt()"> 
                             With password?
                             <input class="form-check-input ml-2" type="checkbox" value="" id="defaultCheck1">
-
                             </label>
                             
                           </div>  
                       </div>
 
                       <div class="col-md-8 col-sm-12">
-                        <div class="form-group mb-2">
-                          <input type="password" class="form-control form-control-sm" id="staticEmail2" placeholder="Password here"
+                        <div class="form-group mb-0">
+                          <fa-icon [icon]="icons[5]" class="position-absolute text-dark password-input-eye-icon" (click)="togglePasswordInputType()"></fa-icon>
+                          <input [type]="passwordInputType" class="form-control form-control-sm" id="staticEmail2" placeholder="Password here"
                           [readOnly]="!this.withPassword"
                           formControlName="password"
                           >
@@ -120,7 +120,6 @@
                       <label for="exampleFormControlTextarea1">Empty = just me</label>
                       <textarea class="form-control" id="exampleFormControlTextarea1" 
                       rows="3" name="loginList" [(ngModel)]="loginList" [ngModelOptions]="{standalone: true}"
-                      (change)="showMe()"
                       >{{loginList}}</textarea>
                     </div>
                   </div>
@@ -152,22 +151,19 @@
 
                   </div>
                   <div class="card-body" *ngIf="this.sendType === 'File'">
-                    <h5 class="card-title">Available formats are: ...?</h5>
-                    <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
-                    <div class="custom-file">
+                    <h5 class="card-title">Available formats are: {{ availableFileFormats.join(', ') }}</h5>
+                    <div class="custom-file" [ngStyle]="{ 'z-index': '0'}">
                       <input type="file" class="custom-file-input" id="customFile" 
                       formControlName = "file"
-                      (change)="showFile($event)">
-                      <label class="custom-file-label" for="customFile" >Choose file</label>
+                      (change)="chooseFile($event)" [accept]="availableFileFormats.join(', ')">
+                      <label class="custom-file-label" for="customFile" >{{ addFileInputLabel }}</label>
                     </div>
                   </div>
 
                   <div class="card-body" *ngIf="this.sendType == 'Text'">
                     <h5 class="card-title">Put your note here:</h5>
-                    <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
                     <textarea class="form-control" id="contentText" 
                     rows="5" name="loginList" [(ngModel)]="contentText" [ngModelOptions]="{standalone: true}"
-                    (change)="showMe()"
                     >{{loginList}}</textarea>
                   </div>
                 </div>

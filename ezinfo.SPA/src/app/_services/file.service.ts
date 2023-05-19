@@ -50,9 +50,12 @@ export class FileService {
     );
   }
 
-  deleteItem(code: string, itemId: string): Observable<Object> {
+  deleteItem(
+    code: string,
+    itemId: string
+  ): Observable<{ deleted: boolean; message: string }> {
     return this.http.delete(
       environment.backUrl + `file/delete?itemId=${itemId}&code=${code}`
-    );
+    ) as Observable<{ deleted: boolean; message: string }>;
   }
 }

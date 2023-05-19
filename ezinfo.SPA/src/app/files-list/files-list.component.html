@@ -39,7 +39,7 @@
                   [(ngModel)]="this.item.possiblePassword">
                 </div>
                 <div class="delete-file ml-2">
-                  <button *ngIf='true' class="btn btn-danger btn-sm" 
+                  <button *ngIf='canDeleteFile(item.login)' class="btn btn-danger btn-sm" 
                   (click)="deleteFile(this.item.id)" type="button"
                   > <fa-icon [icon]="icons[6]"></fa-icon></button>
                 </div>

@@ -39,8 +39,6 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-left animate slideIn" aria-labelledby="navbarDropdown">
-                  <!-- <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>-->
                   <a class="dropdown-item" (click)="changePassword()">Change Password</a>
                   <div class="dropdown-divider"></div> 
                   <a class="dropdown-item" (click)="logout()">Logout</a>
@@ -50,15 +48,16 @@
   
             </ul>
             <form class="form-inline my-2 my-lg-0" *ngIf="this.authServ.currentUser === null">
-                  <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login">
+                  <input class="form-control mr-sm-2" type="text" name="login" placeholder="Login" [(ngModel)]="login" [disabled]="isLoginRequestPending">
                   <div class="d-flex flex-column justify-content-between pass_flex">
-                    <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password">
+                    <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" [(ngModel)]="password" [disabled]="isLoginRequestPending">
                     <small class="text-muted pl-1" (click)="displayForgot()">Forgot the password?</small>
+                    <div *ngIf="isLoginRequestPending" class="spinner-border request-pending-spinner-loader" role="status">
+                      <span class="sr-only">Login pending...</span>
+                    </div>
                   </div>
-
-
-                  <button class="btn btn-secondary" type="button" (click) = 'login_user(this.login, this.password)' 
-                  [disabled]="this.login?.length <= 5 || this.password?.length <= 7">Login</button>
+                    <button class="btn btn-secondary" type="button" (click) = 'login_user(this.login, this.password)' 
+                    [disabled]="this.login?.length <= 5 || this.password?.length <= 7 || isLoginRequestPending">Login</button>
                 </form>
     </div>
 

@@ -1,36 +1,35 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ObjectIdColumn, ObjectId } from "typeorm";
 
 @Entity()
-export class User{
-    @PrimaryGeneratedColumn('uuid')
-    id: number;
+export class User {
+  @ObjectIdColumn()
+  id: ObjectId;
 
-    @Column({
-        nullable: false
-    })
-    name: string;
+  @Column({
+    nullable: false,
+  })
+  name: string;
 
-    @Column({
-        nullable: false
-    })
-    surname: string;
+  @Column({
+    nullable: false,
+  })
+  surname: string;
 
-    @Column({
-        nullable: false,
-       // unique: true 
-    })
-    login: string;
+  @Column({
+    nullable: false,
+    // unique: true
+  })
+  login: string;
 
-    @Column({
-        nullable: false, 
-        //unique: true
-    })
-    email: string;
+  @Column({
+    nullable: false,
+    //unique: true
+  })
+  email: string;
 
-    @Column({
-        type: "blob",
-        nullable: false
-    })
-    passwordHash: string;
-
+  @Column({
+    type: "blob",
+    nullable: false,
+  })
+  passwordHash: string;
 }

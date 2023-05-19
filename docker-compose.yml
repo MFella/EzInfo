@@ -1,6 +1,6 @@
 version: '3.8'
 
-networks: 
+networks:
   app-tier:
     driver: bridge
 
@@ -9,22 +9,22 @@ services:
     build:
       context: ./ezinfo.API
       dockerfile: Dockerfile-dev
-    ports: 
-      - "3090:3090"
+    ports:
+      - '3090:3090'
     container_name: ezinfo-api
-    networks: 
+    networks:
       - app-tier
     volumes:
       - ./ezinfo.API:/usr/src/app/ezinfo.API
       - /usr/src/app/ezinfo.API/node_modules
-    depends_on: 
-      - db 
+    depends_on:
+      - db
   ezinfo-spa:
     build:
       context: ./ezinfo.SPA
       dockerfile: Dockerfile-dev
     ports:
-      - "4201:4201"
+      - '4201:4201'
     expose:
       - '4201'
     container_name: ezinfo-spa
@@ -38,18 +38,18 @@ services:
     networks:
       - app-tier
     #command: --init-file /data/application/init.sql
-    environment: 
+    environment:
       MYSQL_TCP_PORT: '3320'
       MYSQL_DATABASE: 'ezinfo'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: 'root'
+      MONGODB_USER: 'root'
+      MONGODB_PASSWORD: 'root'
       MYSQL_ROOT_PASSWORD: 'root'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - '3320:3320'
     expose:
       - '3320'
-    volumes: 
+    volumes:
       - 'ezinfo-db:/var/lib/mysql'
       - ./init.sql:/data/application/init.sql
 volumes:
