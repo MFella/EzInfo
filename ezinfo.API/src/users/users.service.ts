@@ -26,7 +26,6 @@ export class UsersService {
         return { available: false };
       } else return { available: true };
     } catch (e) {
-      console.log(e);
       throw new HttpException("Something went wrong", 500);
     }
   }

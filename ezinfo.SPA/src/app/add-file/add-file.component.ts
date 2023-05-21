@@ -14,6 +14,7 @@ import {
   faPenFancy,
   faFileImage,
   faEye,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FileToSendDto } from '../dtos/fileToSendDto';
 import { TextToSendDto } from '../dtos/textToSendDto';
@@ -47,6 +48,7 @@ export class AddFileComponent implements OnInit {
     faPenFancy,
     faFileImage,
     faEye,
+    faEyeSlash,
   ];
 
   constructor(
@@ -120,7 +122,6 @@ export class AddFileComponent implements OnInit {
           },
           (err) => {
             this.alert.error(`Error occured while saving note. Error: ${err}`);
-            console.log(err);
           }
         );
       }

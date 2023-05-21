@@ -81,6 +81,6 @@ async function bootstrap() {
     });
   });
 
-  await app.listen(process.env.PORT);
+  await app.listen(configService.getOrThrow<string>("BACKEND_PORT"));
 }
 bootstrap();

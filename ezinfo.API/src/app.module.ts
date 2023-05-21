@@ -24,19 +24,32 @@ import { MailerModule } from "@nestjs-modules/mailer";
         AWS_REGION: Joi.string().required(),
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),
-        PORT: Joi.number(),
         AWS_PUBLIC_BUCKET_NAME: Joi.string().required(),
+        BACKEND_PORT: Joi.number().required(),
+        BACKEND_HOST: Joi.string().required(),
+        FRONTEND_PORT: Joi.number().required(),
+        FRONTEND_HOST: Joi.string().required(),
+        MAIL_HOST: Joi.string().required(),
+        MAIL_PORT: Joi.number().required(),
+        MAIL_USER: Joi.string().required(),
+        MAIL_PASS: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION_TIME: Joi.number().required(),
       }),
     }),
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.MAIL_HOST,
-        port: process.env.MAIL_PORT,
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASS,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.getOrThrow("MAIL_HOST"),
+          port: configService.getOrThrow("MAIL_PORT"),
+          auth: {
+            user: configService.getOrThrow("MAIL_USER"),
+            pass: configService.getOrThrow("MAIL_PASS"),
+          },
         },
-      },
+      }),
     }),
     DatabaseModule,
     AuthModule,

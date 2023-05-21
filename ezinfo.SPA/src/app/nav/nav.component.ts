@@ -46,8 +46,8 @@ export class NavComponent {
 
   async login_user(login: string, password: string) {
     const loginCreds: LoginCredsDto = {
-      login,
-      password,
+      login: login.trim(),
+      password: password.trim(),
     };
 
     this.isLoginRequestPending = true;

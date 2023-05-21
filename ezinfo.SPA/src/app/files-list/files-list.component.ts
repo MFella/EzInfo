@@ -178,7 +178,6 @@ export class FilesListComponent implements OnInit {
         }
       })
       .catch((err: HttpErrorResponse) => {
-        console.log(err.error);
         this.alert.error(err.error?.message?.join(' '));
       });
   }

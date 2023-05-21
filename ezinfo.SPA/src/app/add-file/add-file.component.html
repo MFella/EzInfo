@@ -87,7 +87,8 @@
 
                       <div class="col-md-8 col-sm-12">
                         <div class="form-group mb-0">
-                          <fa-icon [icon]="icons[5]" class="position-absolute text-dark password-input-eye-icon" (click)="togglePasswordInputType()"></fa-icon>
+                          <fa-icon [icon]="passwordInputType === 'password' ? icons[5] : icons[6]" class="position-absolute text-dark password-input-eye-icon" (click)="togglePasswordInputType()"
+                          [ngClass]="{'icon-disabled': !withPassword }"></fa-icon>
                           <input [type]="passwordInputType" class="form-control form-control-sm" id="staticEmail2" placeholder="Password here"
                           [readOnly]="!this.withPassword"
                           formControlName="password"

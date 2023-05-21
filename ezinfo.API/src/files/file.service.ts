@@ -284,7 +284,6 @@ export class FileService {
 
     const noteFromDb = await this.noteRepository.findOne({ where: { id: id } });
 
-    console.log(noteFromDb, id);
     const authorization = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), entityId: id } });
 
     if (!noteFromDb) {

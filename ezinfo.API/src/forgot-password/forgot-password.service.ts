@@ -12,7 +12,7 @@ export class ForgotPasswordService {
     private forgotRepository: MongoRepository<ForgotPassword>,
   ) {}
 
-  async saveForgetness(email: string, token: string) {
+  async saveForgetness(email: string, token: string): Promise<[boolean, string]> {
     try {
       const newId = uuid();
 
@@ -22,7 +22,6 @@ export class ForgotPasswordService {
       const iv = crypto.randomBytes(16);
       const cipher = crypto.createCipheriv(algorithm, key, iv);
       const encrypted = cipher.update(token, "utf8", "hex") + cipher.final("hex");
-      //check if exists there
       const existence = await this.forgotRepository.find({ where: { email: email } });
 
       if (existence.length === 0) {
@@ -37,7 +36,7 @@ export class ForgotPasswordService {
           return [true, newId];
         }
 
-        return [false];
+        return [false, ""];
       } else {
         await this.forgotRepository.update(
           { email: email },
@@ -52,7 +51,7 @@ export class ForgotPasswordService {
         return [true, newId];
       }
     } catch (e) {
-      return [false];
+      return [false, ""];
     }
   }
 

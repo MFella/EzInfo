@@ -98,7 +98,7 @@ form
     animation-name: slideIn;
 }
 
-#navbarColor02
+.navbar-container
 {
     z-index: 1;
 }
@@ -109,6 +109,13 @@ form
     background-color: rgba(235,104,100,0.95);
 }
 
+a.nav-link
+{
+    &.link-active {
+        transition: all .4s;
+        color: #fff !important;
+    }
+}
 
 @keyframes slideIn {
     0% {
@@ -184,6 +191,9 @@ form
     a.nav-link
     {
         padding:0;
+        &.link-active {
+            display: none;
+        }
     }
 
     input{

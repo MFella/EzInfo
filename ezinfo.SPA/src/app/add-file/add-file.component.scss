@@ -43,7 +43,15 @@ textarea {
     position: absolute;
     right: 1.5rem;
     top: .2rem;
-    font-size: .875rem;
+    font-size: 1rem;
+
+    &:hover:not(.icon-disabled) {
+        cursor: pointer;
+    }
+
+    &.icon-disabled {
+        opacity: .5;        
+    }
 }
 
 @keyframes iSeeYou

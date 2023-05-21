@@ -19,6 +19,7 @@ import { AuthInterceptor } from './_services/auth.interceptor';
 import { AllNotesResolver } from './_resolvers/all-notes.resolver';
 import { AllFilesResolver } from './_resolvers/all-files.resolver';
 import { ResetWaitComponent } from './reset-wait/reset-wait.component';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { ToastrModule } from 'ngx-toastr';
@@ -41,6 +42,7 @@ import {
     ResetWaitComponent,
   ],
   imports: [
+    PaginationModule,
     FontAwesomeModule,
     BrowserModule,
     HttpClientModule,

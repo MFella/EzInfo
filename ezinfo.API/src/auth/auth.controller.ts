@@ -24,37 +24,29 @@ export class AuthController {
 
   @Post("login")
   @HttpCode(200)
-  //@UseGuards(LocalAuthGuard)
-  async login(@Req() loginDto: any) {
-    //delay
+  async login(@Req() request: Request) {
     const sleep = time => {
       return new Promise(res => setTimeout(res, time));
     };
 
     return sleep(1000).then(async () => {
-      return await this.authServ.login(loginDto.body);
+      return await this.authServ.login(request.body);
     });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post("logout")
   @HttpCode(200)
-  async logout(@Req() request: Request) {
+  async logout(@Req() request: Request): Promise<{ res: true; msg: string }> {
     request.res.setHeader("Set-Cookie", this.authServ.getCookiesForLogOut());
     return { res: true, msg: "You have successfully logged out" };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get("protected")
-  async protected(@Req() request: Request) {
-    return { msg: "Thats is the protected one" };
   }
 
   @Post("forgotPass")
   @HttpCode(201)
   async forgotPass(@Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto, @Res() response: Response): Promise<void> {
-    const res = await this.authServ.forgotPassword(forgotPasswordDto);
-    if (res) {
+    const forgotPassword = await this.authServ.forgotPassword(forgotPasswordDto);
+    if (forgotPassword) {
       response.json({ msg: "Check your mailbox. There you will find activation link" });
       response.status(201).send();
     }
@@ -62,7 +54,6 @@ export class AuthController {
 
   @Get("confirm")
   async confirmPassword(@Query() query: any, @Res() response: Response): Promise<void> {
-    console.log("xd");
     const tokened = await this.authServ.validateId(query.token);
 
     response.json({ token: tokened });
@@ -71,25 +62,22 @@ export class AuthController {
 
   @Post("change")
   @UseGuards(JwtAuthGuard)
-  async changePassword(@Req() requestWithUser: RequestWithUser, @Body() body, @Res() response: Response) {
+  async changePassword(@Req() requestWithUser: RequestWithUser, @Body() body, @Res() response: Response): Promise<void> {
     const change = this.authServ.changePassword(requestWithUser.user, body.password);
 
     if (change) {
-      response.json({ res: "Your password has been changed" });
+      response.json({ msg: "Your password has been changed" });
       response.status(201);
       response.send();
     } else {
-      response.json({ res: "Cant change password" });
+      response.json({ res: "Cant change password - try again later" });
       response.status(200);
       response.send();
     }
   }
 
   @Get("who-am-I")
-  async whoAmI(
-    @Req() req: any,
-    @Res({ passthrough: true }) res: Response, //RequestWithUser)
-  ) {
+  async whoAmI(@Req() req: any, @Res({ passthrough: true }) res: Response): Promise<{ user: any; csrfToken: string }> {
     const user = req.user ? req.user : undefined;
     const xsrf = req.csrfToken();
     res.cookie("XSRF-TOKEN", xsrf, { maxAge: 900000, httpOnly: true });

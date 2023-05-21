@@ -1,13 +1,11 @@
 import { UsersService } from "src/users/users.service";
 import { RegisterDto } from "./dto/register.dto";
-import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { MysqlErrorCodes } from "../database/mysqlErrorCodes.enum";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { Payload } from "./payload.interface";
 import * as argon2 from "argon2";
 import { LoginDto } from "./dto/login.dto";
-import { jwtConstans } from "./constants";
 import { Attempt } from "./attempt.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MongoRepository } from "typeorm";
@@ -17,9 +15,11 @@ import { ForgotPasswordService } from "src/forgot-password/forgot-password.servi
 import * as crypto from "crypto";
 import { isUUID } from "class-validator";
 import { User } from "src/user";
+import { LoggedUserDto } from "./dto/loggerUser.dto";
 
 @Injectable()
 export class AuthService {
+  private static readonly PASSWORD_PATTERN: RegExp = /^^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtServ: JwtService,
@@ -69,7 +69,7 @@ export class AuthService {
     }
   }
 
-  public async login(loginCreds: LoginDto) {
+  public async login(loginCreds: LoginDto): Promise<LoggedUserDto> {
     const res = await this.validate(loginCreds.login, loginCreds.password);
 
     if (res !== null) {
@@ -78,10 +78,9 @@ export class AuthService {
       await this.attemptRepository.update({ login: loginCreds.login }, { attempt_number: 0, ban_time: "" });
 
       return {
-        //csrfToken: req.csrfToken(),
         res: true,
         msg: "Successfully loggedIn",
-        expiresIn: jwtConstans.expiresIn,
+        expiresIn: this.configServ.getOrThrow<number>("JWT_EXPIRATION_TIME"),
         access_token: this.jwtServ.sign(payload),
         user: res,
       };
@@ -116,7 +115,7 @@ export class AuthService {
     }
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<boolean> {
     const user = await this.usersService.findByEmail(forgotPasswordDto.email);
 
     if (!user) {
@@ -133,24 +132,27 @@ export class AuthService {
       const saveRes = await this.forgotServ.saveForgetness(forgotPasswordDto.email, token);
 
       if (saveRes[0]) {
-        const link = `https://localhost:4201/reset?token=${saveRes[1]}`;
+        const frontendHostName: string = this.configServ.getOrThrow<string>("FRONTEND_HOST");
+        const frontendPort: number = this.configServ.getOrThrow<number>("FRONTEND_PORT");
+        const mailUserAddress: string = this.configServ.getOrThrow<string>("MAIL_USER");
+        const link = `https://${frontendHostName}:${frontendPort}/reset?token=${saveRes[1]}`;
 
         const result = await this.mailService.sendMail({
-          from: this.configServ.get<string>("SERIOUS_EMAIL"),
+          from: mailUserAddress,
           to: user.email,
           subject: "Forgot Password",
           html: `
                       <h2>Hi there, ${user.name}</h2>
-                      <p>Use this <a href=${link}>link</a> to reset your password. You've got 10 minutes. Good luck.</p>
+                      <p>Use this <a href=${link}>link</a> to reset your password. You've got <strong>10 minutes.</strong> Good luck.</p>
                     `,
         });
 
         return result;
-      } else {
-        throw new HttpException("Internal error", 500);
       }
+
+      throw new HttpException("Internal error - cant send reactivation mail", 500);
     } catch (e) {
-      throw new HttpException("Internal error", 500);
+      throw new HttpException("Internal error - cant send reactivation mail", 500);
     }
   }
 
@@ -172,7 +174,6 @@ export class AuthService {
         const algorithm = "camellia-192-cbc";
         const key = crypto.scryptSync(forgotOne.id.toString(), "salt", 24);
 
-        console.log(forgotOne.iv.buffer);
         const decipher = crypto.createDecipheriv(algorithm, key, forgotOne.iv.buffer as Buffer);
 
         const stringedToken = forgotOne.tokenHash;
@@ -203,7 +204,7 @@ export class AuthService {
         return {
           res: true,
           msg: "Successfully loggedIn",
-          expiresIn: jwtConstans.expiresIn,
+          expiresIn: this.configServ.getOrThrow("JWT_EXPIRATION_TIME"),
           access_token: this.jwtServ.sign(payload),
           user: userToReturn,
         };
@@ -212,16 +213,13 @@ export class AuthService {
           throw new HttpException("Password reset time has elapsed. Try to send remind-email again", 401);
         }
 
-        console.log(e);
         throw new InternalServerErrorException("Error occured during checking identity");
       }
     }
   }
 
-  async changePassword(user: User, password: string) {
-    const pattern = /^^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-
-    if (!pattern.test(password)) {
+  async changePassword(user: User, password: string): Promise<boolean> {
+    if (!AuthService.PASSWORD_PATTERN.test(password)) {
       throw new BadRequestException("Bad pattern of password");
     }
 
@@ -233,14 +231,14 @@ export class AuthService {
       const userFromDb = await this.usersService.findByLogin(user.login);
 
       if (!userFromDb) {
-        throw new HttpException("You shouldnt exists!", 418);
+        throw new HttpException("Account with that email doesnt exist", 418);
       }
 
       const result = await this.usersService.changePassword(userFromDb, password);
 
       if (result.affected === 1) {
         return true;
-      } else throw new InternalServerErrorException("Cant change - something went wrong");
+      } else return false;
     } catch (e) {
       throw new InternalServerErrorException("Error occured during changing password");
     }
