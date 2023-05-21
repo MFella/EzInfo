@@ -14,18 +14,33 @@ import { AlertService } from '../_services/alert.service';
 import { FileService } from '../_services/file.service';
 import { SweetyService } from '../_services/sweety.service';
 import { saveAs } from 'file-saver';
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  AfterViewInit,
+  ViewChild,
+  DestroyRef,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, fromEvent } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../_services/auth.service';
+import { PaginationComponent } from 'ngx-bootstrap/pagination';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-files-list',
   templateUrl: './files-list.component.html',
   styleUrls: ['./files-list.component.scss'],
 })
-export class FilesListComponent implements OnInit {
+export class FilesListComponent implements OnInit, AfterViewInit {
+  private destroyRef = inject(DestroyRef);
+
+  @ViewChild('paginationComponent')
+  paginationComponent!: PaginationComponent;
+
   sharedText!: RecordInList[];
   allFiles!: RecordInList[];
   retrievedFile!: any;
@@ -56,7 +71,8 @@ export class FilesListComponent implements OnInit {
     private fileServ: FileService,
     private alert: AlertService,
     private sweety: SweetyService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly elementRef: ElementRef
   ) {}
 
   ngOnInit() {
@@ -68,18 +84,22 @@ export class FilesListComponent implements OnInit {
         this.allFiles[i].possiblePassword = '';
       }
 
+      const totalPages = Math.ceil(
+        this.sharedText.length / this.pagination.itemsPerPage
+      );
       this.pagination = {
         currentPage: 1,
         itemsPerPage: 3,
         totalItems: this.sharedText.length,
-        totalPages: Math.ceil(
-          this.pagination.totalItems / this.pagination.itemsPerPage
-        ),
+        totalPages,
       };
       this.sharedText = [...data.files, ...data.notes].slice(0, 3);
     });
   }
 
+  ngAfterViewInit(): void {
+    this.observeKeyDownArrowKeysEvent();
+  }
   showContent(id: string, password: string) {
     this.fileServ.retrieveNote(id, password).subscribe(
       (res: any) => {
@@ -118,8 +138,8 @@ export class FilesListComponent implements OnInit {
     );
   }
 
-  pageChanged(e: any) {
-    if (this.pagination.currentPage > e.page) {
+  pageChanged(event: { page: number; itemsPerPage: number }) {
+    if (this.pagination.currentPage > event.page) {
       (<HTMLElement>document.querySelector('.list-group')!).style.animation =
         '';
       //(<HTMLElement>document.querySelector('.list-group')!).style.animation = 'headShake';
@@ -151,11 +171,11 @@ export class FilesListComponent implements OnInit {
       }, 1);
     }
 
-    this.pagination.currentPage = e.page;
-    this.pagination.itemsPerPage = e.itemsPerPage;
+    this.pagination.currentPage = event.page;
+    this.pagination.itemsPerPage = event.itemsPerPage;
     this.sharedText = this.allFiles.slice(
-      (e.page - 1) * e.itemsPerPage,
-      e.page * e.itemsPerPage
+      (event.page - 1) * event.itemsPerPage,
+      event.page * event.itemsPerPage
     );
   }
 
@@ -179,6 +199,36 @@ export class FilesListComponent implements OnInit {
       })
       .catch((err: HttpErrorResponse) => {
         this.alert.error(err.error?.message?.join(' '));
+      });
+  }
+
+  private observeKeyDownArrowKeysEvent(): void {
+    const [leftArrowKeyCode, rightArrowKeyCode] = ['ArrowLeft', 'ArrowRight'];
+    fromEvent<KeyboardEvent>(this.elementRef.nativeElement, 'keydown')
+      .pipe(
+        filter(
+          ($event: KeyboardEvent) =>
+            $event.code === leftArrowKeyCode ||
+            $event.code === rightArrowKeyCode
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(($event: KeyboardEvent) => {
+        if (
+          $event.code === leftArrowKeyCode &&
+          this.pagination.currentPage > 1
+        ) {
+          this.paginationComponent.selectPage(this.pagination.currentPage - 1);
+          return;
+        }
+
+        if (
+          $event.code === rightArrowKeyCode &&
+          this.pagination.currentPage < this.pagination.totalPages
+        ) {
+          this.paginationComponent.selectPage(this.pagination.currentPage + 1);
+          return;
+        }
       });
   }
 }
