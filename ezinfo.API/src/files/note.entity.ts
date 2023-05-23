@@ -1,9 +1,15 @@
+import { ItemType } from "../types/item/itemType";
 import { Entity, Column, ObjectIdColumn, ObjectId } from "typeorm";
 
 @Entity()
 export class Note {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
+
+  @Column({
+    nullable: false,
+  })
+  itemId: string;
 
   @Column({
     nullable: false,
@@ -22,14 +28,12 @@ export class Note {
   isRestricted: boolean;
 
   @Column({
-    type: "bool",
     nullable: false,
-    default: false,
+    default: "note",
   })
-  isFile: boolean;
+  itemType: ItemType;
 
   @Column({
-    //type: 'bool',
     nullable: false,
   })
   havePassword: boolean;

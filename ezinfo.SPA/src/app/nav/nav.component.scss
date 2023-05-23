@@ -93,6 +93,19 @@ form
     transform: translateX(-2rem);
 }
 
+.account-number-wrapper {
+    position: absolute;
+    bottom: .5rem;
+    z-index: 2;
+    &:hover {
+        cursor: default !important;
+    }
+
+    &__content:hover {
+        cursor: pointer;
+    }
+}
+
 .slideIn {
     -webkit-animation-name: slideIn;
     animation-name: slideIn;

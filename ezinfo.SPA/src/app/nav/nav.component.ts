@@ -89,6 +89,10 @@ export class NavComponent {
     this.sweety.about('About this project', content);
   }
 
+  copyAccNumberToClipboard(): void {
+    navigator.clipboard.writeText('dasdas');
+  }
+
   async changePassword() {
     toggle();
     const values = await this.sweety.changePassword();

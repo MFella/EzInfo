@@ -8,6 +8,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AlertService } from '../_services/alert.service';
 import { FileService } from '../_services/file.service';
+import { Note } from '../types/item/note';
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +21,9 @@ export class AllNotesResolver {
   ) {}
 
   resolve(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<any> {
+    _route: ActivatedRouteSnapshot,
+    _state: RouterStateSnapshot
+  ): Observable<Array<Note> | null> {
     return this.fileServ.retrieveNotes().pipe(
       catchError((err) => {
         this.alert.error('Problem occured during retriving data');

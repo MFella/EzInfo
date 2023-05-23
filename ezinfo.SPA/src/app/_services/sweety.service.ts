@@ -78,13 +78,13 @@ export class SweetyService {
     return value;
   }
 
-  async confirm(
-    itemId: string,
+  async confirmDeletion(
+    codePattern: string,
     preConfirmCb: (code: string) => void
   ): Promise<boolean> {
     const value = await Swal.fire({
       title: 'Enter destruction code',
-      text: 'XYYY-XYYY-XYYY => XXX',
+      text: `Type ${codePattern} to delete`,
       input: 'text',
       showCancelButton: true,
       confirmButtonText: 'Delete',

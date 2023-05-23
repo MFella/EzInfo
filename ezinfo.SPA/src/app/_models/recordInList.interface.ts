@@ -1,10 +1,11 @@
+import { ItemType } from './../types/item/itemType';
 export interface RecordInList {
-  id: string;
+  itemId: string;
   //content: string;
   login: string;
   isRestricted: boolean;
   havePassword: boolean;
   possiblePassword: string;
-  isFile: boolean;
+  itemType: ItemType;
   filename?: string;
 }

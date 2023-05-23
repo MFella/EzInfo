@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { FileToSendDto } from '../dtos/fileToSendDto';
 import { environment } from '../../environments/environment';
 import { TextToSendDto } from '../dtos/textToSendDto';
-import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Note } from '../types/item/note';
 
 @Injectable({
   providedIn: 'root',
@@ -29,8 +29,8 @@ export class FileService {
     );
   }
 
-  retrieveNotes() {
-    return this.http.get(environment.backUrl + `file/notes`);
+  retrieveNotes(): Observable<Array<Note>> {
+    return this.http.get<Array<Note>>(environment.backUrl + `file/notes`);
   }
 
   retrieveNote(id: string, password: string) {
@@ -39,13 +39,13 @@ export class FileService {
     );
   }
 
-  retrieveFiles() {
+  retrieveFiles(): Observable<any> {
     return this.http.get(environment.backUrl + 'file/files');
   }
 
   downloadFile(id: string, password: string) {
     return this.http.get(
-      environment.backUrl + `file/download?id=${id}&password=${password}`,
+      environment.backUrl + `file/download?itemId=${id}&password=${password}`,
       { responseType: 'blob' }
     );
   }

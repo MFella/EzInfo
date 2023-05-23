@@ -1,3 +1,4 @@
+import { ItemType } from "../types/item/itemType";
 import { Column, Entity, ObjectId, ObjectIdColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -21,8 +22,7 @@ export class Sharing {
   entityId: string;
 
   @Column({
-    type: "bool",
     nullable: false,
   })
-  isFile: boolean;
+  itemType: ItemType;
 }

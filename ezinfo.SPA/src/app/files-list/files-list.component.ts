@@ -29,6 +29,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../_services/auth.service';
 import { PaginationComponent } from 'ngx-bootstrap/pagination';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ItemType } from '../types/item/itemType';
 
 @Component({
   selector: 'app-files-list',
@@ -65,6 +66,7 @@ export class FilesListComponent implements OnInit, AfterViewInit {
   ];
 
   itemIdToDelete!: string;
+  itemTypeToDelete!: ItemType;
 
   constructor(
     private route: ActivatedRoute,
@@ -119,7 +121,6 @@ export class FilesListComponent implements OnInit, AfterViewInit {
     this.fileServ.downloadFile(id, password).subscribe(
       (res: any) => {
         password = '';
-        //handle name of file!
         this.alert.info('File should be downloading. Work in progress...');
         const filed = new File([res], filename!);
         saveAs(filed);
@@ -142,7 +143,6 @@ export class FilesListComponent implements OnInit, AfterViewInit {
     if (this.pagination.currentPage > event.page) {
       (<HTMLElement>document.querySelector('.list-group')!).style.animation =
         '';
-      //(<HTMLElement>document.querySelector('.list-group')!).style.animation = 'headShake';
       (<HTMLElement>(
         document.querySelector('.list-group')!
       )).style.animationDuration = '.95s';
@@ -157,7 +157,6 @@ export class FilesListComponent implements OnInit, AfterViewInit {
     } else {
       (<HTMLElement>document.querySelector('.list-group')!).style.animation =
         '';
-      //(<HTMLElement>document.querySelector('.list-group')!).style.animation = 'fadeInLeft';
       (<HTMLElement>(
         document.querySelector('.list-group')!
       )).style.animationDuration = '.5s';
@@ -179,13 +178,20 @@ export class FilesListComponent implements OnInit, AfterViewInit {
     );
   }
 
-  deleteFile(itemId: string): void {
+  deleteItem(itemId: string, itemType: ItemType): void {
     this.itemIdToDelete = itemId;
-    this.sweety.confirm(itemId, this.deleteFileConfirmCb.bind(this));
+    this.itemTypeToDelete = itemType;
+    this.sweety.confirmDeletion(
+      itemId
+        .split('-')
+        .map((word) => word.charAt(0))
+        .join(''),
+      this.deleteFileConfirmCb.bind(this)
+    );
   }
 
   canDeleteFile(login: string): boolean {
-    return this.authService.currentUser.login === login;
+    return this.authService.getCurrentUser()?.login === login;
   }
 
   private deleteFileConfirmCb(code: string): void {
@@ -193,6 +199,10 @@ export class FilesListComponent implements OnInit, AfterViewInit {
       .then((response: { deleted: boolean; message: string }) => {
         if (!response.deleted) {
           this.alert.error(response.message);
+          this.removeItem(
+            this.itemIdToDelete,
+            this.itemTypeToDelete === 'file' ? this.allFiles : this.sharedText
+          );
         } else {
           this.alert.info(response.message);
         }
@@ -230,5 +240,14 @@ export class FilesListComponent implements OnInit, AfterViewInit {
           return;
         }
       });
+  }
+
+  private removeItem(itemId: string, itemList: Array<RecordInList>): void {
+    let indexToDelete: number;
+    const itemIds = itemList.map((item) => item.itemId);
+
+    while ((indexToDelete = itemIds.indexOf(itemId)) > -1) {
+      itemList.splice(indexToDelete, 1);
+    }
   }
 }

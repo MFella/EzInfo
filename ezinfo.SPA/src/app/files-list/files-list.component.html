@@ -8,7 +8,7 @@
         <div class="list-group w-50 mx-auto">
           <a class="list-group-item list-group-item-action align-items-start" *ngFor="let item of this.sharedText">
             <div class="file_id_show">
-              <h5 class="mb-1">Id: {{item.id}}</h5>
+              <h5 class="mb-1">Id: {{item.itemId}}</h5>
 
               <div class="buttons">
                 <span class="badge badge-danger mr-2"
@@ -17,19 +17,19 @@
                 <span class="badge badge-success mr-2"
                 *ngIf="!this.item.havePassword"
                 >Locked?: Nope</span>
-                <button *ngIf='!this.item.isFile' class="btn btn-primary btn-sm"
+                <button *ngIf='item.itemType === "note"' class="btn btn-primary btn-sm"
                 [disabled]="item.havePassword && item.possiblePassword === ''"
-                (click)="showContent(this.item.id, this.item.possiblePassword)" type="button"
+                (click)="showContent(this.item.itemId, this.item.possiblePassword)" type="button"
                 >Show content <fa-icon [icon]="icons[5]"></fa-icon></button>
-                <button *ngIf='this.item.isFile' class="btn btn-warning btn-sm" 
-                (click)="downloadFile(this.item.id, this.item.possiblePassword, this.item?.filename)" type="button"
+                <button *ngIf='item.itemType === "file"' class="btn btn-warning btn-sm" 
+                (click)="downloadFile(item.itemId, this.item.possiblePassword, this.item?.filename)" type="button"
                 >Download <fa-icon [icon]="icons[2]"></fa-icon></button>
               </div>
               
             </div>
             <p class="mb-1">Published by: {{item.login}}</p>
-            <small class="text-muted" *ngIf="this.item.isFile">File <fa-icon [icon]="icons[1]"></fa-icon></small>
-            <small class="text-muted" *ngIf="!this.item.isFile">Text <fa-icon [icon]="icons[0]"></fa-icon></small>
+            <small class="text-muted" *ngIf="item.itemType === 'file'">File <fa-icon [icon]="icons[1]"></fa-icon></small>
+            <small class="text-muted" *ngIf="item.itemType === 'note'">Text <fa-icon [icon]="icons[0]"></fa-icon></small>
               <div class="d-flex justify-content-between align-items-center w-100">
                 <small class="text-muted w-100" *ngIf="this.item.isRestricted">Restricted <fa-icon [icon]="icons[4]"></fa-icon></small>
                 <small class="text-muted w-100" *ngIf="!this.item.isRestricted">Not restricted <fa-icon [icon]="icons[3]"></fa-icon></small>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="delete-file ml-2">
                   <button *ngIf='canDeleteFile(item.login)' class="btn btn-danger btn-sm" 
-                  (click)="deleteFile(this.item.id)" type="button"
+                  (click)="deleteItem(item.itemId, item.itemType)" type="button"
                   > <fa-icon [icon]="icons[6]"></fa-icon></button>
                 </div>
 

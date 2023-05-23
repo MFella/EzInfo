@@ -1,3 +1,4 @@
+import { ItemType } from "../types/item/itemType";
 import { Entity, Column, ObjectIdColumn, ObjectId } from "typeorm";
 
 @Entity()
@@ -8,7 +9,7 @@ export class File {
   @Column({
     nullable: false,
   })
-  id: string;
+  itemId: string;
 
   @Column({
     nullable: false,
@@ -39,9 +40,9 @@ export class File {
 
   @Column({
     nullable: false,
-    default: true,
+    default: "file",
   })
-  isFile: boolean;
+  itemType: ItemType;
 
   @Column({
     type: "blob",

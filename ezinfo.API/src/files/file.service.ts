@@ -1,8 +1,8 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
-import { HttpResponse, S3 } from "aws-sdk";
-import { Repository, Not, MongoRepository } from "typeorm";
+import { S3 } from "aws-sdk";
+import { Not, MongoRepository } from "typeorm";
 import { File } from "./file.entity";
 import { v4 as uuid } from "uuid";
 import * as argon2 from "argon2";
@@ -46,26 +46,29 @@ export class FileService {
     try {
       const createdId = uuid();
 
+      const keyOfFile: string = `${createdId}-${filename}`;
+
       const putObjectCommand = new PutObjectCommand({
         Bucket: this.configService.get("AWS_PUBLIC_BUCKET_NAME"),
         Body: dataBuffer,
-        Key: `${createdId}-${filename}`,
+        Key: keyOfFile,
       });
 
-      const uploadResult = await this.s3Client.send(putObjectCommand);
+      await this.s3Client.send(putObjectCommand);
 
       const mixedBaseId = `${createdId}_${user.login}_${body.password}`;
 
       const hashed = await argon2.hash(mixedBaseId);
 
       const newFile = await this.fileRepository.save({
-        id: createdId,
-        key: `${createdId}-${filename}`,
+        itemId: createdId,
+        key: keyOfFile,
         login: user.login,
         filename: filename,
         isRestricted: body.accessType === "Restricted" ? true : false, //false -> for everyone; true -> for some group of people
         passwordHash: hashed,
         havePassword: body.password.length === 0 ? false : true, //false -> without additional info in password; true -> with additional info in password
+        itemType: "file",
       });
 
       if (body.loginList.length !== 0) {
@@ -78,7 +81,7 @@ export class FileService {
               ownerId: user.id.toString(),
               authorizedUserId: userFromDb.id.toString(),
               entityId: createdId,
-              isFile: true,
+              fileType: "file",
             });
           }
         }
@@ -121,10 +124,10 @@ export class FileService {
       delete el.key;
     });
 
-    const sharedFilesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), isFile: true } });
+    const sharedFilesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), itemType: "file" } });
 
     for (let i = 0; i < sharedFilesIdsFromDb.length; i++) {
-      const fileFromDb = await this.fileRepository.findOne({ where: { id: sharedFilesIdsFromDb[i]?.entityId, login: Not(user.login) } });
+      const fileFromDb = await this.fileRepository.findOne({ where: { itemId: sharedFilesIdsFromDb[i]?.entityId, login: Not(user.login) } });
 
       if (fileFromDb) {
         delete fileFromDb.passwordHash;
@@ -134,10 +137,11 @@ export class FileService {
       }
     }
 
+    console.log(selfFromDb);
     return selfFromDb;
   }
 
-  async downloadFile(id: string, password: string, user: User, res: Response): Promise<any> {
+  async downloadFile(itemId: string, password: string, user: User): Promise<any> {
     if (user === null) {
       throw new HttpException("You are not allowed, sorry", 401);
     }
@@ -148,9 +152,9 @@ export class FileService {
       throw new HttpException("Ha! Faked creds, bro", 401);
     }
 
-    const fileFromDb = await this.fileRepository.findOne({ where: { id } });
+    const fileFromDb = await this.fileRepository.findOne({ where: { itemId } });
 
-    const authorization = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), entityId: id } });
+    const authorization = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), entityId: itemId } });
 
     if (!fileFromDb) {
       throw new NotFoundException("File doesn't exists");
@@ -160,11 +164,10 @@ export class FileService {
       throw new HttpException("You havent got an access for that", 400);
     }
 
-    const passwordToVerify = fileFromDb.id + "_" + fileFromDb.login + "_" + password;
+    const passwordToVerify = fileFromDb.itemId + "_" + fileFromDb.login + "_" + password;
 
-    const convert = Buffer.from(fileFromDb.passwordHash, "base64").toString("utf-8");
-
-    const matches = await argon2.verify(convert, passwordToVerify);
+    console.log(fileFromDb.passwordHash);
+    const matches = await argon2.verify(fileFromDb.passwordHash, passwordToVerify);
 
     if (matches) {
       try {
@@ -185,7 +188,7 @@ export class FileService {
 
   async deleteFile(id: number) {
     const s3 = new S3();
-    const fileFromDb = await this.fileRepository.findOne({ where: { id: String(id) } });
+    const fileFromDb = await this.fileRepository.findOne({ where: { itemId: String(id) } });
 
     if (!fileFromDb) {
       throw new HttpException("Cant find file with that id!", 404);
@@ -237,7 +240,7 @@ export class FileService {
       const encrypted = cipher.update(textToSaveDto.text, "utf8", "hex") + cipher.final("hex");
 
       const newNote = await this.noteRepository.save({
-        id: newId,
+        itemId: newId,
         //TODO: change to hashedContent
         content: encrypted,
         iv,
@@ -245,6 +248,7 @@ export class FileService {
         isRestricted: textToSaveDto.accessType === "Restricted",
         havePassword: textToSaveDto.password.length !== 0,
         passwordHash: passHash,
+        itemType: "note",
       });
 
       if (textToSaveDto.loginList.length !== 0) {
@@ -255,11 +259,11 @@ export class FileService {
 
           if (userFromDb) {
             //save him in sharing table
-            const xd = await this.sharingRepository.save({
+            await this.sharingRepository.save({
               ownerId: user.id.toString(),
               authorizedUserId: userFromDb.id.toString(),
               entityId: newId,
-              isFile: false,
+              itemType: "note",
             });
           }
         });
@@ -282,7 +286,8 @@ export class FileService {
       throw new HttpException("Ha! Faked creds, bro", 401);
     }
 
-    const noteFromDb = await this.noteRepository.findOne({ where: { id: id } });
+    console.log(id);
+    const noteFromDb = await this.noteRepository.findOne({ where: { itemId: id } });
 
     const authorization = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), entityId: id } });
 
@@ -294,28 +299,27 @@ export class FileService {
       throw new HttpException("You havent got an access for that ;c", 400);
     }
 
-    const passwordToVerify = noteFromDb.id + "_" + noteFromDb.login + "_" + password;
+    const passwordToVerify = noteFromDb.itemId + "_" + noteFromDb.login + "_" + password;
 
     //try to verify password
     const matches = await argon2.verify(noteFromDb.passwordHash, passwordToVerify);
 
     if (matches) {
-      //try to decrypt file content:
       const algorithm = "aes-192-cbc";
       const key = crypto.scryptSync(password, "salt", 24);
 
-      const decipher = crypto.createDecipheriv(algorithm, key, noteFromDb.iv);
+      const decipher = crypto.createDecipheriv(algorithm, key, noteFromDb.iv.buffer as Buffer);
       const decrypted = decipher.update(noteFromDb.content, "hex", "utf8") + decipher.final("utf8");
 
       return { note: decrypted };
     } else {
-      throw new HttpException("Wrong password, kido", 400);
+      throw new HttpException("Wrong password", 400);
     }
   }
 
   async deleteItem(code: string, itemId: string, user: User): Promise<DeleteItemResponse> {
-    const fileFromDb = await this.fileRepository.findOne({ where: { id: itemId } });
-    const noteFromDb = await this.noteRepository.findOne({ where: { id: itemId } });
+    const fileFromDb = await this.fileRepository.findOne({ where: { itemId: itemId } });
+    const noteFromDb = await this.noteRepository.findOne({ where: { itemId: itemId } });
 
     if (!fileFromDb && !noteFromDb) {
       throw new NotFoundException("Item with that id doesnt exists");
@@ -333,7 +337,8 @@ export class FileService {
     const itemToProceed = fileFromDb || noteFromDb;
 
     if (this.isItemNote(itemToProceed)) {
-      await this.noteRepository.delete(itemId);
+      console.log(itemId);
+      await this.noteRepository.findOneAndDelete({ where: { itemId: itemId } });
       return { deleted: true, message: "Note has been deleted successfully" };
     } else {
       const command = new DeleteObjectCommand({
@@ -368,10 +373,10 @@ export class FileService {
       delete el.content;
     });
 
-    const sharedNotesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), isFile: false } });
+    const sharedNotesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), itemType: "note" } });
 
     for (let i = 0; i < sharedNotesIdsFromDb.length; i++) {
-      const noteFromDb = await this.noteRepository.findOne({ where: { id: sharedNotesIdsFromDb[i].entityId, login: Not(user.login) } });
+      const noteFromDb = await this.noteRepository.findOne({ where: { itemId: sharedNotesIdsFromDb[i].entityId, login: Not(user.login) } });
 
       if (noteFromDb) {
         delete noteFromDb.iv;
@@ -382,6 +387,7 @@ export class FileService {
       }
     }
 
+    console.log(selfNotesFromDb);
     return selfNotesFromDb;
   }
 }

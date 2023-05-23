@@ -12,7 +12,7 @@ import { v4 as uuid } from "uuid";
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: MongoRepository<User>,
+    private readonly usersRepository: MongoRepository<User>,
   ) {}
 
   findAll(): Promise<Array<User>> {
@@ -37,6 +37,7 @@ export class UsersService {
     user.surname = newUser.surname;
     user.email = newUser.email;
     user.id = uuid();
+    user.accountNumber = this.generateRandomHexNumber();
 
     try {
       const customHash = await argon2.hash(newUser.password);
@@ -85,5 +86,10 @@ export class UsersService {
 
   async delete(id: number) {
     await this.usersRepository.delete(id);
+  }
+
+  private generateRandomHexNumber(): string {
+    const hexNumberLength = Math.floor(Math.random() + 3) * 2;
+    return [...Array(hexNumberLength)].map(() => Math.floor(Math.random() * 16).toString(16)).join("");
   }
 }

@@ -6,12 +6,13 @@ import { UserForCreationDto } from '../dtos/userForCreationDto';
 import { AlertService } from './alert.service';
 import * as moment from 'moment';
 import { delay, map, shareReplay, tap } from 'rxjs/operators';
+import { LoggedUser } from '../types/user/loggedUser';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  currentUser: any;
+  currentUser: LoggedUser | null = null;
 
   constructor(private http: HttpClient, private alertServ: AlertService) {
     this.currentUser = localStorage.getItem('user')
@@ -83,7 +84,7 @@ export class AuthService {
     );
   }
 
-  public whoAmI() {
+  whoAmI() {
     return this.http.get(environment.backUrl + 'auth/who-am-I', {
       withCredentials: true,
     });
@@ -95,21 +96,25 @@ export class AuthService {
     });
   }
 
-  private setSession(authRes: any) {
-    this.currentUser = authRes.user;
-    const expireDate = moment().add(authRes.expiresIn, 'second');
-    localStorage.setItem('user', JSON.stringify(authRes.user));
-    localStorage.setItem('id_token', authRes.access_token);
-    localStorage.setItem('expires_at', JSON.stringify(expireDate.valueOf()));
-  }
-
   logout() {
     this.currentUser = null;
     localStorage.removeItem('user');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
-    //just make sure, that everything is cleared
     localStorage.clear();
     this.alertServ.info('You have been logged out!');
+  }
+
+  getCurrentUser(): LoggedUser | null {
+    return this.currentUser;
+  }
+
+  private setSession(authRes: any) {
+    this.currentUser = authRes.user;
+    console.log(authRes);
+    const expireDate = moment().add(authRes.expiresIn, 'second');
+    localStorage.setItem('user', JSON.stringify(authRes.user));
+    localStorage.setItem('id_token', authRes.access_token);
+    localStorage.setItem('expires_at', JSON.stringify(expireDate.valueOf()));
   }
 }

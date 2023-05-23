@@ -59,8 +59,8 @@ export class FileController {
 
   @Get("download")
   @UseGuards(JwtAuthGuard)
-  async downloadFile(@Query() query: any, @Req() request: RequestWithUser, @Res() res: Response) {
-    const file = await this.fileServ.downloadFile(query.id, query.password, request.user, res);
+  async downloadFile(@Query() query: { itemId: string; password: any }, @Req() request: RequestWithUser, @Res() res: Response) {
+    const file = await this.fileServ.downloadFile(query.itemId, query.password, request.user);
     return file.pipe(res);
   }
 
