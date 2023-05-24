@@ -77,7 +77,7 @@ export class NavComponent {
     this.router.navigate(['']);
   }
 
-  about() {
+  displayAboutModal() {
     const content = `Main purpose of this project was to be maximum safety. 
     The most important implemented things: password hashing,
     encrypting/dedcrypting content of notes, storing files
@@ -86,11 +86,13 @@ export class NavComponent {
     <a href="https://github.com/MFella/EzInfo" target="_blank">readme</a> on github.
     `;
 
-    this.sweety.about('About this project', content);
+    this.sweety.displayAboutModal('About this project', content);
   }
 
   copyAccNumberToClipboard(): void {
-    navigator.clipboard.writeText('dasdas');
+    navigator.clipboard.writeText(
+      this.authServ.getCurrentUser()?.accountNumber ?? ''
+    );
   }
 
   async changePassword() {

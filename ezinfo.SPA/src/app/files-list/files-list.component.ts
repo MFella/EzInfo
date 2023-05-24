@@ -22,6 +22,7 @@ import {
   ViewChild,
   DestroyRef,
   inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { filter, firstValueFrom, fromEvent } from 'rxjs';
@@ -42,8 +43,8 @@ export class FilesListComponent implements OnInit, AfterViewInit {
   @ViewChild('paginationComponent')
   paginationComponent!: PaginationComponent;
 
-  sharedText!: RecordInList[];
-  allFiles!: RecordInList[];
+  visibleItemsList!: RecordInList[];
+  allItemsList!: RecordInList[];
   retrievedFile!: any;
   page: any = 1;
   rotate: boolean = true;
@@ -74,44 +75,46 @@ export class FilesListComponent implements OnInit, AfterViewInit {
     private alert: AlertService,
     private sweety: SweetyService,
     private readonly authService: AuthService,
-    private readonly elementRef: ElementRef
+    private readonly elementRef: ElementRef,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
-      this.allFiles = [...data.files, ...data.notes];
-      this.sharedText = [...data.files, ...data.notes];
+      this.allItemsList = [...data.files, ...data.notes];
+      this.visibleItemsList = [...data.files, ...data.notes];
 
-      for (let i = 0; i < this.allFiles.length; i++) {
-        this.allFiles[i].possiblePassword = '';
+      for (let i = 0; i < this.allItemsList.length; i++) {
+        this.allItemsList[i].possiblePassword = '';
       }
 
       const totalPages = Math.ceil(
-        this.sharedText.length / this.pagination.itemsPerPage
+        this.visibleItemsList.length / this.pagination.itemsPerPage
       );
       this.pagination = {
         currentPage: 1,
         itemsPerPage: 3,
-        totalItems: this.sharedText.length,
+        totalItems: this.visibleItemsList.length,
         totalPages,
       };
-      this.sharedText = [...data.files, ...data.notes].slice(0, 3);
+      this.visibleItemsList = [...data.files, ...data.notes].slice(0, 3);
     });
   }
 
   ngAfterViewInit(): void {
     this.observeKeyDownArrowKeysEvent();
   }
+
   showContent(id: string, password: string) {
     this.fileServ.retrieveNote(id, password).subscribe(
       (res: any) => {
         password = '';
         this.sweety.success(id, res.note);
-        this.sharedText.forEach((el) => (el.possiblePassword = ''));
+        this.visibleItemsList.forEach((el) => (el.possiblePassword = ''));
       },
       (err) => {
         this.sweety.error(id, err.error.message);
-        this.sharedText.forEach((el) => (el.possiblePassword = ''));
+        this.visibleItemsList.forEach((el) => (el.possiblePassword = ''));
         password = '';
       }
     );
@@ -172,7 +175,7 @@ export class FilesListComponent implements OnInit, AfterViewInit {
 
     this.pagination.currentPage = event.page;
     this.pagination.itemsPerPage = event.itemsPerPage;
-    this.sharedText = this.allFiles.slice(
+    this.visibleItemsList = this.allItemsList.slice(
       (event.page - 1) * event.itemsPerPage,
       event.page * event.itemsPerPage
     );
@@ -199,12 +202,9 @@ export class FilesListComponent implements OnInit, AfterViewInit {
       .then((response: { deleted: boolean; message: string }) => {
         if (!response.deleted) {
           this.alert.error(response.message);
-          this.removeItem(
-            this.itemIdToDelete,
-            this.itemTypeToDelete === 'file' ? this.allFiles : this.sharedText
-          );
         } else {
           this.alert.info(response.message);
+          this.removeItem(this.itemIdToDelete);
         }
       })
       .catch((err: HttpErrorResponse) => {
@@ -242,12 +242,19 @@ export class FilesListComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private removeItem(itemId: string, itemList: Array<RecordInList>): void {
-    let indexToDelete: number;
-    const itemIds = itemList.map((item) => item.itemId);
+  private removeItem(itemId: string): void {
+    this.allItemsList = this.allItemsList.filter(
+      (item) => item.itemId !== itemId
+    );
+    this.visibleItemsList = this.allItemsList.slice(0, 3);
 
-    while ((indexToDelete = itemIds.indexOf(itemId)) > -1) {
-      itemList.splice(indexToDelete, 1);
-    }
+    this.pagination.totalItems -= 1;
+    this.changeDetectorRef.detectChanges();
+    // let indexToDelete: number;
+    // const itemIds = itemList.map((item) => item.itemId);
+
+    // while ((indexToDelete = itemIds.indexOf(itemId)) > -1) {
+    //   itemList.splice(indexToDelete, 1);
+    // }
   }
 }

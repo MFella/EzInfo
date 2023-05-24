@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, Injectable, NotFoundException } fro
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { S3 } from "aws-sdk";
-import { Not, MongoRepository } from "typeorm";
+import { MongoRepository } from "typeorm";
 import { File } from "./file.entity";
 import { v4 as uuid } from "uuid";
 import * as argon2 from "argon2";
@@ -10,7 +10,6 @@ import { User } from "src/user";
 import { Note } from "./note.entity";
 import * as crypto from "crypto";
 import { Sharing } from "./shared.entity";
-import { Response } from "express";
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { DeleteItemResponse } from "src/types/deleteItemResponse";
 
@@ -115,7 +114,7 @@ export class FileService {
 
     let selfFromDb = await this.fileRepository.find({ where: { login: user.login } });
 
-    const filesWithoutRestriction = await this.fileRepository.find({ where: { isRestricted: false, login: Not(user.login) } });
+    const filesWithoutRestriction = await this.fileRepository.find({ where: { isRestricted: false, login: { $ne: user.login } } });
 
     selfFromDb = [...selfFromDb, ...filesWithoutRestriction];
 
@@ -127,7 +126,7 @@ export class FileService {
     const sharedFilesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), itemType: "file" } });
 
     for (let i = 0; i < sharedFilesIdsFromDb.length; i++) {
-      const fileFromDb = await this.fileRepository.findOne({ where: { itemId: sharedFilesIdsFromDb[i]?.entityId, login: Not(user.login) } });
+      const fileFromDb = await this.fileRepository.findOne({ where: { itemId: sharedFilesIdsFromDb[i]?.entityId, login: { $ne: user.login } } });
 
       if (fileFromDb) {
         delete fileFromDb.passwordHash;
@@ -137,7 +136,6 @@ export class FileService {
       }
     }
 
-    console.log(selfFromDb);
     return selfFromDb;
   }
 
@@ -166,7 +164,6 @@ export class FileService {
 
     const passwordToVerify = fileFromDb.itemId + "_" + fileFromDb.login + "_" + password;
 
-    console.log(fileFromDb.passwordHash);
     const matches = await argon2.verify(fileFromDb.passwordHash, passwordToVerify);
 
     if (matches) {
@@ -241,7 +238,6 @@ export class FileService {
 
       const newNote = await this.noteRepository.save({
         itemId: newId,
-        //TODO: change to hashedContent
         content: encrypted,
         iv,
         login: user.login,
@@ -258,7 +254,6 @@ export class FileService {
           const userFromDb = await this.usersRepository.findOne({ where: { login: el } });
 
           if (userFromDb) {
-            //save him in sharing table
             await this.sharingRepository.save({
               ownerId: user.id.toString(),
               authorizedUserId: userFromDb.id.toString(),
@@ -286,7 +281,6 @@ export class FileService {
       throw new HttpException("Ha! Faked creds, bro", 401);
     }
 
-    console.log(id);
     const noteFromDb = await this.noteRepository.findOne({ where: { itemId: id } });
 
     const authorization = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), entityId: id } });
@@ -337,7 +331,6 @@ export class FileService {
     const itemToProceed = fileFromDb || noteFromDb;
 
     if (this.isItemNote(itemToProceed)) {
-      console.log(itemId);
       await this.noteRepository.findOneAndDelete({ where: { itemId: itemId } });
       return { deleted: true, message: "Note has been deleted successfully" };
     } else {
@@ -347,9 +340,13 @@ export class FileService {
       });
       await this.s3Client.send(command);
 
-      await this.fileRepository.delete(itemId);
+      const deletedResponse = await this.fileRepository.deleteOne({ itemId });
 
-      return { deleted: true, message: "File has been deleted successfully" };
+      if (deletedResponse.deletedCount === 1) {
+        return { deleted: true, message: "File has been deleted successfully" };
+      } else {
+        return { deleted: false, message: "Cant delete file - unrecognized issue" };
+      }
     }
   }
 
@@ -363,7 +360,7 @@ export class FileService {
     }
 
     let selfNotesFromDb: Array<Note> = await this.noteRepository.find({ where: { login: user.login } });
-    const notesWithoutRestriction = await this.noteRepository.find({ where: { isRestricted: false, login: Not(user.login) } });
+    const notesWithoutRestriction = await this.noteRepository.find({ where: { isRestricted: false, login: { $ne: user.login } } });
 
     selfNotesFromDb = [...selfNotesFromDb, ...notesWithoutRestriction];
 
@@ -376,7 +373,7 @@ export class FileService {
     const sharedNotesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), itemType: "note" } });
 
     for (let i = 0; i < sharedNotesIdsFromDb.length; i++) {
-      const noteFromDb = await this.noteRepository.findOne({ where: { itemId: sharedNotesIdsFromDb[i].entityId, login: Not(user.login) } });
+      const noteFromDb = await this.noteRepository.findOne({ where: { itemId: sharedNotesIdsFromDb[i].entityId, login: { $ne: user.login } } });
 
       if (noteFromDb) {
         delete noteFromDb.iv;
@@ -387,7 +384,6 @@ export class FileService {
       }
     }
 
-    console.log(selfNotesFromDb);
     return selfNotesFromDb;
   }
 }

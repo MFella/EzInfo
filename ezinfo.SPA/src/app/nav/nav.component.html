@@ -10,25 +10,25 @@
 
             <ul class="navbar-nav ml-auto">
 
-              <li class="nav-item p-2" (click)="tryToggle()">
+              <li class="nav-item p-2">
                 <a class="nav-link" [routerLink]="['/']" [routerLinkActive]="'link-active'" [routerLinkActiveOptions]="{ exact: true }"><fa-icon [icon]="icons[0]"></fa-icon> Home
                   <span class="sr-only">(current)</span>
                 </a>
               </li>
 
-              <li class="nav-item p-2" *ngIf="!this.authServ.getCurrentUser()" (click)="tryToggle()">
+              <li class="nav-item p-2" *ngIf="!this.authServ.getCurrentUser()">
                 <a class="nav-link" [routerLink]="['register']" [routerLinkActive]="'link-active'"><fa-icon [icon]="icons[1]"></fa-icon> Register</a>
               </li>
 
-              <li class="nav-item p-2" (click)="about()" (click)="tryToggle()">
+              <li class="nav-item p-2" (click)="displayAboutModal()">
                 <a class="nav-link"><fa-icon [icon]="icons[2]"></fa-icon> About</a>
               </li>
 
-              <li class="nav-item p-2" *ngIf="this.authServ.getCurrentUser()" (click)="tryToggle()">
+              <li class="nav-item p-2" *ngIf="this.authServ.getCurrentUser()">
                 <a class="nav-link" [routerLink]="['add-file']" [routerLinkActive]="'link-active'"><fa-icon [icon]="icons[3]"></fa-icon> Upload</a>
               </li>
 
-              <li class="nav-item p-2" *ngIf="this.authServ.getCurrentUser()" (click)="tryToggle()">
+              <li class="nav-item p-2" *ngIf="this.authServ.getCurrentUser()">
                 <a class="nav-link" [routerLink]="['/files-list']" [routerLinkActive]="'link-active'"><fa-icon [icon]="icons[4]"></fa-icon> Files</a>
               </li>
 

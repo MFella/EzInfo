@@ -41,14 +41,14 @@ export class SweetyService {
     });
   }
 
-  about(title: string, text: string) {
+  displayAboutModal(title: string, text: string) {
     Swal.fire({
       title: title,
       showClass: {
         popup: 'animate__animated animate__flipInY',
       },
       hideClass: {
-        popup: 'animate__animated animate__fadeOutDownBig',
+        popup: 'animate__animated animate__fadeOut',
       },
       showCloseButton: true,
       showConfirmButton: true,

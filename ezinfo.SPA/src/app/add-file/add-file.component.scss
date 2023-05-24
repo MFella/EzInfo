@@ -39,6 +39,21 @@ textarea {
     min-height: 17.7rem;
 }
 
+.password-validation-wrapper {
+    position: absolute;
+    margin-left: .1rem;
+    padding-top: .2rem;
+    font-size: .75rem;
+
+    &.valid span {
+        color: rgb(0, 184, 40) !important;
+    }
+
+    &.invalid span {
+        color: red !important;
+    }
+}
+
 .password-input-eye-icon  {
     position: absolute;
     right: 1.5rem;

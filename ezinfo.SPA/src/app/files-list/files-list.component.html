@@ -6,7 +6,7 @@
     <div class="row py-4">
       <div class="col-md-12">
         <div class="list-group w-50 mx-auto">
-          <a class="list-group-item list-group-item-action align-items-start" *ngFor="let item of this.sharedText">
+          <a class="list-group-item list-group-item-action align-items-start" *ngFor="let item of this.visibleItemsList">
             <div class="file_id_show">
               <h5 class="mb-1">Id: {{item.itemId}}</h5>
 
@@ -47,7 +47,7 @@
               </div> 
           </a>
 
-          <div class="card text-white bg-info mb-3" *ngIf="this.sharedText.length === 0">
+          <div class="card text-white bg-info mb-3" *ngIf="visibleItemsList.length === 0">
             <div class="card-header text-center">No more to say</div>
             <div class="card-body">
               <p class="card-text text-center">Right now, you've got nothing here. Add files to fill list</p>

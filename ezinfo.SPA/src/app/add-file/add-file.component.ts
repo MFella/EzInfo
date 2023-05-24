@@ -61,14 +61,7 @@ export class AddFileComponent implements OnInit {
   ngOnInit() {
     this.fileForm = this.fb.group({
       file: [''],
-      password: [
-        '',
-        [
-          Validators.pattern(
-            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
-          ),
-        ],
-      ],
+      password: ['', [Validators.minLength(5)]],
     });
   }
 

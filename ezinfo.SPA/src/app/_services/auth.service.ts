@@ -111,7 +111,6 @@ export class AuthService {
 
   private setSession(authRes: any) {
     this.currentUser = authRes.user;
-    console.log(authRes);
     const expireDate = moment().add(authRes.expiresIn, 'second');
     localStorage.setItem('user', JSON.stringify(authRes.user));
     localStorage.setItem('id_token', authRes.access_token);
