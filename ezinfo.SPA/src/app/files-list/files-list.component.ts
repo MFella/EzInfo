@@ -128,15 +128,15 @@ export class FilesListComponent implements OnInit, AfterViewInit {
         const filed = new File([res], filename!);
         saveAs(filed);
       },
-      async (err: any) => {
+      async (err: HttpErrorResponse) => {
         password = '';
         if (err.status === 0) {
           this.alert.error(
             'Probably this entity doesnt exists in db, or in storage-place'
           );
         } else {
-          const hah = JSON.parse(await err.error.text());
-          this.sweety.error(id, `${hah.message}`);
+          const errorMessage = JSON.parse(await err.error.text())?.message;
+          this.sweety.error(id, `${errorMessage}`);
         }
       }
     );

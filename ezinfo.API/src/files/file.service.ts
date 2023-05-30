@@ -1,7 +1,7 @@
+import { ItemType } from "./../types/item/itemType";
 import { BadRequestException, HttpException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
-import { S3 } from "aws-sdk";
 import { MongoRepository } from "typeorm";
 import { File } from "./file.entity";
 import { v4 as uuid } from "uuid";
@@ -12,6 +12,7 @@ import * as crypto from "crypto";
 import { Sharing } from "./shared.entity";
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { DeleteItemResponse } from "src/types/deleteItemResponse";
+import { DeleteResult } from "typeorm/driver/mongodb/typings";
 
 @Injectable()
 export class FileService {
@@ -94,19 +95,6 @@ export class FileService {
     }
   }
 
-  async getObject(key: string) {
-    const s3 = new S3();
-
-    const options = {
-      Key: key,
-      Bucket: this.configService.get("AWS_PUBLIC_BUCKET_NAME"),
-    };
-
-    s3.getObject(options, (err, data) => {
-      if (err) throw err;
-    });
-  }
-
   async retrieveAllFiles(user: User) {
     if (user === null) {
       throw new HttpException("You are not allowed", 401);
@@ -176,42 +164,12 @@ export class FileService {
         const file = await this.s3Client.send(options);
         return file.Body;
       } catch (e) {
+        console.log(e);
         throw new HttpException("Error occured during download file", 500);
       }
     } else {
       throw new BadRequestException("Wrong password");
     }
-  }
-
-  async deleteFile(id: number) {
-    const s3 = new S3();
-    const fileFromDb = await this.fileRepository.findOne({ where: { itemId: String(id) } });
-
-    if (!fileFromDb) {
-      throw new HttpException("Cant find file with that id!", 404);
-    }
-
-    if (fileFromDb.isRestricted) {
-    }
-
-    if (fileFromDb.havePassword) {
-      //provide special password(as input, or in query), verify password -> if truthy, lets go
-    }
-
-    //delete from s3
-    const delRes = await s3
-      .deleteObject({
-        Bucket: this.configService.get("AWS_PUBLIC_BUCKET_NAME"),
-        Key: fileFromDb.key,
-      })
-      .promise();
-
-    //delete records from sharedTable: TODO
-
-    //delete from main-file table
-    await this.fileRepository.delete(id);
-
-    return { deleted: true };
   }
 
   async saveText(textToSaveDto: any, user: User) {
@@ -331,8 +289,8 @@ export class FileService {
     const itemToProceed = fileFromDb || noteFromDb;
 
     if (this.isItemNote(itemToProceed)) {
-      await this.noteRepository.findOneAndDelete({ where: { itemId: itemId } });
-      return { deleted: true, message: "Note has been deleted successfully" };
+      const deleteResponse = await this.noteRepository.deleteOne({ itemId });
+      return this.getDeleteItemResponse(deleteResponse, "note");
     } else {
       const command = new DeleteObjectCommand({
         Bucket: this.configService.get("AWS_PUBLIC_BUCKET_NAME"),
@@ -340,13 +298,17 @@ export class FileService {
       });
       await this.s3Client.send(command);
 
-      const deletedResponse = await this.fileRepository.deleteOne({ itemId });
+      const deleteResponse = await this.fileRepository.deleteOne({ itemId });
 
-      if (deletedResponse.deletedCount === 1) {
-        return { deleted: true, message: "File has been deleted successfully" };
-      } else {
-        return { deleted: false, message: "Cant delete file - unrecognized issue" };
-      }
+      return this.getDeleteItemResponse(deleteResponse, "file");
+    }
+  }
+
+  private getDeleteItemResponse(deleteResultFromDb: DeleteResult, itemType: ItemType): DeleteItemResponse {
+    if (deleteResultFromDb.deletedCount === 1) {
+      return { deleted: true, message: `${itemType.charAt(0).toUpperCase() + itemType.slice(1).toLowerCase()} has been deleted successfully` };
+    } else {
+      return { deleted: false, message: `Cant delete ${itemType} - unrecognized issue` };
     }
   }
 

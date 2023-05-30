@@ -51,12 +51,6 @@ export class FileController {
     return this.fileServ.retrieveAllFiles(request.user);
   }
 
-  @Get("")
-  @HttpCode(200)
-  async getFile(@Query() query: any) {
-    return this.fileServ.getObject(query.key);
-  }
-
   @Get("download")
   @UseGuards(JwtAuthGuard)
   async downloadFile(@Query() query: { itemId: string; password: any }, @Req() request: RequestWithUser, @Res() res: Response) {
@@ -67,9 +61,7 @@ export class FileController {
   @Post("save")
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  async saveText(
-    @Req() request: RequestWithUser, //requestWithUser
-  ) {
+  async saveText(@Req() request: RequestWithUser) {
     return this.fileServ.saveText(request.body, request.user);
   }
 
