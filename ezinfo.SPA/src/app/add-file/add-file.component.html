@@ -86,7 +86,7 @@
               <div class="col-md-4 col-xs-12">
                 
                 <div class="card text-white bg-primary mb-3" 
-                [ngClass] = "(accessType === ''  || accessType === 'Restricted')? '' : 'not-available' "
+                [ngClass] = "accessType === 'Restricted' ? '' : 'not-available' "
 
                 >
                   <div class="card-header">Authorized list here</div>
@@ -95,8 +95,8 @@
                     <div class="form-group">
                       <label for="exampleFormControlTextarea1">Empty = just me</label>
                       <textarea class="form-control" id="exampleFormControlTextarea1" 
-                      rows="3" name="loginList" [(ngModel)]="loginList" [ngModelOptions]="{standalone: true}"
-                      >{{loginList}}</textarea>
+                      rows="3" name="accountNumbers" [(ngModel)]="accountNumbers" [ngModelOptions]="{standalone: true}"
+                      >{{accountNumbers}}</textarea>
                     </div>
                   </div>
                 </div>
@@ -139,12 +139,12 @@
                   <div class="card-body" *ngIf="this.sendType == 'Text'">
                     <h5 class="card-title">Put your note here:</h5>
                     <textarea class="form-control" id="contentText" 
-                    rows="5" name="loginList" [(ngModel)]="contentText" [ngModelOptions]="{standalone: true}"
-                    >{{loginList}}</textarea>
+                    rows="5" name="accountNumbers" [(ngModel)]="contentText" [ngModelOptions]="{standalone: true}"
+                    >{{accountNumbers}}</textarea>
                   </div>
                 </div>
 
-                <button class="btn btn-info" [disabled]="validateInfo()" type="button" (click)="sendFile()">Add {{sendType === 'Text' ? ' Note' : ' File'}}</button>
+                <button class="btn btn-info" [disabled]="isItemInfoInvalid()" type="button" (click)="sendItem()">Add {{sendType === 'Text' ? ' Note' : ' File'}}</button>
               </div>
             </div>
           </div>

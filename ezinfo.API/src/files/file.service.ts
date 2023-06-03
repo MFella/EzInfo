@@ -13,6 +13,7 @@ import { Sharing } from "./shared.entity";
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { DeleteItemResponse } from "src/types/deleteItemResponse";
 import { DeleteResult } from "typeorm/driver/mongodb/typings";
+import { FileInfo } from "../types/item/fileInfo";
 
 @Injectable()
 export class FileService {
@@ -32,13 +33,13 @@ export class FileService {
     this.s3Client = new S3Client({
       region: this.configService.get("AWS_REGION"),
       credentials: {
-        accessKeyId: this.configService.get("AWS_SECRET_ACCESS_KEY"),
-        secretAccessKey: this.configService.get("AWS_ACCESS_KEY_ID"),
+        accessKeyId: this.configService.get("AWS_ACCESS_KEY_ID"),
+        secretAccessKey: this.configService.get("AWS_SECRET_ACCESS_KEY"),
       },
     });
   }
 
-  async uploadFile(dataBuffer: Buffer, filename: string, user: User, body: any) {
+  async uploadFile(dataBuffer: Buffer, filename: string, user: User, fileInfo: FileInfo) {
     if (!user) {
       throw new HttpException("You are not allowed, or token expired ;c", 401);
     }
@@ -56,7 +57,7 @@ export class FileService {
 
       await this.s3Client.send(putObjectCommand);
 
-      const mixedBaseId = `${createdId}_${user.login}_${body.password}`;
+      const mixedBaseId = `${createdId}_${user.login}_${fileInfo.password}`;
 
       const hashed = await argon2.hash(mixedBaseId);
 
@@ -65,23 +66,23 @@ export class FileService {
         key: keyOfFile,
         login: user.login,
         filename: filename,
-        isRestricted: body.accessType === "Restricted" ? true : false, //false -> for everyone; true -> for some group of people
+        isRestricted: fileInfo.accessType === "Restricted" ? true : false, //false -> for everyone; true -> for some group of people
         passwordHash: hashed,
-        havePassword: body.password.length === 0 ? false : true, //false -> without additional info in password; true -> with additional info in password
+        havePassword: fileInfo.password.length === 0 ? false : true, //false -> without additional info in password; true -> with additional info in password
         itemType: "file",
       });
 
-      if (body.loginList.length !== 0) {
-        const logins = body.loginList.split(",");
-
-        for (let i = 0; i < logins.length; i++) {
-          const userFromDb = await this.usersRepository.findOne({ where: { login: logins[i] } });
+      if (fileInfo.accountNumbers.length !== 0) {
+        const accountNumbersList = fileInfo.accountNumbers.split(",").map((accountNumber: string) => accountNumber.trim());
+        console.log(accountNumbersList);
+        for (let i = 0; i < accountNumbersList.length; i++) {
+          const userFromDb = await this.usersRepository.findOne({ where: { accountNumber: accountNumbersList[i] } });
           if (userFromDb) {
             await this.sharingRepository.save({
               ownerId: user.id.toString(),
               authorizedUserId: userFromDb.id.toString(),
               entityId: createdId,
-              fileType: "file",
+              itemType: "file",
             });
           }
         }
@@ -91,6 +92,7 @@ export class FileService {
 
       return rest;
     } catch (e) {
+      console.log(e);
       throw new HttpException("Something went wrong ;/", 400);
     }
   }
@@ -111,6 +113,7 @@ export class FileService {
       delete el.key;
     });
 
+    const userId = user.id.toString();
     const sharedFilesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), itemType: "file" } });
 
     for (let i = 0; i < sharedFilesIdsFromDb.length; i++) {
@@ -164,7 +167,6 @@ export class FileService {
         const file = await this.s3Client.send(options);
         return file.Body;
       } catch (e) {
-        console.log(e);
         throw new HttpException("Error occured during download file", 500);
       }
     } else {
@@ -205,11 +207,11 @@ export class FileService {
         itemType: "note",
       });
 
-      if (textToSaveDto.loginList.length !== 0) {
-        const logArr = textToSaveDto.loginList.split(",");
+      if (textToSaveDto.accountNumbers.length !== 0) {
+        const accountNumberList = textToSaveDto.accountNumbers.split(",");
 
-        logArr.forEach(async el => {
-          const userFromDb = await this.usersRepository.findOne({ where: { login: el } });
+        accountNumberList.forEach(async accountNumber => {
+          const userFromDb = await this.usersRepository.findOne({ where: { accountNumber } });
 
           if (userFromDb) {
             await this.sharingRepository.save({
@@ -290,6 +292,7 @@ export class FileService {
 
     if (this.isItemNote(itemToProceed)) {
       const deleteResponse = await this.noteRepository.deleteOne({ itemId });
+      this.sharingRepository.deleteOne({ entityId: itemId });
       return this.getDeleteItemResponse(deleteResponse, "note");
     } else {
       const command = new DeleteObjectCommand({
@@ -299,6 +302,7 @@ export class FileService {
       await this.s3Client.send(command);
 
       const deleteResponse = await this.fileRepository.deleteOne({ itemId });
+      this.sharingRepository.deleteOne({ entityId: itemId });
 
       return this.getDeleteItemResponse(deleteResponse, "file");
     }
@@ -334,6 +338,7 @@ export class FileService {
 
     const sharedNotesIdsFromDb = await this.sharingRepository.find({ where: { authorizedUserId: user.id.toString(), itemType: "note" } });
 
+    console.log(sharedNotesIdsFromDb);
     for (let i = 0; i < sharedNotesIdsFromDb.length; i++) {
       const noteFromDb = await this.noteRepository.findOne({ where: { itemId: sharedNotesIdsFromDb[i].entityId, login: { $ne: user.login } } });
 

@@ -23,6 +23,7 @@ import { RealIP } from "nestjs-real-ip";
 import { Response } from "express";
 import { DeleteItemQuery } from "src/types/deleteItemQuery";
 import { DeleteItemResponse } from "src/types/deleteItemResponse";
+import { FileInfo } from "../types/item/fileInfo";
 
 @Controller("file")
 export class FileController {
@@ -33,7 +34,7 @@ export class FileController {
   @UseInterceptors(FileInterceptor("file"))
   @UseGuards(JwtAuthGuard)
   async uploadFile(
-    @Req() request: RequestWithUser,
+    @Req() request: RequestWithUser & FileInfo,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: FileController.UPLOAD_FILE_MAX_SIZE })],
@@ -41,7 +42,7 @@ export class FileController {
     )
     file: Express.Multer.File,
   ) {
-    const result = await this.fileServ.uploadFile(file.buffer, file.originalname, request.user, request.body);
+    const result = await this.fileServ.uploadFile(file.buffer, file.originalname, request.user, (request.body as unknown) as FileInfo);
     return { reached: true, result: result };
   }
 

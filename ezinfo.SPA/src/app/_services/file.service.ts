@@ -16,7 +16,7 @@ export class FileService {
     const formData = new FormData();
     formData.append('file', fileToSendDto.file);
     formData.append('accessType', fileToSendDto.accessType);
-    formData.append('loginList', fileToSendDto.loginList);
+    formData.append('accountNumbers', fileToSendDto.accountNumbers);
     formData.append('password', fileToSendDto.password);
 
     return this.http.post<any>(environment.backUrl + 'file/upload', formData);

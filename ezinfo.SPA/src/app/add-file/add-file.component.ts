@@ -18,6 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FileToSendDto } from '../dtos/fileToSendDto';
 import { TextToSendDto } from '../dtos/textToSendDto';
+import { ItemAccessType } from '../types/item/itemAccessType';
 import { AlertService } from '../_services/alert.service';
 import { FileService } from '../_services/file.service';
 
@@ -31,9 +32,9 @@ export class AddFileComponent implements OnInit {
 
   addFileInputLabel: string = 'Choose File';
 
-  accessType: string = 'Everyone';
+  accessType: ItemAccessType = 'Everyone';
   sendType: string = 'File';
-  loginList: string = '';
+  accountNumbers: string = '';
   contentText: string = '';
   withPassword: boolean = false;
   passwordValue: string = '';
@@ -65,7 +66,7 @@ export class AddFileComponent implements OnInit {
     });
   }
 
-  setAccessType(type: string) {
+  setAccessType(type: ItemAccessType) {
     this.accessType = type;
   }
 
@@ -74,52 +75,53 @@ export class AddFileComponent implements OnInit {
     this.addFileInputLabel = this.file?.name ?? 'Choose File';
   }
 
-  sendFile() {
-    if (!this.validateInfo()) {
-      if (this.sendType === 'File') {
-        const fileToSendDto: FileToSendDto = Object.assign(
-          {},
-          {
-            file: this.file as File,
-            accessType: this.accessType,
-            loginList: this.loginList,
-            password: this.fileForm.get('password')!.value.toString(),
-          }
-        );
-
-        this.fileServ.sendFile(fileToSendDto).subscribe(
-          () => {
-            this.alert.success('Saved correctly! See this in your infos!');
-            this.router.navigate(['']);
-          },
-          (err: HttpErrorResponse) => {
-            this.alert.error(`Some error occured: ${err.error?.message}`);
-          }
-        );
-      } else {
-        //else text
-        const textToSendDto: TextToSendDto = Object.assign(
-          {},
-          {
-            text: this.contentText,
-            accessType: this.accessType,
-            loginList: this.loginList,
-            password: this.fileForm.get('password')?.value,
-          }
-        );
-
-        this.fileServ.sendText(textToSendDto).subscribe(
-          (res) => {
-            this.alert.success('Saved correctly! See this in your strongbox!');
-            this.router.navigate(['']);
-          },
-          (err) => {
-            this.alert.error(`Error occured while saving note. Error: ${err}`);
-          }
-        );
-      }
-    } else {
+  sendItem() {
+    if (this.isItemInfoInvalid()) {
       this.alert.error('Data which you provided are invalid!');
+      return;
+    }
+
+    if (this.sendType === 'File') {
+      const fileToSendDto: FileToSendDto = Object.assign(
+        {},
+        {
+          file: this.file as File,
+          accessType: this.accessType,
+          accountNumbers: this.accountNumbers,
+          password: this.fileForm.get('password')!.value.toString(),
+        }
+      );
+
+      this.fileServ.sendFile(fileToSendDto).subscribe(
+        () => {
+          this.alert.success('Saved correctly! See this in your infos!');
+          this.router.navigate(['']);
+        },
+        (err: HttpErrorResponse) => {
+          this.alert.error(`Some error occured: ${err.error?.message}`);
+        }
+      );
+    } else {
+      //else text
+      const textToSendDto: TextToSendDto = Object.assign(
+        {},
+        {
+          text: this.contentText,
+          accessType: this.accessType,
+          accountNumbers: this.accountNumbers,
+          password: this.fileForm.get('password')?.value,
+        }
+      );
+
+      this.fileServ.sendText(textToSendDto).subscribe(
+        (res) => {
+          this.alert.success('Saved correctly! See this in your strongbox!');
+          this.router.navigate(['']);
+        },
+        (err) => {
+          this.alert.error(`Error occured while saving note. Error: ${err}`);
+        }
+      );
     }
   }
 
@@ -132,7 +134,7 @@ export class AddFileComponent implements OnInit {
     this.withPassword = !this.withPassword;
   }
 
-  validateInfo() {
+  isItemInfoInvalid(): boolean {
     if (this.sendType === 'File' && this.file === null) {
       return true;
     }
