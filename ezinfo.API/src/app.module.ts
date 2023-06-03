@@ -15,6 +15,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
   imports: [
     UsersModule,
     ConfigModule.forRoot({
+      isGlobal: true,
       validationSchema: Joi.object({
         MONGODB_HOST: Joi.string().required(),
         MONGODB_PORT: Joi.number().required(),

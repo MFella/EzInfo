@@ -1,5 +1,5 @@
 {
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
-  "entryFile": "ezinfo.API/src/main"
+  "entryFile": "src/main"
 }

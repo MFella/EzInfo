@@ -10,7 +10,7 @@ services:
       context: ./ezinfo.API
       dockerfile: Dockerfile-dev
     ports:
-      - '3090:3090'
+      - '3000:3000'
     container_name: ezinfo-api
     networks:
       - app-tier
@@ -18,7 +18,7 @@ services:
       - ./ezinfo.API:/usr/src/app/ezinfo.API
       - /usr/src/app/ezinfo.API/node_modules
     depends_on:
-      - db
+      - mongodb
   ezinfo-spa:
     build:
       context: ./ezinfo.SPA
@@ -31,26 +31,22 @@ services:
     volumes:
       - ./ezinfo.SPA:/usr/src/app/ezinfo.SPA
       - /usr/src/app/ezinfo.SPA/node_modules
-  db:
-    image: mysql
+  mongodb:
+    image: mongo:6-jammy
     restart: always
     container_name: ezinfo_db
     networks:
       - app-tier
     #command: --init-file /data/application/init.sql
     environment:
-      MYSQL_TCP_PORT: '3320'
-      MYSQL_DATABASE: 'ezinfo'
-      MONGODB_USER: 'root'
-      MONGODB_PASSWORD: 'root'
-      MYSQL_ROOT_PASSWORD: 'root'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MONGO_INITDB_DATABASE: 'ezinfo'
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: 'root'
     ports:
-      - '3320:3320'
+      - '27017:27017'
     expose:
-      - '3320'
+      - '27017'
     volumes:
-      - 'ezinfo-db:/var/lib/mysql'
-      - ./init.sql:/data/application/init.sql
+      - 'ezinfo-db:/var/lib/mongodb'
 volumes:
   ezinfo-db:

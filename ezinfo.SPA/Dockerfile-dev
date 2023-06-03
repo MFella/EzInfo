@@ -1,10 +1,10 @@
-FROM node:10
+FROM node:latest
 
 WORKDIR /usr/src/app/ezinfo.SPA
 
 COPY package*.json ./
 
-RUN npm install -g @angular/cli @angular-devkit/build-angular && npm install
+RUN npm install -g @angular/cli @angular-devkit/build-angular && npm install --force
 
 EXPOSE 4200
 

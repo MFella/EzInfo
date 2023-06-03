@@ -1,10 +1,10 @@
-FROM node:10
+FROM node:18-alpine
 
 WORKDIR /usr/src/app/ezinfo.API
 
 COPY package*.json ./
 
-RUN npm install && npm i -g @nestjs/cli
+RUN npm ci && npm i -g @nestjs/cli
 
 EXPOSE 3090
 

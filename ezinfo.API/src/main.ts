@@ -3,7 +3,6 @@ import { AppModule } from "./app.module";
 import * as dotenv from "dotenv";
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { config } from "aws-sdk";
 import * as cookieParser from "cookie-parser";
 import * as fs from "fs";
 import * as csurf from "csurf";
@@ -45,12 +44,6 @@ async function bootstrap() {
       reportOnly: true,
     }),
   );
-
-  config.update({
-    accessKeyId: configService.get("AWS_ACCESS_KEY_ID"),
-    secretAccessKey: configService.get("AWS_SECRET_ACCESS_KEY"),
-    region: configService.get("AWS_REGION"),
-  });
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,

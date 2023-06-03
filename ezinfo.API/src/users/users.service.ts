@@ -21,11 +21,12 @@ export class UsersService {
 
   public async checkIfExists(login: string) {
     try {
-      const user = await this.usersRepository.findOneBy({ login });
+      const user = await this.usersRepository.findOne({ where: { login } });
       if (user) {
         return { available: false };
       } else return { available: true };
     } catch (e) {
+      console.log(e);
       throw new HttpException("Something went wrong", 500);
     }
   }
@@ -77,7 +78,7 @@ export class UsersService {
   }
 
   async ifUserExists(login: string) {
-    const hipoUser = await this.usersRepository.findBy({ login: login });
+    const hipoUser = await this.usersRepository.find({ where: { login: login } });
 
     if (hipoUser.length === 0) {
       return true;

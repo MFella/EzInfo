@@ -17,13 +17,11 @@ export class UsersController {
   @Get(":id")
   async find(@Param("login") login: string): Promise<User> {
     return this.userServ.findByLogin(login);
-    //return this.userServ.find(id);
   }
 
   @Post()
   create(@Body() user: UserForCreationDto) {
     this.userServ.create(user);
-    //return this.authServ.register(user);
   }
 
   @Get("/exists/:login")
@@ -33,7 +31,6 @@ export class UsersController {
 
   @Put()
   update(@Body() user: User) {
-    //this.userServ.update(user);
     throw new InternalServerErrorException("Not implemented yet");
   }
 
