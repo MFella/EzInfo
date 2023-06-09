@@ -1,10 +1,16 @@
 FROM node:18-alpine
 
-WORKDIR /user/src/app
+WORKDIR /usr/src/app/ezinfo.API
 
-COPY . .
+RUN chown -R root .
 
-RUN npm ci
+COPY --chown=node:node package*.json ./
+
+COPY --chown=node:node tsconfig.json ./
+
+# COPY --chown=node:node . .
+
+RUN npm ci --omit=dev && npm i -g @nestjs/cli
 
 RUN npm run build
 

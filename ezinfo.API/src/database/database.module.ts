@@ -22,6 +22,7 @@ import { Attempt } from "src/auth/attempt.entity";
         database: configService.get("MONGODB_DB"),
         synchronize: true,
         autoLoadEntities: true,
+        // todo: uncomment for docker-container access
         // authSource: "admin",
         entities: [File, User, Attempt, ForgotPassword, Note, Sharing],
       }),

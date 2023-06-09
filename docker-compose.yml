@@ -8,7 +8,7 @@ services:
   ezinfo-api:
     build:
       context: ./ezinfo.API
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile-prod
     ports:
       - '3000:3000'
     container_name: ezinfo-api
@@ -22,7 +22,7 @@ services:
   ezinfo-spa:
     build:
       context: ./ezinfo.SPA
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile-prod
     ports:
       - '4201:4201'
     expose:
@@ -37,7 +37,6 @@ services:
     container_name: ezinfo_db
     networks:
       - app-tier
-    #command: --init-file /data/application/init.sql
     environment:
       MONGO_INITDB_DATABASE: 'ezinfo'
       MONGO_INITDB_ROOT_USERNAME: 'root'
