@@ -17,6 +17,8 @@ RUN npm run build --prod
 FROM nginx:latest
 
 COPY --from=builder /usr/src/app/ezinfo.SPA/dist/ezinfo-app /usr/share/nginx/html
+COPY --from=builder /usr/src/app/ezinfo.SPA/ssl /usr/share/nginx/ssl
 COPY --from=builder /usr/src/app/ezinfo.SPA/nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 90
+EXPOSE 4201
+EXPOSE 443

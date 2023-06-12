@@ -23,7 +23,7 @@ import { Attempt } from "src/auth/attempt.entity";
         synchronize: true,
         autoLoadEntities: true,
         // todo: uncomment for docker-container access
-        // authSource: "admin",
+        authSource: "admin",
         entities: [File, User, Attempt, ForgotPassword, Note, Sharing],
       }),
     }),

@@ -17,6 +17,7 @@ services:
     volumes:
       - ./ezinfo.API:/usr/src/app/ezinfo.API
       - /usr/src/app/ezinfo.API/node_modules
+      - /usr/src/app/ezinfo.API/dist
     depends_on:
       - mongodb
   ezinfo-spa:
@@ -24,9 +25,11 @@ services:
       context: ./ezinfo.SPA
       dockerfile: Dockerfile-prod
     ports:
-      - '4201:4201'
+      - '4201:443'
+      - '443:443'
     expose:
       - '4201'
+      - '443'
     container_name: ezinfo-spa
     volumes:
       - ./ezinfo.SPA:/usr/src/app/ezinfo.SPA
