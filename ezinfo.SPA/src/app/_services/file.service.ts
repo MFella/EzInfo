@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FileToSendDto } from '../dtos/fileToSendDto';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 import { TextToSendDto } from '../dtos/textToSendDto';
 import { Observable } from 'rxjs';
 import { Note } from '../types/item/note';

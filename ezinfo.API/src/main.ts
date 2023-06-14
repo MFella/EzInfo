@@ -20,14 +20,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     httpsOptions,
   });
-  app.enableCors({
-    origin: ["https://localhost:4201", "https://localhost:4200"],
-    credentials: true,
-  });
 
   app.useGlobalPipes(new ValidationPipe());
 
   const configService = app.get(ConfigService);
+
+  const frontendCorsOrigin: string = `https://${configService.getOrThrow<string>("FRONTEND_HOST")}:${configService.getOrThrow<string>("FRONTEND_PORT")}`;
+
+  app.enableCors({
+    origin: [frontendCorsOrigin],
+    credentials: true,
+  });
 
   app.use(cookieParser(configService.get("COOKIE_SECRET")));
 
@@ -37,7 +40,6 @@ async function bootstrap() {
     helmet.contentSecurityPolicy({
       directives: {
         defaultSrc: ["'self'"],
-        // scriptSrc: ["'self'", "example.com"],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
       },
