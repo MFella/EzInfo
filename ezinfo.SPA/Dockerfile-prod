@@ -9,7 +9,7 @@ COPY package*.json ./
 
 COPY . /usr/src/app/ezinfo.SPA/
 
-RUN npm ci --omit=dev --force && npm install --save-dev @angular/cli@latest @angular-devkit/build-angular --force
+RUN npm ci --omit=dev --force && npm install --save-dev @angular/cli@16.0.1 @angular-devkit/build-angular@16.0.1 --force
 
 RUN npm run build --prod
 
