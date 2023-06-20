@@ -133,9 +133,8 @@ export class AuthService {
 
       if (saveRes[0]) {
         const frontendHostName: string = this.configServ.getOrThrow<string>("FRONTEND_HOST");
-        const frontendPort: number = this.configServ.getOrThrow<number>("FRONTEND_PORT");
         const mailUserAddress: string = this.configServ.getOrThrow<string>("MAIL_USER");
-        const link = `https://${frontendHostName}:${frontendPort}/reset?token=${saveRes[1]}`;
+        const link = `https://${frontendHostName}/reset?token=${saveRes[1]}`;
 
         const result = await this.mailService.sendMail({
           from: mailUserAddress,
