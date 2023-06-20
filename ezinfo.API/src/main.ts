@@ -26,7 +26,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const frontendCorsOrigin: string = `https://${configService.getOrThrow<string>("FRONTEND_HOST")}:${configService.getOrThrow<string>("FRONTEND_PORT")}`;
-  const frontendDefaultOrigin: string = `https://${configService.getOrThrow<string>("FRONTEND_HOST")}:80`;
+  const frontendDefaultOrigin: string = `https://${configService.getOrThrow<string>("FRONTEND_HOST")}`;
   app.enableCors({
     origin: [frontendDefaultOrigin, frontendCorsOrigin],
     credentials: true,
